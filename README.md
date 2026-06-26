@@ -1,36 +1,148 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⬢ NexusForge
 
-## Getting Started
+> Forge your freelance business.
 
-First, run the development server:
+NexusForge is a modern SaaS platform built to help freelancers organize every aspect of their business—from managing clients and projects to generating invoices and tracking productivity—all from one beautiful workspace.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Overview
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Freelancers often juggle multiple tools for managing clients, projects, notes, invoices, and deadlines.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+NexusForge brings everything together into one intuitive workspace, allowing freelancers to spend less time managing work and more time creating value.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 👥 Client Management
+- Add, edit and archive clients
+- Store contact information
+- Track client history
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 📁 Project Management
+- Create projects
+- Track project status
+- Set deadlines
+- Organize project details
 
-## Deploy on Vercel
+### 📝 Notes
+- Rich text editor
+- Organize project notes
+- Personal workspace
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 💰 Invoice Generator
+- Generate professional invoices
+- Track payment status
+- Download invoices as PDF
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 📊 Dashboard
+- Active projects
+- Total clients
+- Revenue overview
+- Recent activity
+
+### 🔐 Authentication
+- Secure sign up
+- Secure sign in
+- Protected routes
+- Session management
+
+### ⚙️ Settings
+- Update profile
+- Account preferences
+- Workspace customization
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+
+### Backend
+- Next.js Route Handlers
+- Server Actions
+
+### Database
+- PostgreSQL
+- Drizzle ORM
+
+### Authentication
+- Better Auth
+
+### Deployment
+- Vercel
+- Neon PostgreSQL
+
+---
+
+## 🗺 Roadmap
+
+### Version 1.0
+- [x] Landing Page
+- [ ] Authentication
+- [ ] Dashboard
+- [ ] Client Management
+- [ ] Project Management
+- [ ] Notes
+- [ ] Invoice Generator
+- [ ] Settings
+
+### Version 1.5
+- [ ] File Uploads
+- [ ] Calendar
+- [ ] Notifications
+- [ ] Analytics
+
+### Version 2.0
+- [ ] Team Collaboration
+- [ ] Member Invitations
+- [ ] Roles & Permissions
+
+### Version 3.0
+- [ ] Real-Time Collaboration
+- [ ] Live Comments
+- [ ] Presence Indicators
+- [ ] Live Editing
+
+---
+
+## 🎯 Vision
+
+NexusForge aims to become the all-in-one operating system for freelancers by providing professional tools in one seamless workspace.
+
+Instead of switching between multiple applications, freelancers can manage their entire workflow from a single platform.
+
+---
+
+## 📸 Preview
+
+Coming Soon...
+
+---
+
+## 🤝 Contributing
+
+Contributions, feature requests and feedback are always welcome.
+
+If you'd like to contribute, feel free to fork the repository and submit a pull request.
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 👨‍💻 Author
+
+Built with ❤️ by **Iam Savage**
+
+> "Forge your future, one project at a time."
