@@ -143,6 +143,6 @@ This project is licensed under the MIT License.
 
 ## 👨‍💻 Author
 
-Built with ❤️ by **Iam Savage**
+Built with ❤️ by **CodeXSavage**
 
 > "Forge your future, one project at a time."

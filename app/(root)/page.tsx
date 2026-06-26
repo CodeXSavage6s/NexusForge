@@ -126,7 +126,7 @@ const Home = () => {
           <h2>
             Everything you need to run
             <br />
-            your <span className="text-blue-400">freelancing business</span>
+            your <span className="text-blue-500">freelancing business</span>
           </h2>
         </article>
 
@@ -273,7 +273,7 @@ const Home = () => {
       <footer className="border-t px-4 py-8">
         <div className="flex flex-col md:flex-row md:justify-between gap-8 max-w-4xl mx-auto">
           <div className="max-w-xs">
-            <Image src="/assets/logo.svg" width={120} height={32} alt="NexusForge" />
+            <Image src="/assets/logo.svg" width={150} height={40} alt="NexusForge" />
             <p className="text-[12px] text-gray-500 mt-2">
               The all-in-one workspace for freelancers to manage clients, projects, and payments.
             </p>
