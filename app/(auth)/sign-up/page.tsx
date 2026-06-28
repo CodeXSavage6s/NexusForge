@@ -4,7 +4,9 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import InputField from "@/components/form/InputField";
 import FooterLink from '@/components/form/FooterLink'
+
 import { SignUpFormData } from "@/types/form";
+import { signUp } from '@/lib/actions/auth'
 
 const SignUp = () => {
   const {
@@ -14,7 +16,11 @@ const SignUp = () => {
     formState: { errors, isSubmitting },
   } = useForm<SignUpFormData>();
 
-  const onSubmit = (data: SignUpFormData) => {
+  const onSubmit = async (data: SignUpFormData) => { 
+    const response = await signUp(data)
+    if (response.success) {
+      console.log("sign up success")
+    }
     console.log(data);
   };
 
@@ -91,7 +97,7 @@ const SignUp = () => {
               }}
             />
   
-            <Button type="submit" className="w-full h-[45px]" disabled={isSubmitting}>
+            <Button type="submit" className="w-full h-[45px] text-xl font-semibold" disabled={isSubmitting}>
               {isSubmitting ? "Creating account..." : "Sign up"}
             </Button>
           </form>

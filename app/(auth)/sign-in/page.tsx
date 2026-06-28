@@ -5,15 +5,23 @@ import { Button } from "@/components/ui/button";
 import InputField from "@/components/form/InputField";
 import FooterLink from '@/components/form/FooterLink'
 import { SignInFormData } from "@/types/form";
+import { signIn } from '@/lib/actions/auth'
+import { useRouter } from 'next/navigation'
+
 
 const SignIn = () => {
+  const router = useRouter()
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<SignInFormData>();
 
-  const onSubmit = (data: SignInFormData) => {
+  const onSubmit = async (data: SignInFormData) => {
+    const response = await signIn(data)
+    if (response.success) {
+      router.push("/")
+    }
     console.log(data);
   };
 
@@ -61,7 +69,7 @@ const SignIn = () => {
               }}
             />
   
-            <Button type="submit" className="w-full h-[45px] text-2xl font-semibold" disabled={isSubmitting}>
+            <Button type="submit" className="w-full h-[45px] text-xl font-semibold" disabled={isSubmitting}>
               {isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
           </form>
