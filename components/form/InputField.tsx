@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldValues } from "react-hook-form";
-//import { FormInputPops } from "@/types/form";
+import { FormInputProps } from "@/types/global";
 
 const InputField = <T extends FieldValues>({
   name,
@@ -13,7 +13,7 @@ const InputField = <T extends FieldValues>({
   disabled,
   value,
   error,
-}: FormInputPops<T>) => {
+}: FormInputProps) => {
   return (
     <div>
       <Label htmlFor={name} className="mb-2">{label}</Label>
