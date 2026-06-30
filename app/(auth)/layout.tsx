@@ -24,7 +24,7 @@ const Layout = async ({ children } : {
             <div className="flex">
             {
               [1, 2, 3, 4, 5].map(star => (
-              <Image src="/assets/star.svg" width={25} height={25} alt="" aria-hidden="true" />
+              <Image key={star} src="/assets/star.svg" width={25} height={25} alt="" aria-hidden="true" />
               ))
             }
             </div>
