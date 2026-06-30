@@ -7,9 +7,10 @@ import FooterLink from '@/components/form/FooterLink'
 import { SignInFormData } from "@/types/form";
 import { signIn } from '@/lib/actions/auth'
 import { useRouter } from 'next/navigation'
-
+import { useState } from 'react'
 
 const SignIn = () => {
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const {
     register,
@@ -18,12 +19,17 @@ const SignIn = () => {
   } = useForm<SignInFormData>();
 
   const onSubmit = async (data: SignInFormData) => {
-    const response = await signIn(data)
-    if (response.success) {
-      router.push("/")
-    }
-    console.log(data);
-  };
+  setError(null)
+  const response = await signIn(data)
+  console.log("RESPONSE:", response)        // add this
+  console.log("ERROR VALUE:", response.error) // and this
+  if (response.success) {
+    setError(null)
+    router.push("/")
+  } else {
+    setError(response.error)
+  }
+};
 
   return (
     <div className="flex flex-col px-4">
@@ -34,8 +40,13 @@ const SignIn = () => {
             Enter your email and password to continue
           </p>
         </div>
-        
+
         <div>
+          {error && (
+            <div className="text-center text-red-500 font-semibold mb-2">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <InputField
               name="email"
@@ -52,7 +63,7 @@ const SignIn = () => {
                 },
               }}
             />
-  
+
             <InputField
               name="password"
               label="Password"
@@ -68,13 +79,13 @@ const SignIn = () => {
                 },
               }}
             />
-  
+
             <Button type="submit" className="w-full h-[45px] text-xl font-semibold" disabled={isSubmitting}>
               {isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
           </form>
         </div>
-        <FooterLink 
+        <FooterLink
           text="Don't have an account?"
           linkText="Sign-Up"
           href="/sign-up"
