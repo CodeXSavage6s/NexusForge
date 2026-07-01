@@ -21,13 +21,11 @@ const SignIn = () => {
   const onSubmit = async (data: SignInFormData) => {
   setError(null)
   const response = await signIn(data)
-  console.log("RESPONSE:", response)        // add this
-  console.log("ERROR VALUE:", response.error) // and this
-  if (response.success) {
-    setError(null)
-    router.push("/")
-  } else {
+  if (response?.error) {
     setError(response.error)
+  } else {
+    setError(null)
+    router.push("/dashboard")
   }
 };
 
@@ -43,7 +41,7 @@ const SignIn = () => {
 
         <div>
           {error && (
-            <div className="text-center text-red-500 font-semibold mb-2">
+            <div role="alert" aria-live="polite" className="text-center text-red-500 font-semibold mb-2">
               {error}
             </div>
           )}

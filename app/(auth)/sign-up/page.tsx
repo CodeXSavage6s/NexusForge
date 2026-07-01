@@ -7,8 +7,13 @@ import FooterLink from '@/components/form/FooterLink'
 
 import { SignUpFormData } from "@/types/form";
 import { signUp } from '@/lib/actions/auth'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 const SignUp = () => {
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
+  
   const {
     register,
     handleSubmit,
@@ -17,12 +22,20 @@ const SignUp = () => {
   } = useForm<SignUpFormData>();
 
   const onSubmit = async (data: SignUpFormData) => { 
-    const response = await signUp(data)
-    if (response.success) {
-      console.log("sign up success")
-    }
-    console.log(data);
-  };
+  setError(null);
+  
+  const response = await signUp(data);
+  
+  console.log("signUp response:", response); 
+
+  if (!response.success) {
+    setError(response.error || "Something went wrong");
+    return; // ← stop here, don't redirect
+  }
+  
+  setError(null);
+  router.push("/dashboard");
+};
 
   return (
     <div className="flex flex-col px-4">
@@ -35,6 +48,11 @@ const SignUp = () => {
         </div>
 
         <div>
+          {error && (
+            <div role="alert" aria-live="polite" className="text-center text-red-500 font-semibold mb-2">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <InputField
               name="name"

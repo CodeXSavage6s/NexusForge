@@ -1,4 +1,4 @@
-"use server";
+import "server-only";
 
 import nodemailer from "nodemailer";
 
@@ -8,16 +8,21 @@ export async function sendEmail({ to, subject, text, html }: {
   text?: string;
   html?: string;
 }) {
+  const { SMTP_USER, SMTP_PASS, FROM_EMAIL } = process.env;
+    if (!SMTP_USER || !SMTP_PASS || !FROM_EMAIL) {
+      throw new Error("Missing SMTP_USER, SMTP_PASS, or FROM_EMAIL");
+    }
+  
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: SMTP_USER,
+      pass: SMTP_PASS,
     },
   });
 
   await transporter.sendMail({
-    from: process.env.FROM_EMAIL,
+    from: FROM_EMAIL,
     to,
     subject,
     text,

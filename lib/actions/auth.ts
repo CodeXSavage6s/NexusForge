@@ -1,31 +1,49 @@
 "use server"
 
-import {auth} from '@/lib/better-auth/auth'
+import { auth } from '@/lib/better-auth/auth'
 import { headers } from 'next/headers'
+import db from "@/database/index";
+import { user } from "@/database/schema/auth-schema";
+import { eq } from "drizzle-orm";
 
-export async function signUp ({ name, email, password }) {
+export async function signUp({ name, email, password }: { name: string; email: string; password: string }) {
+
+  const existing = await db.select().from(user).where(eq(user.email, email)).limit(1);
+  if (existing.length > 0) {
+    return { success: false as const, error: "An account with this email already exists" };
+  }
+
   try {
-    const data = await auth.api.signUpEmail({ 
-      body: { name, email, password, callBackUrl: "/dashboard", },
-});
-  
-  return { success: true, data };
-  } catch(err) {
+    const data = await auth.api.signUpEmail({
+      body: { name, email, password },
+      headers: await headers(),
+    });
+    
+    console.log("SignUp success:", data);
+    return { success: true as const, data };
+  } catch (err: any) {
     console.error("Sign Up Failed", err);
-    return { success: false, error: err?.body?.message || "Sign-Up Failed" };
+    
+    const message = err?.message || err?.body?.message || "Sign-Up Failed";
+    return { success: false as const, error: message };
   }
 }
 
-export async function signIn({ email, password }) {
+export async function signIn({ email, password }: { email: string; password: string }) {
   try {
     const data = await auth.api.signInEmail({
       body: { email, password },
       headers: await headers(),
     });
-    return { success: true as const };
+    return { success: true as const, data };
   } catch (err: any) {
-    const message = err?.body?.message ?? "Failed to sign in"
-    return { success: false as const, error: String(message) };
+    console.error("Sign In Failed", err);
+    
+    const message = err?.message || err?.body?.message || "Failed to sign in";
+    return {
+      success: false as const,
+      error: message,
+    };
   }
 }
 
@@ -33,9 +51,11 @@ export async function signOut() {
   try {
     await auth.api.signOut({
       headers: await headers(),
-});
-    console.log("signed out")
-  } catch(err) {
-    console.error("sign out failed", err)
+    });
+    console.log("signed out");
+    return { success: true as const };
+  } catch (err: any) {
+    console.error("sign out failed", err);
+    return { success: false as const, error: err?.message || "Sign out failed" };
   }
 }
