@@ -33,7 +33,7 @@ const Home = () => {
   return (
     <div>
       {/* Header */}
-      <header className="header flex items-center justify-between px-4 py-3 border-b">
+      <header className="header flex items-center justify-between px-4 py-3 border-b z-50">
         <Link href="/dashboard" className="flex items-center">
           <Image src="/assets/logo.svg" width={170} height={60} alt="NexusForge" />
         </Link>
@@ -57,11 +57,11 @@ const Home = () => {
 
       {/* Hero */}
       <section className="flex flex-col items-center text-center px-4">
-        <div className="light-blue-bg text-blue-600 rounded-full px-2 py-1 text-[9px] font-medium w-fit my-4 border border-blue-200">
+        <div className="load-fade-up light-blue-bg text-blue-600 rounded-full px-2 py-1 text-[9px] font-medium w-fit my-4 border border-blue-200">
           + All-in-one workspace for freelancers
         </div>
 
-        <article>
+        <article className="load-fade-up delay-1">
           <h1 className="h1">
             Manage Clients,
             <br />
@@ -74,20 +74,20 @@ const Home = () => {
           </p>
         </article>
 
-        <div className="flex flex-col gap-2 my-4 w-full max-w-sm">
-          <Button className="blue-btn">
+        <div className="load-fade-up delay-2 flex flex-col gap-2 my-4 w-full max-w-sm">
+          <Button className="blue-btn btn-press">
             <Link href="/sign-up" className="w-full">
               Get Started &ndash; It&apos;s Free
             </Link>
           </Button>
-          <Button className="black-btn" variant="outline">
+          <Button className="black-btn btn-press" variant="outline">
             <Link href="/demo" className="w-full">
               View Demo
             </Link>
           </Button>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px] text-gray-500 mb-6">
+        <div className="load-fade-up delay-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px] text-gray-500 mb-6">
           <span>No credit card required</span>
           <span>Free forever plan</span>
           <span>Cancel anytime</span>
@@ -96,7 +96,7 @@ const Home = () => {
 
       {/* Problem */}
       <section className="bg-card px-4 py-8">
-        <article className="text-center">
+        <article className="scroll-fade-up text-center">
           <h2>
             Freelancing is hard enough,
             <br />
@@ -107,11 +107,11 @@ const Home = () => {
           </p>
         </article>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-5">
+        <div className="scroll-stagger grid grid-cols-2 sm:grid-cols-4 gap-3 my-5">
           {problems.map((pro) => (
             <div
               key={pro}
-              className="flex flex-col justify-between gap-3 bg-popover p-3 rounded-lg shadow-sm shadow-muted-foreground transition-shadow hover:shadow-md"
+              className="hover-lift flex flex-col justify-between gap-3 bg-popover p-3 rounded-lg shadow-sm shadow-muted-foreground transition-shadow hover:shadow-md"
             >
               <Image src="/svgs/icon-cross.svg" width={24} height={24} alt="" />
               <p className="text-[12px] font-bold">{pro}</p>
@@ -122,7 +122,7 @@ const Home = () => {
 
       {/* Features */}
       <section id="features" className="px-4 py-8">
-        <article className="text-center">
+        <article className="scroll-fade-up text-center">
           <h2>
             Everything you need to run
             <br />
@@ -145,7 +145,7 @@ const Home = () => {
               {page.map((fea) => (
                 <div
                   key={fea.title}
-                  className="flex flex-col justify-evenly bg-card rounded-lg text-center items-center p-2"
+                  className="hover-lift flex flex-col justify-evenly bg-card rounded-lg text-center items-center p-2"
                 >
                   <Image src={fea.path} width={30} height={30} alt={fea.title} />
                   <strong>{fea.title}</strong>
@@ -172,11 +172,11 @@ const Home = () => {
         )}
 
         {/* Static grid: medium screens and up */}
-        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-3 my-4">
+        <div className="scroll-stagger hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-3 my-4">
           {features.map((fea) => (
             <div
               key={fea.title}
-              className="flex flex-col justify-evenly bg-card rounded-lg text-center items-center p-3"
+              className="hover-lift flex flex-col justify-evenly bg-card rounded-lg text-center items-center p-3"
             >
               <Image src={fea.path} width={30} height={30} alt={fea.title} />
               <strong className="mt-2">{fea.title}</strong>
@@ -188,9 +188,9 @@ const Home = () => {
 
       {/* How It Works */}
       <section className="px-4 py-10 text-center">
-        <h2>How NexusForge Works</h2>
+        <h2 className="scroll-fade-up">How NexusForge Works</h2>
 
-        <div className="flex md:flex-row md:justify-center md:items-start gap-6 md:gap-4 mt-6 max-w-3xl mx-auto">
+        <div className="scroll-stagger flex md:flex-row md:justify-center md:items-start gap-6 md:gap-4 mt-6 max-w-3xl mx-auto">
           {steps.map((step, index) => (
             <div key={step.number} className="flex flex-col items-center gap-4 md:gap-2 md:flex-1 text-center">
               <div className="flex items-center w-full md:w-auto md:flex-col">
@@ -212,14 +212,14 @@ const Home = () => {
 
       {/* Pricing */}
       <section id="pricing" className="bg-card px-4 py-10 text-center">
-        <h2>Simple, transparent pricing</h2>
-        <p className="text-sm text-gray-500 mt-2">Start free and upgrade when you&apos;re ready.</p>
+        <h2 className="scroll-fade-up">Simple, transparent pricing</h2>
+        <p className="scroll-fade-up text-sm text-gray-500 mt-2">Start free and upgrade when you&apos;re ready.</p>
 
-        <div className="flex flex-col md:flex-row justify-center gap-4 mt-6 max-w-2xl mx-auto">
+        <div className="scroll-stagger flex flex-col md:flex-row justify-center gap-4 mt-6 max-w-2xl mx-auto">
           {pricingPlans.map((plan) => (
             <div
               key={plan.name}
-              className={`flex-1 text-left bg-popover rounded-xl p-5 border ${
+              className={`hover-lift flex-1 text-left bg-popover rounded-xl p-5 border ${
                 plan.highlighted ? 'border-blue-300 shadow-sm' : 'border-muted-foreground/20'
               }`}
             >
@@ -258,10 +258,10 @@ const Home = () => {
 
       {/* CTA */}
       <section className="px-4 py-8">
-        <div className="bg-card rounded-xl p-5 flex flex-col items-center text-center gap-3 max-w-2xl mx-auto">
+        <div className="scroll-scale bg-card rounded-xl p-5 flex flex-col items-center text-center gap-3 max-w-2xl mx-auto">
           <p className="font-bold">Ready to organize your freelance business?</p>
           <Link href="/sign-up" className="w-full max-w-xs">
-            <Button className="blue-btn w-full">Get Started &ndash; It&apos;s Free</Button>
+            <Button className="blue-btn btn-press w-full">Get Started &ndash; It&apos;s Free</Button>
           </Link>
           <p className="text-[11px] text-gray-500">
             No credit card required &middot; Free forever plan &middot; Cancel anytime
@@ -270,7 +270,7 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t px-4 py-8">
+      <footer className="scroll-fade border-t px-4 py-8">
         <div className="flex flex-col md:flex-row md:justify-between gap-8 max-w-4xl mx-auto">
           <div className="max-w-xs">
             <Image src="/assets/logo.svg" width={150} height={40} alt="NexusForge" />

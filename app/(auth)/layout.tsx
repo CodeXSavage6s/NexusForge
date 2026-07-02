@@ -5,8 +5,8 @@ const Layout = async ({ children } : {
   children : React.ReactNode
 }) => {
   return (
-      <main className="flex flex-col justify-between min-h-screen relative">
-      <section className="flex-1 flex flex-col">
+      <main className="flex flex-col justify-between min-h-screen relative lg:flex-row">
+      <section className="flex-1 flex flex-col lg:sticky lg:top-0 lg:min-h-screen">
         <div className="mb-2">
           <Link href="/">
             <Image src="/assets/logo.svg" width={250} height={100} alt="NexusForge Logo" />
@@ -14,6 +14,7 @@ const Layout = async ({ children } : {
         </div>
           <div className="flex-1 overflow-auto">{children}</div>
       </section>
+      
       <section className="bg-card">
         <div className="z-10 relative text-gray-400 text-md font-serif font-semibold bg-card p-2 mb-3 flex flex-col gap-2">
           <blockquote className="">
@@ -24,7 +25,7 @@ const Layout = async ({ children } : {
             <div className="flex">
             {
               [1, 2, 3, 4, 5].map(star => (
-              <Image src="/assets/star.svg" width={25} height={25} alt="" aria-hidden="true" />
+              <Image key={star} src="/assets/star.svg" width={25} height={25} alt="" aria-hidden="true" />
               ))
             }
             </div>

@@ -4,11 +4,16 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import InputField from "@/components/form/InputField";
 import FooterLink from '@/components/form/FooterLink'
-
 import { SignUpFormData } from "@/types/form";
 import { signUp } from '@/lib/actions/auth'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import GoogleAuth from '@/components/form/GoogleAuth'
 
 const SignUp = () => {
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
+  
   const {
     register,
     handleSubmit,
@@ -17,12 +22,20 @@ const SignUp = () => {
   } = useForm<SignUpFormData>();
 
   const onSubmit = async (data: SignUpFormData) => { 
-    const response = await signUp(data)
-    if (response.success) {
-      console.log("sign up success")
-    }
-    console.log(data);
-  };
+  setError(null);
+  
+  const response = await signUp(data);
+  
+  console.log("signUp response:", response); 
+
+  if (!response.success) {
+    setError(response.error || "Something went wrong");
+    return; // ← stop here, don't redirect
+  }
+  
+  setError(null);
+  router.push("/dashboard");
+};
 
   return (
     <div className="flex flex-col px-4">
@@ -35,6 +48,11 @@ const SignUp = () => {
         </div>
 
         <div>
+          {error && (
+            <div role="alert" aria-live="polite" className="text-center text-red-500 font-semibold mb-2">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <InputField
               name="name"
@@ -101,6 +119,17 @@ const SignUp = () => {
               {isSubmitting ? "Creating account..." : "Sign up"}
             </Button>
           </form>
+          <div className="flex flex-col gap-2 w-full my-2">
+            <div className="flex gap-2 justify-around items-center">
+              <hr className="bg-foreground) border-t border-white flex-1"/>
+              <p className="">Or</p>
+              <hr className="bg-foreground border-t border-white flex-1"/>
+            </div>
+            <GoogleAuth
+            className="w-full h-[45px] text-xl font-semibold"
+            auth="sign-up" />
+          </div>
+          
         </div>
         <FooterLink 
           text="Already have an account?"
