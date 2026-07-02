@@ -8,6 +8,7 @@ import { SignInFormData } from "@/types/form";
 import { signIn } from '@/lib/actions/auth'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import GoogleAuth from '@/components/form/GoogleAuth'
 
 const SignIn = () => {
   const [error, setError] = useState<string | null>(null)
@@ -39,7 +40,7 @@ const SignIn = () => {
           </p>
         </div>
 
-        <div>
+        <div className="">
           {error && (
             <div role="alert" aria-live="polite" className="text-center text-red-500 font-semibold mb-2">
               {error}
@@ -82,6 +83,16 @@ const SignIn = () => {
               {isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
           </form>
+          <div className="flex flex-col gap-2 w-full my-2">
+            <div className="flex gap-2 justify-around items-center">
+              <hr className="bg-foreground) border-t border-white flex-1"/>
+              <p className="">Or</p>
+              <hr className="bg-foreground border-t border-white flex-1"/>
+            </div>
+            <GoogleAuth
+            className="w-full h-[45px] text-xl font-semibold"
+            auth="sign-in" />
+          </div>
         </div>
         <FooterLink
           text="Don't have an account?"

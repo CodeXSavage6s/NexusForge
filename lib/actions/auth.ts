@@ -5,6 +5,7 @@ import { headers } from 'next/headers'
 import db from "@/database/index";
 import { user } from "@/database/schema/auth-schema";
 import { eq } from "drizzle-orm";
+import { authClient } from '@/lib/better-auth/auth-client'
 
 export async function signUp({ name, email, password }: { name: string; email: string; password: string }) {
 
@@ -57,5 +58,31 @@ export async function signOut() {
   } catch (err: any) {
     console.error("sign out failed", err);
     return { success: false as const, error: err?.message || "Sign out failed" };
+  }
+}
+
+////GoogleAuth
+
+export async function signInGoogle() {
+  console.log("google signin hit")
+  try {
+    const data = await authClient.signIn.social({
+      provider: "google",
+    });
+    console.log("Google signin success")
+  } catch (err) {
+    console.error("Google signin failed", err)
+  }
+}
+
+export async function signUpGoogle() {
+  console.log("google signup hit")
+  try {
+    const data = await authClient.signUp.social({
+      provider: "google",
+    });
+    console.log("Google signup success")
+  } catch (err) {
+    console.error("Google signup failed", err)
   }
 }

@@ -17,6 +17,7 @@ export const auth = betterAuth({
         minPasswordLength: 8,
         maxPasswordLength: 128,
         autoSignIn: false,
+        baseURL: process.env.BETTER_AUTH_URL, 
         sendResetPassword: async ({ user, url, token }, request) => {
             await sendEmail({
                 to: user.email,
@@ -28,21 +29,28 @@ export const auth = betterAuth({
             console.log(`Password for user ${user.email} has been reset.`);
         },
     }, 
-    emailVerification: {
-        sendOnSignUp: true, 
-        sendVerificationEmail: async ({ user, url, token }, request) => {
-            try {
-                await sendEmail({
-                    to: user.email,
-                    subject: "Verify your email address",
-                    text: `Click the link to verify your email: ${url}`,
-                });
-                console.log("Verification email sent successfully!");
-            } catch (error) {
-                console.error("Failed to send email:", error);
-                throw error;
-            }
-        },
-    },
-    plugins: [nextCookies()],
+      socialProviders: {
+          google: { 
+            prompt: "select_account",
+              clientId: process.env.GOOGLE_CLIENT_ID as string, 
+              clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
+          }, 
+      },
+      emailVerification: {
+          sendOnSignUp: true, 
+          sendVerificationEmail: async ({ user, url, token }, request) => {
+              try {
+                  await sendEmail({
+                      to: user.email,
+                      subject: "Verify your email address",
+                      text: `Click the link to verify your email: ${url}`,
+                  });
+                  console.log("Verification email sent successfully!");
+              } catch (error) {
+                  console.error("Failed to send email:", error);
+                  throw error;
+              }
+          },
+      },
+      plugins: [nextCookies()],
 });
