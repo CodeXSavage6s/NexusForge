@@ -1,8 +1,9 @@
+import Greetings from '@/components/dashboard/Greetings'
 
 export default function Dashboard() {
   return (
     <div>
-      Dashboard
+      <Greetings user="Savage"/>
     </div>
   )
 }
