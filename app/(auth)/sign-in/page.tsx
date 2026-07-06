@@ -85,9 +85,9 @@ const SignIn = () => {
           </form>
           <div className="flex flex-col gap-2 w-full my-2">
             <div className="flex gap-2 justify-around items-center">
-              <hr className="bg-foreground) border-t border-white flex-1"/>
+              <hr className="bg-gray-500 border-t border-white flex-1"/>
               <p className="">Or</p>
-              <hr className="bg-foreground border-t border-white flex-1"/>
+              <hr className="bg-gray-500 border-t border-white flex-1"/>
             </div>
             <GoogleAuth
             className="w-full h-[45px] text-xl font-semibold"
