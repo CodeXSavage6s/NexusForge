@@ -7,22 +7,25 @@ import { demoUser, demoMenuItems, demoNavLinks } from "@/lib/constants/header-co
 import {auth} from "@/lib/better-auth/auth";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
+import { UnreadNoticationsCount } from '@/lib/actions/notifications'
 
 export const metadata: Metadata = {
   title: "NexusForge",
   description: "NexusForge dashboard",
 };
 
+
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth.api.getSession({ headers: await headers() });
-
-    if(!session?.user) redirect('/sign-in');
-    
-    const user = session?.user
+    const session = await auth.api.getSession({ headers: await headers() });
+  
+      if(!session?.user) redirect('/sign-in');
+      
+      const user = session?.user
+      const count = await UnreadNoticationsCount(user.id)
   return (
       <div className="min-h-screen">
         <TooltipProvider>
@@ -32,7 +35,7 @@ export default async function Layout({
               <Header
                 logoSrc="/assets/logo.svg"
                 navLinks={demoNavLinks}
-                notificationCount={3}
+                notificationCount={count}
                 user={user}
                 menuItems={demoMenuItems}
               />
