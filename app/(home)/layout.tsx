@@ -7,7 +7,8 @@ import { demoUser, demoMenuItems, demoNavLinks } from "@/lib/constants/header-co
 import {auth} from "@/lib/better-auth/auth";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
-import { UnreadNoticationsCount } from '@/lib/actions/notifications'
+import { UnreadNotificationsCount } from '@/lib/actions/notifications'
+import { getUserWorkspaces } from '@/lib/actions/workspace'
 
 export const metadata: Metadata = {
   title: "NexusForge",
@@ -25,12 +26,13 @@ export default async function Layout({
       if(!session?.user) redirect('/sign-in');
       
       const user = session?.user
-      const count = await UnreadNoticationsCount(user.id)
+      const count = await UnreadNotificationsCount(user.id)
+      const workspaces = await getUserWorkspaces(user.id)
   return (
       <div className="min-h-screen">
         <TooltipProvider>
           <SidebarProvider>
-            <AppSidebar logoSrc="/assets/logo.svg" brandName="" />
+            <AppSidebar logoSrc="/assets/logo.svg" brandName="" workspaces={workspaces} />
             <SidebarInset>
               <Header
                 logoSrc="/assets/logo.svg"

@@ -2,19 +2,33 @@ import Greetings from '@/components/dashboard/Greetings'
 import InfoCard from '@/components/dashboard/InfoCard'
 import ClientCard from '@/components/dashboard/ClientCard'
 import { demoInfoCards, demoClients } from '@/lib/constants/dashboard-constants'
-import {auth} from "@/lib/better-auth/auth";
-import {headers} from "next/headers";
-import {redirect} from "next/navigation";
+import { auth } from "@/lib/better-auth/auth";
+import { headers } from "next/headers";
+import { redirect, notFound } from "next/navigation";
 import { ProjectsCount } from "@/lib/actions/project"
 import { ClientCount } from "@/lib/actions/client"
+import { getWorkspace } from "@/lib/actions/workspace"
 
+export default async function WorkspaceDashboard({
+  params,
+}: {
+  params: Promise<{ workspaceId: string }>;
+}) {
+  const { workspaceId } = await params;
 
-export default async function Dashboard() {
   const session = await auth.api.getSession({ headers: await headers() });
-  
-  const user = session?.user
-  const projectCount = await ProjectsCount()
-  const clientCount = await ClientCount()
+  if (!session?.user) redirect('/sign-in');
+
+  // TODO: getWorkspace should also confirm this user owns/belongs to it
+  const workspace = await getWorkspace(workspaceId);
+  if (!workspace) notFound();
+
+  const user = session.user
+  // TODO: update ProjectsCount / ClientCount to accept workspaceId and
+  // filter by it (they're currently unscoped from the old single-user schema)
+  const projectCount = await ProjectsCount(workspaceId)
+  const clientCount = await ClientCount(workspaceId)
+
   return (
     <div className="flex flex-col gap-2 p-2">
       <Greetings user={user.name} projectCount={projectCount} clientCount={clientCount} />

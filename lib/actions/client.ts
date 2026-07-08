@@ -3,5 +3,5 @@ import db from '@/database/index'
 import { eq } from 'drizzle-orm'
 
 export async function ClientCount(userId) {
-  return await db.select().from(clients).where(eq(clients.ownerId, userId))
+  return await db.select().from(clients).where(eq(clients.workspaceId, userId))
 }
