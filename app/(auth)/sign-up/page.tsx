@@ -121,9 +121,9 @@ const SignUp = () => {
           </form>
           <div className="flex flex-col gap-2 w-full my-2">
             <div className="flex gap-2 justify-around items-center">
-              <hr className="flex-1"/>
+              <hr className="bg-gray-500 flex-1"/>
               <p className="">Or</p>
-              <hr className="bg-red-500 border-lg flex-1"/>
+              <hr className="bg-gray-500 border-lg flex-1"/>
             </div>
             <GoogleAuth
             className="w-full h-[45px] text-xl font-semibold"

@@ -1,0 +1,61 @@
+import { Users, FolderKanban, CalendarCheck, DollarSign } from 'lucide-react'
+
+export const demoInfoCards = [
+  {
+    title: "Clients",
+    href: "/clients",
+    icon: Users,
+    iconBg: "rgba(224,17,228,0.15)",
+    iconColor: "#e011e4",
+    count: 15,
+    subtitle: "2 remaining",
+    subtitleColor: "#e011e4",
+    progress: 80,
+    progressColor: "#e011e4",
+    caption: "Free plan: 10 max",
+  },
+  {
+    title: "Projects",
+    href: "/projects",
+    icon: FolderKanban,
+    iconBg: "rgba(59,130,246,0.15)",
+    iconColor: "#3b82f6",
+    count: 15,
+    subtitle: "3 remaining",
+    subtitleColor: "#3b82f6",
+    progress: 75,
+    progressColor: "#3b82f6",
+    caption: "Free plan: 20 max",
+  },
+  {
+    title: "Tasks Due",
+    href: "/tasks",
+    icon: CalendarCheck,
+    iconBg: "rgba(249,115,22,0.15)",
+    iconColor: "#f97316",
+    count: 7,
+    subtitle: "2 overdue",
+    subtitleColor: "#ef4444",
+    progress: 30,
+    progressColor: "#ef4444",
+  },
+  {
+    title: "Invoices",
+    href: "/invoices",
+    icon: DollarSign,
+    iconBg: "rgba(34,197,94,0.15)",
+    iconColor: "#22c55e",
+    count: 5,
+    subtitle: "2 pending",
+    subtitleColor: "#22c55e",
+    progress: 60,
+    progressColor: "#22c55e",
+  },
+]
+
+export const demoClients = [
+  { id: "1", name: "TechNova Ltd.", href: "/clients/technova", initials: "TN", projectCount: 3 },
+  { id: "2", name: "BrightCorp", href: "/clients/brightcorp", initials: "BC", projectCount: 2 },
+  { id: "3", name: "Creative Studio", href: "/clients/creative-studio", initials: "CS", projectCount: 4 },
+  { id: "4", name: "Skyline Media", href: "/clients/skyline-media", initials: "SM", projectCount: 1 },
+]

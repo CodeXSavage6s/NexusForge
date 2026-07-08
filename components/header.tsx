@@ -40,7 +40,7 @@ export function Header({
       <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6">
         {/* Left: sidebar trigger + logo */}
         <div className="flex items-center gap-4">
-          <SidebarTrigger className="text-white/80 hover:bg-white/10 hover:text-white" />
+          <SidebarTrigger className="text-primary " />
 
           <Link
             href={brandHref}
@@ -80,7 +80,7 @@ export function Header({
             }
             className="relative rounded-full p-1.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
           >
-            <Bell className="h-5 w-5" />
+            <Bell className="h-5 w-5 text-primary" />
             {notificationCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-violet-600 px-1 text-[10px] font-semibold leading-none text-white ring-2 ring-[#0a0a0f]">
                 {notificationCount > 9 ? "9+" : notificationCount}
@@ -100,7 +100,7 @@ export function Header({
                     <AvatarImage src={user.image} alt={user.name} />
                     <AvatarFallback>{initials}</AvatarFallback>
                   </Avatar>
-                  <ChevronDown className="h-4 w-4 text-white/60" />
+                  <ChevronDown className="h-5 w-5 text-foreground" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -115,7 +115,7 @@ export function Header({
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <ThemeToggle />
                 </DropdownMenuItem>
                 {menuItems.map((item) => {

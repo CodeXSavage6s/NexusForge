@@ -1,19 +1,22 @@
 import { Button } from '@/components/ui/button'
 
 export default function Greetings({
-  user
+  user, projectCount = 0, clientCount = 0
 }) {
   return (
-    <div className="flex flex-col gap-2 justify-between lg:flex-row bg-card p-2 rounded-md w-full">
-      <div className="flex flex-col">
+    <div className="flex flex-col gap-3 justify-center bg-card p-4 rounded-md w-full shadow-md shadow-foreground-secondary">
+      <div className="flex flex-col gap-1">
         <span className="text-sm text-gray-500">Welcome Back</span>
         <strong className="text-2xl">{user} 👋</strong>
-        <div className="text-sm text-gray-500">You have <span>15</span> projects across <span>8</span> clients</div>
+        <div className="text-sm text-gray-500">
+          You have <span className="font-medium text-foreground">{projectCount}</span> projects across{" "}
+          <span className="font-medium text-foreground">{clientCount}</span> clients
+        </div>
       </div>
-      
-      <div className="w-full flex gap-2 justify-between">
-        <Button className="w-1/2 bg-purple-700 text-foreground border border-foreground">+ New Project</Button>
-        <Button className="w-1/2 bg-transparent text-foreground border border-foreground">+ New Client</Button>
+
+      <div className="flex gap-2">
+        <Button className="bg-purple-700 text-foreground-secondary border border-foreground-secondary">+ New Project</Button>
+        <Button className="bg-transparent text-foreground border border-foreground-secondary">+ New Client</Button>
       </div>
     </div>
   )
