@@ -3,11 +3,12 @@ import Header from "@/components/header";
 import { AppSidebar } from "@/components/SideBar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip"; 
-import { demoUser, demoMenuItems, demoNavLinks } from "@/lib/constants/header-constants.tsx"
+import { demoUser, demoMenuItems, demoNavLinks } from "@/lib/constants/header-constants"
 import {auth} from "@/lib/better-auth/auth";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";
-import { UnreadNoticationsCount } from '@/lib/actions/notifications'
+import { UnreadNotificationsCount } from '@/lib/actions/notifications'
+import { getUserWorkspaces } from '@/lib/actions/workspace'
 
 export const metadata: Metadata = {
   title: "NexusForge",
@@ -25,12 +26,13 @@ export default async function Layout({
       if(!session?.user) redirect('/sign-in');
       
       const user = session?.user
-      const count = await UnreadNoticationsCount(user.id)
+      const count = await UnreadNotificationsCount(user.id)
+      const workspaces = await getUserWorkspaces(user.id)
   return (
       <div className="min-h-screen">
         <TooltipProvider>
           <SidebarProvider>
-            <AppSidebar logoSrc="/assets/logo.svg" brandName="" />
+            <AppSidebar logoSrc="/assets/logo.svg" brandName="" workspaces={workspaces} />
             <SidebarInset>
               <Header
                 logoSrc="/assets/logo.svg"

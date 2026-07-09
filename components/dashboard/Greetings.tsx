@@ -2,6 +2,10 @@ import { Button } from '@/components/ui/button'
 
 export default function Greetings({
   user, projectCount = 0, clientCount = 0
+}: {
+  user: string;
+  projectCount?: number;
+  clientCount?: number;
 }) {
   return (
     <div className="flex flex-col gap-3 justify-center bg-card p-4 rounded-md w-full shadow-md shadow-foreground-secondary">

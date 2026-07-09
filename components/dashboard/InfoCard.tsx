@@ -11,7 +11,19 @@ export default function InfoCard({
   subtitleColor,
   progress,
   progressColor,
-  caption,
+  caption = undefined,
+}: {
+  href?: string;
+  icon: any;
+  iconBg: any;
+  iconColor: any;
+  title: any;
+  count: any;
+  subtitle: any;
+  subtitleColor: any;
+  progress: any;
+  progressColor: any;
+  caption?: any;
 }) {
   return (
     <Link

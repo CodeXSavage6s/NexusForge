@@ -87,12 +87,66 @@ export const invoiceStatusEnum = pgEnum("invoice_status", [
 // V1 CORE
 // ═════════════════════════════════════════════════════════════
 
+// ── Workspace ───────────────────────────────────────────────
+// A workspace is the new top-level scope. A user can own several
+// workspaces; everything that used to hang directly off a user
+// (clients, projects, ...) now hangs off a workspace instead.
+export const workspaces = pgTable(
+  "workspaces",
+  {
+    id: cuid(),
+    ownerId: text("owner_id").notNull(), // TODO: .references(() => user.id, { onDelete: "cascade" })
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    logo: text("logo"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    slugUnique: uniqueIndex("workspaces_slug_unique").on(t.slug),
+    ownerIdx: index("workspaces_owner_idx").on(t.ownerId),
+  })
+);
+
+// ── WorkspaceMember (optional, for multi-user workspaces) ────
+// Not strictly required by "one user -> many workspaces", but
+// included since it mirrors projectMembers and lets you invite
+// teammates into a workspace later without a schema change.
+export const workspaceMemberRoleEnum = pgEnum("workspace_member_role", [
+  "OWNER",
+  "ADMIN",
+  "MEMBER",
+  "VIEWER",
+]);
+
+export const workspaceMembers = pgTable(
+  "workspace_members",
+  {
+    id: cuid(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull(), // TODO: .references(() => user.id, { onDelete: "cascade" })
+    role: workspaceMemberRoleEnum("role").notNull().default("MEMBER"),
+    joinedAt: timestamp("joined_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    workspaceUserUnique: uniqueIndex("workspace_members_workspace_user_unique").on(
+      t.workspaceId,
+      t.userId
+    ),
+    userIdx: index("workspace_members_user_idx").on(t.userId),
+  })
+);
+
 // ── Client ──────────────────────────────────────────────────
 export const clients = pgTable(
   "clients",
   {
     id: cuid(),
-    ownerId: text("owner_id").notNull(), // TODO: .references(() => user.id)
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     companyName: text("company_name"),
     email: text("email"),
@@ -107,7 +161,7 @@ export const clients = pgTable(
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (t) => ({
-    ownerIdx: index("clients_owner_idx").on(t.ownerId),
+    workspaceIdx: index("clients_workspace_idx").on(t.workspaceId),
     statusIdx: index("clients_status_idx").on(t.status),
   })
 );
@@ -120,7 +174,11 @@ export const projects = pgTable(
     clientId: text("client_id")
       .notNull()
       .references(() => clients.id, { onDelete: "restrict" }),
-    ownerId: text("owner_id").notNull(), // TODO: .references(() => user.id)
+    // Denormalized from clients.workspaceId so you can query/scope
+    // projects by workspace without joining through clients first.
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     slug: text("slug").notNull(),
     description: text("description"),
@@ -138,9 +196,13 @@ export const projects = pgTable(
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (t) => ({
-    // slug unique per owner, not globally — adjust if you want it scoped to client instead
-    ownerSlugUnique: uniqueIndex("projects_owner_slug_unique").on(t.ownerId, t.slug),
+    // slug unique per workspace, not globally — adjust if you want it scoped to client instead
+    workspaceSlugUnique: uniqueIndex("projects_workspace_slug_unique").on(
+      t.workspaceId,
+      t.slug
+    ),
     clientIdx: index("projects_client_idx").on(t.clientId),
+    workspaceIdx: index("projects_workspace_idx").on(t.workspaceId),
     statusIdx: index("projects_status_idx").on(t.status),
   })
 );
@@ -351,12 +413,33 @@ export const invoices = pgTable(
 // RELATIONS
 // ═════════════════════════════════════════════════════════════
 
-export const clientsRelations = relations(clients, ({ many }) => ({
+export const workspacesRelations = relations(workspaces, ({ many }) => ({
+  members: many(workspaceMembers),
+  clients: many(clients),
+  projects: many(projects),
+}));
+
+export const workspaceMembersRelations = relations(workspaceMembers, ({ one }) => ({
+  workspace: one(workspaces, {
+    fields: [workspaceMembers.workspaceId],
+    references: [workspaces.id],
+  }),
+}));
+
+export const clientsRelations = relations(clients, ({ one, many }) => ({
+  workspace: one(workspaces, {
+    fields: [clients.workspaceId],
+    references: [workspaces.id],
+  }),
   projects: many(projects),
   invoices: many(invoices),
 }));
 
 export const projectsRelations = relations(projects, ({ one, many }) => ({
+  workspace: one(workspaces, {
+    fields: [projects.workspaceId],
+    references: [workspaces.id],
+  }),
   client: one(clients, { fields: [projects.clientId], references: [clients.id] }),
   tasks: many(tasks),
   documents: many(documents),
