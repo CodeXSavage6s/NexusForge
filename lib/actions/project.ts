@@ -1,7 +1,8 @@
 import { projects } from '@/database/schema/schema'
 import db from '@/database/index'
-import { eq } from 'drizzle-orm'
+import { eq, count } from 'drizzle-orm'
 
-export async function ProjectsCount(userId) {
-  return await db.select().from(projects).where(eq(projects.workspaceId, userId));
+export async function ProjectsCount(workspaceId: string): Promise<number> {
+  const result = await db.select({ count: count() }).from(projects).where(eq(projects.workspaceId, workspaceId));
+  return result[0]?.count ?? 0;
 }

@@ -3,7 +3,7 @@ import Header from "@/components/header";
 import { AppSidebar } from "@/components/SideBar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip"; 
-import { demoUser, demoMenuItems, demoNavLinks } from "@/lib/constants/header-constants.tsx"
+import { demoUser, demoMenuItems, demoNavLinks } from "@/lib/constants/header-constants"
 import {auth} from "@/lib/better-auth/auth";
 import {headers} from "next/headers";
 import {redirect} from "next/navigation";

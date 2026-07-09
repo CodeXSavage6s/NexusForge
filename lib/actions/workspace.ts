@@ -2,6 +2,8 @@
 
 import { auth } from "@/lib/better-auth/auth";
 import { headers } from "next/headers";
+import db from "@/database/index";
+import { workspaces } from "@/database/schema/schema";
 
 export interface WorkspaceSummary {
   id: string;
@@ -31,7 +33,13 @@ export async function createWorkspace(
   slug: string
 ): Promise<{ id: string; name: string; slug: string }> {
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) throw new Error("Not authenticated");l
+  if (!session?.user) throw new Error("Not authenticated");
 
-  return { id, name, slug };
+  const [workspace] = await db.insert(workspaces).values({
+    name,
+    slug,
+    ownerId: session.user.id,
+  }).returning();
+
+  return { id: workspace.id, name: workspace.name, slug: workspace.slug };
 }

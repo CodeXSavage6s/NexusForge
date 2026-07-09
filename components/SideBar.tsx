@@ -71,10 +71,10 @@ export const demoGeneralNavItems: SidebarNavItem[] = [
 
 function getWorkspaceNavItems(workspaceId: string): SidebarNavItem[] {
   return [
-    { title: "Dashboard", href: `/workspace/${workspaceId}`, icon: LayoutDashboard },
-    { title: "Projects", href: `/workspace/${workspaceId}/projects`, icon: FolderKanban },
-    { title: "Analytics", href: `/workspace/${workspaceId}/analytics`, icon: BarChart3 },
-    { title: "Team", href: `/workspace/${workspaceId}/team`, icon: Users },
+    { title: "Dashboard", href: `/${workspaceId}/dashboard`, icon: LayoutDashboard },
+    { title: "Projects", href: `/${workspaceId}/projects`, icon: FolderKanban },
+    { title: "Analytics", href: `/${workspaceId}/analytics`, icon: BarChart3 },
+    { title: "Team", href: `/${workspaceId}/team`, icon: Users },
   ];
 }
 
@@ -114,7 +114,7 @@ function WorkspaceSwitcher({
         {workspaces.map((workspace) => (
           <DropdownMenuItem key={workspace.id} asChild>
             <Link
-              href={`/workspace/${workspace.id}`}
+              href={`/${workspace.id}/dashboard`}
               className="flex items-center justify-between"
             >
               <span className="truncate">{workspace.name}</span>
@@ -146,9 +146,9 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const pathname = usePathname();
 
-  // The current workspace is inferred from the URL (/workspace/[id]/...),
+  // The current workspace is inferred from the URL (/[workspace]/...),
   // so the layout only needs to pass the full workspace list down once.
-  const workspaceIdInPath = pathname.match(/^\/workspace\/([^/]+)/)?.[1] ?? null;
+  const workspaceIdInPath = pathname.match(/^\/([^/]+)\/(?:dashboard|projects|analytics|team)/)?.[1] ?? null;
   const currentWorkspace =
     workspaces.find((w) => w.id === workspaceIdInPath) ?? null;
 

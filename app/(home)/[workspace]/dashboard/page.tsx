@@ -7,25 +7,27 @@ import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import { ProjectsCount } from "@/lib/actions/project"
 import { ClientCount } from "@/lib/actions/client"
-import { getWorkspace } from "@/lib/actions/workspace"
+import { getWorkspace, getUserWorkspaces } from "@/lib/actions/workspace"
 
 export default async function WorkspaceDashboard({
   params,
 }: {
-  params: Promise<{ workspaceId: string }>;
+  params: Promise<{ workspace: string }>;
 }) {
-  const { workspaceId } = await params;
+  const { workspace: workspaceId } = await params;
 
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) redirect('/sign-in');
 
-  // TODO: getWorkspace should also confirm this user owns/belongs to it
   const workspace = await getWorkspace(workspaceId);
   if (!workspace) notFound();
 
+  // Verify user owns or belongs to this workspace
+  const userWorkspaces = await getUserWorkspaces(session.user.id);
+  const hasAccess = userWorkspaces.some(w => w.id === workspaceId);
+  if (!hasAccess) notFound();
+
   const user = session.user
-  // TODO: update ProjectsCount / ClientCount to accept workspaceId and
-  // filter by it (they're currently unscoped from the old single-user schema)
   const projectCount = await ProjectsCount(workspaceId)
   const clientCount = await ClientCount(workspaceId)
 

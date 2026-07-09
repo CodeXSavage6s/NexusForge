@@ -31,18 +31,28 @@ export function CreateWorkspaceDialog({
   const [open, setOpen] = React.useState(false);
   const [name, setName] = React.useState("");
   const [pending, setPending] = React.useState(false);
+  const [error, setError] = React.useState("");
 
   async function handleCreate() {
     const trimmed = name.trim();
     if (!trimmed || pending) return;
 
+    const slug = slugify(trimmed);
+    if (!slug) {
+      setError("Please use a name with at least one letter or number");
+      return;
+    }
+
     setPending(true);
+    setError("");
     try {
-      const workspace = await createWorkspace(trimmed, slugify(trimmed));
+      const workspace = await createWorkspace(trimmed, slug);
       setOpen(false);
       setName("");
-      router.push(`/workspace/${workspace.id}`);
+      router.push(`/${workspace.id}/dashboard`);
       router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create workspace");
     } finally {
       setPending(false);
     }
@@ -66,13 +76,19 @@ export function CreateWorkspaceDialog({
           <Input
             id="workspace-name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              setError("");
+            }}
             placeholder="Acme Inc."
             autoFocus
             onKeyDown={(e) => {
               if (e.key === "Enter") handleCreate();
             }}
           />
+          {error && (
+            <p className="text-sm text-red-500">{error}</p>
+          )}
         </div>
 
         <DialogFooter>
