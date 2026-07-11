@@ -1,3 +1,4 @@
+// CreateWorkspaceDialog.tsx
 "use client";
 
 import * as React from "react";
@@ -47,9 +48,14 @@ export function CreateWorkspaceDialog({
     setError("");
     try {
       const workspace = await createWorkspace(trimmed, slug);
+      if (workspace.message) {
+        setError(workspace.message);
+        setPending(false);
+        return;
+      }
       setOpen(false);
       setName("");
-      router.push(`/${workspace.id}/dashboard`);
+      router.push(`/${workspace.slug}/dashboard`);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create workspace");
@@ -92,7 +98,7 @@ export function CreateWorkspaceDialog({
         </div>
 
         <DialogFooter>
-          <Button onClick={handleCreate} disabled={pending || !name.trim()}>
+          <Button onClick={handleCreate} disabled={pending || !name.trim()} variant="ghost">
             {pending ? "Creating..." : "Create workspace"}
           </Button>
         </DialogFooter>

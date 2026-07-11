@@ -96,8 +96,8 @@ export const workspaces = pgTable(
   {
     id: cuid(),
     ownerId: text("owner_id").notNull(), // TODO: .references(() => user.id, { onDelete: "cascade" })
-    name: text("name").notNull(),
-    slug: text("slug").notNull(),
+    name: text("name").notNull().unique(),
+    slug: text("slug").notNull().unique(),
     logo: text("logo"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
