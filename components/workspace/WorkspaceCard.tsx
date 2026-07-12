@@ -5,7 +5,7 @@ import type { WorkspaceSummary } from "@/lib/actions/workspace";
 export function WorkspaceCard({ workspace }: { workspace: WorkspaceSummary }) {
   return (
     <Link
-      href={`/workspace/${workspace.id}`}
+      href={`/${workspace.slug}/dashboard`}
       className="flex flex-col gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
     >
       <div>

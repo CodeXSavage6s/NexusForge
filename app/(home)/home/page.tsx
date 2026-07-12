@@ -15,7 +15,7 @@ export default async function WorkspacesPage() {
 
   return (
     <div className="flex flex-col gap-4 p-2">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Workspaces</h1>
           <p className="text-sm text-muted-foreground">

@@ -37,6 +37,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { CreateWorkspaceDialog } from "@/components/workspace/CreateWorkspaceDialog"
 
 // ---------- Types ----------
 
@@ -69,12 +70,12 @@ export const demoGeneralNavItems: SidebarNavItem[] = [
   { title: "Settings", href: "/settings", icon: Settings },
 ];
 
-function getWorkspaceNavItems(workspaceId: string): SidebarNavItem[] {
+function getWorkspaceNavItems(workspaceSlug: string): SidebarNavItem[] {
   return [
-    { title: "Dashboard", href: `/${workspaceId}/dashboard`, icon: LayoutDashboard },
-    { title: "Projects", href: `/${workspaceId}/projects`, icon: FolderKanban },
-    { title: "Analytics", href: `/${workspaceId}/analytics`, icon: BarChart3 },
-    { title: "Team", href: `/${workspaceId}/team`, icon: Users },
+    { title: "Dashboard", href: `/${workspaceSlug}/dashboard`, icon: LayoutDashboard },
+    { title: "Projects", href: `/${workspaceSlug}/projects`, icon: FolderKanban },
+    { title: "Analytics", href: `/${workspaceSlug}/analytics`, icon: BarChart3 },
+    { title: "Team", href: `/${workspaceSlug}/team`, icon: Users },
   ];
 }
 
@@ -87,52 +88,77 @@ function WorkspaceSwitcher({
   workspaces: WorkspaceSummary[];
   currentWorkspace: WorkspaceSummary | null;
 }) {
+  // Controlled separately from the dropdown so the dialog can stay mounted
+  // and open *after* the dropdown closes. Nesting a Dialog trigger inside a
+  // DropdownMenuItem via `asChild` causes Radix to close/unmount the menu
+  // (and the dialog trigger along with it) before the dialog gets a chance
+  // to open — see bug notes.
+  const [createWorkspaceOpen, setCreateWorkspaceOpen] = React.useState(false);
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <SidebarMenuButton
-          className="justify-between"
-          tooltip={currentWorkspace?.name ?? "Select workspace"}
-        >
-          <span className="truncate text-sm font-medium">
-            {currentWorkspace ? currentWorkspace.name : "Select workspace"}
-          </span>
-          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-60" />
-        </SidebarMenuButton>
-      </DropdownMenuTrigger>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <SidebarMenuButton
+            className="justify-between"
+            tooltip={currentWorkspace?.name ?? "Select workspace"}
+          >
+            <span className="truncate text-sm font-medium">
+              {currentWorkspace ? currentWorkspace.name : "Select workspace"}
+            </span>
+            <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-60" />
+          </SidebarMenuButton>
+        </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        <DropdownMenuContent align="start" className="w-56">
+          <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+          <DropdownMenuSeparator />
 
-        {workspaces.length === 0 && (
-          <p className="px-2 py-1.5 text-xs text-muted-foreground">
-            No workspaces yet
-          </p>
-        )}
+          {workspaces.length === 0 && (
+            <p className="px-2 py-1.5 text-xs text-muted-foreground">
+              No workspaces yet
+            </p>
+          )}
 
-        {workspaces.map((workspace) => (
-          <DropdownMenuItem key={workspace.id} asChild>
-            <Link
-              href={`/${workspace.id}/dashboard`}
-              className="flex items-center justify-between"
-            >
-              <span className="truncate">{workspace.name}</span>
-              {currentWorkspace?.id === workspace.id && (
-                <Check className="h-4 w-4" />
-              )}
-            </Link>
+          {workspaces.map((workspace) => (
+            <DropdownMenuItem key={workspace.id} asChild>
+              <Link
+                href={`/${workspace.slug}/dashboard`}
+                className="flex items-center justify-between"
+              >
+                <span className="truncate">{workspace.name}</span>
+                {currentWorkspace?.id === workspace.id && (
+                  <Check className="h-4 w-4" />
+                )}
+              </Link>
+            </DropdownMenuItem>
+          ))}
+
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onSelect={(e) => {
+              // Keep the item from trying to auto-close/navigate before we
+              // can open the dialog on the next tick.
+              e.preventDefault();
+              setCreateWorkspaceOpen(true);
+            }}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Create Workspace
           </DropdownMenuItem>
-        ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/" className="flex items-center gap-2">
-            <Plus className="h-4 w-4" /> Create workspace
-          </Link>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      {/* Rendered outside the DropdownMenu so it isn't unmounted when the
+          menu closes. Assumes CreateWorkspaceDialog accepts controlled
+          `open`/`onOpenChange` props (same pattern as CreateClientDialog).
+          If it currently manages its own internal `open` state instead,
+          add those two props to it. */}
+      <CreateWorkspaceDialog
+        open={createWorkspaceOpen}
+        onOpenChange={setCreateWorkspaceOpen}
+      />
+    </>
   );
 }
 
@@ -146,14 +172,16 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const pathname = usePathname();
 
-  // The current workspace is inferred from the URL (/[workspace]/...),
-  // so the layout only needs to pass the full workspace list down once.
-  const workspaceIdInPath = pathname.match(/^\/([^/]+)\/(?:dashboard|projects|analytics|team)/)?.[1] ?? null;
+  // The current workspace is inferred from the URL (/[workspace]/...).
+  // The URL segment is the workspace SLUG (see the Link hrefs below,
+  // which route to `/${workspace.slug}/...`), so we must match against
+  // `slug`, not `id`.
+  const workspaceSlugInPath = pathname.match(/^\/([^/]+)\/(?:dashboard|projects|analytics|team)/)?.[1] ?? null;
   const currentWorkspace =
-    workspaces.find((w) => w.id === workspaceIdInPath) ?? null;
+    workspaces.find((w) => w.slug === workspaceSlugInPath) ?? null;
 
   const workspaceNavItems = currentWorkspace
-    ? getWorkspaceNavItems(currentWorkspace.id)
+    ? getWorkspaceNavItems(currentWorkspace.slug)
     : [];
 
   return (
@@ -190,7 +218,7 @@ export function AppSidebar({
                     tooltip={item.title}
                     isActive={pathname === item.href}
                   >
-                    <Link href={item.href} className="text-2xl font-bold">
+                    <Link href={item.href} className=" font-bold">
                       {item.icon && <item.icon className="h-4 w-4" />}
                       <span className="text-xl">{item.title}</span>
                     </Link>
@@ -213,7 +241,7 @@ export function AppSidebar({
                       tooltip={item.title}
                       isActive={pathname === item.href}
                     >
-                      <Link href={item.href} className="text-2xl font-bold">
+                      <Link href={item.href} className=" font-bold">
                         {item.icon && <item.icon className="h-4 w-4" />}
                         <span className="text-xl">{item.title}</span>
                       </Link>

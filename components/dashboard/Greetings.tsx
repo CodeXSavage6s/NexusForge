@@ -1,14 +1,22 @@
+// components/dashboard/Greetings.tsx
 import { Button } from '@/components/ui/button'
+import { CreateClientDialog } from '@/components/workspace/CreateClient'
 
-export default function Greetings({
-  user, projectCount = 0, clientCount = 0
-}: {
+interface GreetingsProps {
   user: string;
+  workspaceId: string;
   projectCount?: number;
   clientCount?: number;
-}) {
+}
+
+export default function Greetings({
+  user, 
+  workspaceId, 
+  projectCount = 0, 
+  clientCount = 0
+}: GreetingsProps) {
   return (
-    <div className="flex flex-col gap-3 justify-center bg-card p-4 rounded-md w-full shadow-md shadow-foreground-secondary">
+    <div className="flex flex-col gap-3 bg-card p-4 rounded-md w-full shadow-md">
       <div className="flex flex-col gap-1">
         <span className="text-sm text-gray-500">Welcome Back</span>
         <strong className="text-2xl">{user} 👋</strong>
@@ -19,8 +27,9 @@ export default function Greetings({
       </div>
 
       <div className="flex gap-2">
-        <Button className="bg-purple-700 text-foreground-secondary border border-foreground-secondary">+ New Project</Button>
-        <Button className="bg-transparent text-foreground border border-foreground-secondary">+ New Client</Button>
+        <Button className="bg-purple-700 text-white">+ New Project</Button>
+        {/* Safely passed downstream */}
+        <CreateClientDialog workspaceId={workspaceId} />
       </div>
     </div>
   )
