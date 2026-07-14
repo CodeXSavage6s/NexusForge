@@ -74,15 +74,3 @@ export async function signInGoogle() {
     console.error("Google signin failed", err)
   }
 }
-
-export async function signUpGoogle() {
-  console.log("google signup hit")
-  try {
-    const data = await authClient.signUp.social({
-      provider: "google",
-    });
-    console.log("Google signup success")
-  } catch (err) {
-    console.error("Google signup failed", err)
-  }
-}

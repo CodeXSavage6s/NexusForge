@@ -26,7 +26,7 @@ const SignIn = () => {
     setError(response.error)
   } else {
     setError(null)
-    router.push("/dashboard")
+    router.push("/home")
   }
 };
 

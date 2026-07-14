@@ -24,7 +24,8 @@ function slugify(name: string) {
 }
 
 export function CreateWorkspaceDialog({
-  label = "New workspace",
+  label = "New Workspace",
+  
 }: {
   label?: string;
 }) {
@@ -67,8 +68,8 @@ export function CreateWorkspaceDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-1.5">
-          <Plus className="h-4 w-4" />
+        <Button className="border border-gray-400 p-1 text-sm" variant="ghost">
+          <Plus className="h-8 w-8 stroke-[3px]" />
           {label}
         </Button>
       </DialogTrigger>

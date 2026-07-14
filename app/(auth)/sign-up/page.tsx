@@ -34,7 +34,7 @@ const SignUp = () => {
   }
   
   setError(null);
-  router.push("/dashboard");
+  router.push("/home"); 
 };
 
   return (

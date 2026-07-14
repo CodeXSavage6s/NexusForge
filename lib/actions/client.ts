@@ -43,17 +43,15 @@ export async function CreateClient(
     const {
       workspaceId,
       name,
-      companyName = "Acme Corp",
-      email = "test@example.com",
-      phone = "+1-555-0199",
-      website = "https://example.com",
-      industry = "Technology",
-      address = "123 Innovation Way, Tech City",
-      notes = "This is a test client entry generated for debugging.",
+      companyName,
+      email,
+      phone,
+      website,
+      industry,
+      address,
+      notes,
       status = "PLANNING", // Updated from PENDING to a valid option from your constants file
     } = data;
-    
-    console.log("Hit!!", workspaceId)
     
     if (!workspaceId) {
       return {
@@ -76,10 +74,10 @@ export async function CreateClient(
       fieldErrors.email = "Enter a valid email address.";
     }
 
-    if (website && !WEBSITE_RE.test(website)) {
+   /* if (website && !WEBSITE_RE.test(website)) {
       fieldErrors.website = "Enter a valid URL (starting with http:// or https://).";
     }
-
+*/
     if (Object.keys(fieldErrors).length > 0) {
       return {
         success: false,
@@ -87,7 +85,14 @@ export async function CreateClient(
         fieldErrors,
       };
     }
-
+    
+    const [check] = await db.select().from(clients).where(eq(clients.name, name))
+    
+    if (check || check.length > 0) return {
+      success: false,
+      error: "Client name already exist"
+    }
+    
     const [newClient] = await db
       .insert(clients)
       .values({
@@ -111,8 +116,6 @@ export async function CreateClient(
       };
     }
 
-    console.log("Client created:", newClient);
-
     return {
       success: true,
       clientId: newClient.id,
@@ -125,5 +128,23 @@ export async function CreateClient(
       success: false,
       error: "Failed to create client.",
     };
+  }
+}
+
+export async function GetWorkspaceClient(workspaceId) {
+  try {
+    const client = await db.select().from(clients).where(eq(clients.workspaceId, workspaceId))
+    
+    return {
+      success: true,
+      client,
+      message: "Success"
+    }
+  } catch (err) {
+    return ({
+      success: false,
+      error: err,
+      message: "Failed to fetch workspace clients"
+    })
   }
 }

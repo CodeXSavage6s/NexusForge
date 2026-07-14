@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { getUserWorkspaces } from "@/lib/actions/workspace";
 import { WorkspaceCard } from "@/components/workspace/WorkspaceCard";
 import { CreateWorkspaceDialog } from "@/components/workspace/CreateWorkspaceDialog";
+import { ProjectsCount } from "@/lib/actions/project"
+import { ClientCount } from "@/lib/actions/client"
 
 export default async function WorkspacesPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -15,14 +17,14 @@ export default async function WorkspacesPage() {
 
   return (
     <div className="flex flex-col gap-4 p-2">
-      <div className="flex flex-col items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Workspaces</h1>
+      <div className="flex flex-col items-center justify-between ">
+        <div className="flex justify-between w-full gap-4 mb-2">
+          <h1 className="text-2xl font-bold font-sans">Workspaces</h1>
+        {workspaces.length > 0 && <CreateWorkspaceDialog />}
+        </div>
           <p className="text-sm text-muted-foreground">
             Pick a workspace to jump in, or create a new one.
           </p>
-        </div>
-        {workspaces.length > 0 && <CreateWorkspaceDialog />}
       </div>
 
       {workspaces.length === 0 ? (
@@ -35,7 +37,8 @@ export default async function WorkspacesPage() {
       ) : (
         <section className="grid grid-cols-1 sm:grid-cols-2 mid:grid-cols-3 gap-2">
           {workspaces.map((workspace) => (
-            <WorkspaceCard key={workspace.id} workspace={workspace} />
+            <WorkspaceCard key={workspace.id} workspace={workspace} 
+            clientCount={ClientCount(workspace.id)} projectCount={ProjectsCount(workspace.id)} />
           ))}
         </section>
       )}

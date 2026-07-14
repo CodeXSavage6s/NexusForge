@@ -45,7 +45,6 @@ const emptyForm = {
 
 interface CreateClientDialogProps {
   workspaceId: string;
-  /** Optional controlled trigger — pass your own button/element as children */
   children?: React.ReactNode;
   onCreated?: (clientId: string) => void;
 }
