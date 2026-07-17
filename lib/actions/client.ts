@@ -131,10 +131,10 @@ export async function CreateClient(
   }
 }
 
-export async function GetWorkspaceClient(workspaceId) {
+export async function GetWorkspaceClient(workspaceId: string) {
   try {
     const client = await db.select().from(clients).where(eq(clients.workspaceId, workspaceId))
-    
+    console.log("client from server", client)
     return {
       success: true,
       client,
