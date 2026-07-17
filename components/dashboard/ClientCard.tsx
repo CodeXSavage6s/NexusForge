@@ -1,45 +1,61 @@
-import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
+import Link from "next/link";
+import { Mail, Phone, FolderKanban } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-interface Client {
-  id: string;
-  name: string;
-  href: string;
-  initials: string;
-  projectCount: number;
-}
 
-export default function ClientCard({ title, clients = [] }: { title: string; clients?: Client[] }) {
+export function ClientCard({
+  client,
+  projectCount = 0,
+}: {
+  client: ClientSummary;
+  projectCount?: number;
+}) {
   return (
-    <div className="flex min-h-[200px] w-full flex-col gap-1 rounded-md bg-card p-2 shadow shadow-foreground-secondary">
-      <p className="mb-1 text-xl font-bold">{title}</p>
-
-      {clients.length === 0 ? (
-        <p className="text-sm text-gray-400 px-1 py-4">No clients yet.</p>
-      ) : (
-        <div className="flex flex-col divide-y divide-foreground-secondary/10">
-          {clients.map((client) => (
-            <Link
-              key={client.id}
-              href={client.href}
-              className="flex items-center justify-between gap-3 rounded-sm px-1 py-2.5 transition-colors hover:bg-popover"
-            >
-              <div className="flex items-center gap-3">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-purple-700/20 text-sm font-semibold text-purple-400">
-                  {client.initials}
-                </span>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">{client.name}</span>
-                  <span className="text-xs text-gray-400">
-                    {client.projectCount} projects
-                  </span>
-                </div>
-              </div>
-              <ChevronRight className="h-4 w-4 text-gray-500" />
-            </Link>
-          ))}
+    <Link
+      href={`/clients/${client.id}`}
+      className="flex justify-between gap-4 rounded-lg border p-4 transition-colors hover:bg-muted/50"
+    >
+      <div className="flex flex-col gap-3">
+        <div>
+          <h3 className="font-semibold">{client.name}</h3>
+          {client.companyName && (
+            <p className="text-xs text-muted-foreground">{client.companyName}</p>
+          )}
         </div>
-      )}
-    </div>
-  )
+
+        <div className="flex flex-col gap-1 text-sm text-muted-foreground">
+          {client.email && (
+            <span className="flex items-center gap-1">
+              <Mail className="h-3.5 w-3.5" /> {client.email}
+            </span>
+          )}
+          {client.phone && (
+            <span className="flex items-center gap-1">
+              <Phone className="h-3.5 w-3.5" /> {client.phone}
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <FolderKanban className="h-3.5 w-3.5" /> {projectCount} projects
+          </span>
+          <span
+            className={`rounded-full px-2 py-0.5 text-xs font-medium ${client.status}`}
+          >
+            {client.status}
+          </span>
+        </div>
+      </div>
+
+      <Avatar className="w-12 h-12 shrink-0">
+        <AvatarImage src={client.logo ?? undefined} />
+        <AvatarFallback className="font-bold text-xl">
+          {client.name[0]}
+        </AvatarFallback>
+      </Avatar>
+    </Link>
+  );
 }
+
+export default ClientCard;

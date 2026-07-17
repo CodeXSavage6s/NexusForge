@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from '@/lib/context/theme-provider'
+import Eruda from '@/lib/context/eruda'
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,9 +29,11 @@ export default function RootLayout({
       lang="en"
       className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-    <ThemeProvider >
-      <body className="min-h-screen flex flex-col">{children}</body>
-    </ThemeProvider>
+    <Eruda>
+      <ThemeProvider >
+        <body className="min-h-screen flex flex-col">{children}</body>
+      </ThemeProvider>
+    </Eruda>
     </html>
   );
 }
