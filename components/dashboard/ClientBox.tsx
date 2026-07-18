@@ -1,6 +1,6 @@
 import ClientCard from '@/components/dashboard/ClientCard'
 
-export default function ClientBox({ title, clients = [] }: { title: string; clients?: Client[] }) {
+export default function ClientBox({ title, clients = [], workspace }: { title: string; clients?: Client[], workspace: string }) {
     
   
   return (
@@ -12,7 +12,7 @@ export default function ClientBox({ title, clients = [] }: { title: string; clie
       ) : (
         <div className="flex flex-col gap-2">
           {clients.map((client) => (
-            <ClientCard key={client.id} client={client} projectCount={client.projectCount} />
+            <ClientCard key={client.id} client={client} projectCount={client.projectCount} workspace={workspace}/>
           ))}
         </div>
       )}

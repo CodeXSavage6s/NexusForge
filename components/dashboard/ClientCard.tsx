@@ -1,18 +1,24 @@
+"use client"
+
 import Link from "next/link";
 import { Mail, Phone, FolderKanban } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { usePathname } from 'next/navigation'
 
 
 export function ClientCard({
+  workspace,
   client,
   projectCount = 0,
 }: {
   client: ClientSummary;
   projectCount?: number;
 }) {
+  const path = usePathname()
+  
   return (
     <Link
-      href={`/clients/${client.id}`}
+      href={`/${workspace}/clients/${client.id}`}
       className="flex justify-between gap-4 rounded-lg border p-4 transition-colors hover:bg-muted/50"
     >
       <div className="flex flex-col gap-3">
