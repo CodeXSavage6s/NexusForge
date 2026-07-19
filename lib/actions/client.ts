@@ -131,10 +131,10 @@ export async function CreateClient(
   }
 }
 
-export async function GetWorkspaceClient(workspaceId) {
+export async function GetWorkspaceClient(workspaceId: string) {
   try {
     const client = await db.select().from(clients).where(eq(clients.workspaceId, workspaceId))
-    
+    console.log("client from server", client)
     return {
       success: true,
       client,
@@ -146,5 +146,16 @@ export async function GetWorkspaceClient(workspaceId) {
       error: err,
       message: "Failed to fetch workspace clients"
     })
+  }
+}
+
+export async function GetClientDetails(clientId) {
+  try {
+    const [client] = await db.select().from(clients).where(eq(clients.id, clientId))
+    
+    return client
+  } catch (err) {
+    throw err
+    console.error("Error fetching client details", err)
   }
 }

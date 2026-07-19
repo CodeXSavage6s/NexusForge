@@ -49,4 +49,24 @@ declare global {
     user?: NavbarUser;
     menuItems?: NavbarMenuItem[];
   }
+  
+   type ClientStatus = "LEAD" | "ACTIVE" | "INACTIVE" | "ARCHIVED" // adjust to match your clientStatusEnum values
+
+  interface Client {
+      id: string
+      workspaceId: string
+      name: string
+      companyName: string | null
+      email: string | null
+      phone: string | null
+      website: string | null
+      industry: string | null
+      logo: string | null
+      address: string | null
+      notes: string | null
+      status: ClientStatus
+      createdAt: Date
+      updatedAt: Date
+    }
+
 }

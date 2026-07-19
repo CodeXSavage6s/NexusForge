@@ -42,7 +42,7 @@ export default async function WorkspaceDashboard({
       <div className="grid grid-cols-2 mid:grid-cols-4 gap-2">
         <InfoCard
           title="Clients"
-          href="/clients"
+          href={`${workspace.slug}/clients`}
           icon={Users}
           iconBg="rgba(224,17,228,0.15)"
           iconColor="#e011e4"
@@ -95,7 +95,7 @@ export default async function WorkspaceDashboard({
         />
       </div>
 
-      <ClientBox title="Clients" clients={clients.client} />
+      <ClientBox title="Clients" clients={clients.client} workspace={workspace.slug}/>
     </div>
   )
 }
