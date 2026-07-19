@@ -4,7 +4,7 @@ import ClientDropMenu from "@/components/client/ClientDropMenu"
 
 export default function ClientHeader({ name, logo, companyName}) {
   return (
-    <div className="flex justify-between gap-4 p-2">
+    <div className="flex flex-row justify-between gap-12 p-2">
       <div className="flex gap-2">
         <Avatar className="w-12 h-12">
           <AvatarImage src={logo} alt="client logo" />
@@ -15,7 +15,7 @@ export default function ClientHeader({ name, logo, companyName}) {
           <span className="text-gray-400">{companyName}</span>
         </div>
       </div>
-      <ClientDropMenu />
+      <ClientDropMenu className="self-end"/>
     </div>
   )
 }

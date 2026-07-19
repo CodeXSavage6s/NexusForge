@@ -148,3 +148,14 @@ export async function GetWorkspaceClient(workspaceId: string) {
     })
   }
 }
+
+export async function GetClientDetails(clientId) {
+  try {
+    const [client] = await db.select().from(clients).where(eq(clients.id, clientId))
+    
+    return client
+  } catch (err) {
+    throw err
+    console.error("Error fetching client details", err)
+  }
+}

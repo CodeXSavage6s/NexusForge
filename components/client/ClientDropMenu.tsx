@@ -10,10 +10,10 @@ import { Button } from "@/components/ui/button"
 
 export default function ClientDropMenu() {
   return (
-    <div>
+    <div className="self-end ">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="flex items-center justify-center"><span>•</span><span>•</span><span>•</span></Button>
+          <Button className="flex items-center justify-center" variant="ghost"><span>•</span><span>•</span><span>•</span></Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem>
