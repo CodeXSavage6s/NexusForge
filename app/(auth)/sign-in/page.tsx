@@ -42,7 +42,7 @@ const SignIn = () => {
 
         <div className="">
           {error && (
-            <div role="alert" aria-live="polite" className="text-center text-red-500 font-semibold mb-2">
+            <div role="alert" aria-live="polite" className="text-center text-red-500 font-semibold mb-2 ">
               {error}
             </div>
           )}

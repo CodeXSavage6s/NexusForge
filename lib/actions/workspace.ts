@@ -34,7 +34,6 @@ export async function getWorkspace(
     
     const [ workspace ] = await db.select().from(workspaces).where(and(eq(workspaces.slug, workspaceSlug), eq(workspaces.ownerId, userId)));
     
-    console.log("Workspace", workspace)
     return workspace;
   } catch (err) {
     console.error("no workspace found", err);

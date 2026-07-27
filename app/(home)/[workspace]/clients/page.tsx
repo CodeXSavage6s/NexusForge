@@ -22,7 +22,7 @@ export default async function ClientsPage({ params }) {
 
   return (
     <div>
-      <ClientsFilter clients={clients} />
+      <ClientsFilter clients={clients} workspace={workspace} />
     </div>
   )
 }

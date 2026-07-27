@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, type ReactNode } from "react"
 
-export const CLIENT_TABS = ["Activity", "Settings", "Detail"] as const
+export const CLIENT_TABS = ["Activity", "Detail", "Settings"] as const
 export type ClientTab = (typeof CLIENT_TABS)[number]
 
 interface ClientNavContextValue {

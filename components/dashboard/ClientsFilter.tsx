@@ -29,7 +29,7 @@ interface ClientsFilterProps {
 
 const ALL_STATUSES = "ALL"
 
-export default function ClientsFilter({ clients }: ClientsFilterProps) {
+export default function ClientsFilter({ clients, workspace }: ClientsFilterProps) {
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState<string>(ALL_STATUSES)
 
@@ -88,7 +88,7 @@ export default function ClientsFilter({ clients }: ClientsFilterProps) {
           </p>
         ) : (
           filteredClients.map((client) => (
-            <ClientCard key={client.id} client={client} />
+            <ClientCard key={client.id} client={client} workspace={workspace} />
           ))
         )}
       </div>

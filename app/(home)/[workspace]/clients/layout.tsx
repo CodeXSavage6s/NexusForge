@@ -39,7 +39,7 @@ export default async function Layout({
         <TooltipProvider>
           <SidebarProvider>
             <AppSidebar logoSrc="/assets/logo.svg" brandName=""
-            workspaces={workspaces} />
+            workspaces={workspaces} currentWorkspace={workspace}/>
             <SidebarInset>
               <Header
                 logoSrc="/assets/logo.svg"

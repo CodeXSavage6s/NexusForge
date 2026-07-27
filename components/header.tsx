@@ -21,7 +21,7 @@ export function Header({
   logoSrc = "",
   logoAlt = "Logo",
   brandName = "",
-  brandHref = "/",
+  brandHref = "/home",
   navLinks = [],
   notificationCount = 0,
   onNotificationClick,
@@ -43,7 +43,7 @@ export function Header({
           <SidebarTrigger className="text-primary " />
 
           <Link
-            href={brandHref}
+            href="/home"
             className="flex items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded-md"
           >
             <span className="relative shrink-0 overflow-hidden rounded-md">

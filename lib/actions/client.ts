@@ -2,7 +2,7 @@
 
 import db from "@/database";
 import { clients } from "@/database/schema/schema";
-import { eq, count } from "drizzle-orm";
+import { eq, count, and, ne } from "drizzle-orm";
 import type { ClientStatus } from "@/lib/constants/client-constants";
 
 export async function ClientCount(workspaceId: string): Promise<number> {
@@ -88,7 +88,7 @@ export async function CreateClient(
     
     const [check] = await db.select().from(clients).where(eq(clients.name, name))
     
-    if (check || check.length > 0) return {
+    if (check) return {
       success: false,
       error: "Client name already exist"
     }
@@ -157,5 +157,89 @@ export async function GetClientDetails(clientId) {
   } catch (err) {
     throw err
     console.error("Error fetching client details", err)
+  }
+}
+
+export async function UpdateClient(data: {
+    id: string;
+    workspaceId: string;
+    name?: string;
+    companyName?: string;
+    email?: string;
+    phone?: string;
+    website?: string;
+    industry?: string;
+    address?: string;
+    notes?: string;
+    status?: ClientStatus;
+}) {
+  const {
+    id,
+    workspaceId,
+    name,
+    companyName,
+    email,
+    phone,
+    website,
+    industry,
+    address,
+    notes,
+    status = "PLANNING",
+  } = data;
+  console.log("update client hit", data)
+  try {
+    if (!id) {
+      return { success: false, error: "Client ID is required." };
+    }
+    if (!workspaceId) {
+      return { success: false, error: "Could not identify workspace." };
+    }
+
+    const [existingClient] = await db
+      .select()
+      .from(clients)
+      .where(
+        and(
+          eq(clients.workspaceId, workspaceId),
+          eq(clients.name, name),
+          ne(clients.id, id) 
+        )
+      );
+
+    if (existingClient) {
+      return {
+        success: false,
+        error: "A client with this name already exists in this workspace.",
+      };
+    }
+
+    const [updatedClient] = await db
+      .update(clients)
+      .set({
+        name,
+        companyName,
+        email,
+        phone,
+        website,
+        industry,
+        address,
+        notes,
+        status,
+      })
+      .where(and(eq(clients.id, id), eq(clients.workspaceId, workspaceId)))
+      .returning();
+
+    if (!updatedClient) {
+      return { success: false, error: "Client not found or update failed." };
+    }
+
+    return {
+      success: true,
+      message: "Update successful.",
+      client: updatedClient,
+    };
+  } catch (err) {
+    console.error("Update Client Error:", err);
+    return { success: false, error: "Update failed." };
   }
 }

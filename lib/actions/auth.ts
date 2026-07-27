@@ -68,6 +68,7 @@ export async function signInGoogle() {
   try {
     const data = await authClient.signIn.social({
       provider: "google",
+      callbackURL: "/home"
     });
     console.log("Google signin success")
   } catch (err) {

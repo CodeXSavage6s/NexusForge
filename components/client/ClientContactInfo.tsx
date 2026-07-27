@@ -30,11 +30,11 @@ function Row({
 
 export default function ClientContactInfo({ client }: { client: Client }) {
   return (
-    <div className="flex flex-col gap-1 ">
-      <Row icon={Mail} value={client.email} href={client.email ? `mailto:${client.email}` : undefined} />
+    <div className="grid gap-2  text-sm text-gray-400">
       <Row icon={Phone} value={client.phone} href={client.phone ? `tel:${client.phone}` : undefined} />
       <Row icon={Globe} value={client.website} href={client.website ?? undefined} />
       <Row icon={MapPin} value={client.address} />
+      <Row icon={Mail} value={client.email} href={client.email ? `mailto:${client.email}` : undefined} />
     </div>
   )
 }

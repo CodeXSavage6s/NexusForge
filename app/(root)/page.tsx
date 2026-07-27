@@ -34,7 +34,7 @@ const Home = () => {
     <div>
       {/* Header */}
       <header className="header flex items-center justify-between px-4 py-3 border-b z-50">
-        <Link href="/dashboard" className="flex items-center">
+        <Link href="/home" className="flex items-center">
           <Image src="/assets/logo.svg" width={170} height={60} alt="NexusForge" />
         </Link>
         
