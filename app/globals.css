@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import '@fontsource-variable/geist-mono/wght.css';
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
+@import '@fontsource-variable/source-serif-4/wght.css';
+@import '@fontsource/share-tech-mono';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -127,9 +132,6 @@
   body {
     @apply bg-background text-foreground transition-all duration-100;
   }
-  html {
-    @apply font-sans;
-  }
 }
 
 @utility text-gradient {
@@ -153,12 +155,30 @@
     @apply bg-transparent text-foreground p-5 border-1 border-gray-500 font-bold text-lg;
   }
   section {
-    @apply my-3 
+    @apply my-3;
   }
+  .editInput {
+    @apply w-full border-0 border-b border-gray-500 bg-transparent pb-1 font-medium outline-none focus:bg-card
+  }
+  .editLabel {
+    @apply text-gray-500
+  }
+}
+
+html, body {
+  font-family: 'Source Serif 4 Variable', serif;
+}
+
+.markdown {
+  font-family: 'Share Tech Mono', monospace;
 }
 
 .light-blue-bg {
   background: rgba(59, 130, 246, 0.2);
+}
+
+.editLabel {
+  font-family: 'Geist Mono Variable', monospace;
 }
 
 /* ==========================================================================

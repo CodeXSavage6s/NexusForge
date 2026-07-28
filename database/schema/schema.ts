@@ -285,6 +285,9 @@ export const activity = pgTable(
   "activity",
   {
     id: cuid(),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => clients.id, { onDelete: "cascade" }),
     projectId: text("project_id")
       .notNull()
       .references(() => projects.id, { onDelete: "cascade" }),

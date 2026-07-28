@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 export default function InfoCard({
-  href = "/",
+  href = "",
   icon: Icon,
   iconBg,
   iconColor,

@@ -61,6 +61,7 @@ export interface AppSidebarProps {
   navItems?: SidebarNavItem[];
   /** Every workspace the current user can switch into. */
   workspaces?: WorkspaceSummary[];
+  currentWorkspace?: WorkspaceSummary | null;
 }
 
 // ---------- Demo data (swap out with real data) ----------
@@ -169,6 +170,7 @@ export function AppSidebar({
   logoSrc = "",
   navItems = demoGeneralNavItems,
   workspaces = [],
+  currentWorkspace
 }: AppSidebarProps) {
   const pathname = usePathname();
 
@@ -177,8 +179,8 @@ export function AppSidebar({
   // which route to `/${workspace.slug}/...`), so we must match against
   // `slug`, not `id`.
   const workspaceSlugInPath = pathname.match(/^\/([^/]+)\/(?:dashboard|projects|analytics|team)/)?.[1] ?? null;
-  const currentWorkspace =
-    workspaces.find((w) => w.slug === workspaceSlugInPath) ?? null;
+  // const currentWorkspace =
+  //   workspaces.find((w) => w.slug === workspaceSlugInPath) ?? null;
 
   const workspaceNavItems = currentWorkspace
     ? getWorkspaceNavItems(currentWorkspace.slug)
@@ -189,7 +191,7 @@ export function AppSidebar({
       <SidebarHeader className="gap-2">
         <Link href="/" className="flex items-center gap-2.5 px-2 py-1.5">
           <span className="relative shrink-0 overflow-hidden rounded-md">
-            <Image src={logoSrc} alt={brandName} width={230} height={95} />
+            <Image src="/home" alt={brandName} width={230} height={95} />
           </span>
           <span className="text-base font-semibold tracking-tight group-data-[collapsible=icon]:hidden">
             {brandName}
@@ -220,7 +222,7 @@ export function AppSidebar({
                   >
                     <Link href={item.href} className=" font-bold">
                       {item.icon && <item.icon className="h-4 w-4" />}
-                      <span className="text-xl">{item.title}</span>
+                      <span className="">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -243,7 +245,7 @@ export function AppSidebar({
                     >
                       <Link href={item.href} className=" font-bold">
                         {item.icon && <item.icon className="h-4 w-4" />}
-                        <span className="text-xl">{item.title}</span>
+                        <span className="">{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

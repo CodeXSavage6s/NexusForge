@@ -38,7 +38,7 @@ export default function GoogleAuth({ auth, className }: { auth: string; classNam
     try {
       const response = await authClient.signIn.social({
           provider: "google",
-          callbackURL: "/"
+          callbackURL: "/home"
       });
       //await signUpGoogle()
       console.log("Message:", response)
@@ -53,7 +53,7 @@ export default function GoogleAuth({ auth, className }: { auth: string; classNam
     try {
       const response = await authClient.signIn.social({
           provider: "google",
-          callbackURL: "/"
+          callbackURL: "/home"
       });
       console.log("Message:", response)
       //await signInGoogle()  
