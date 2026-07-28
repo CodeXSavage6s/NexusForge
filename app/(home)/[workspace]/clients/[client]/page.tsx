@@ -8,23 +8,7 @@ import { GetClientDetails } from "@/lib/actions/client"
 export default async function Page({ params }) {
   const { workspace, client } = await params
   
-  const Client = await GetClientDetails(client)
-  /*const client = {
-    id: clientId,
-    workspaceId: workspace,
-    name: "Client Name",
-    companyName: "Nexuforge inc.",
-    email: "hello@nexuforge.com",
-    phone: "+1 555 123 4567",
-    website: "https://nexuforge.com",
-    industry: "Manufacturing",
-    logo: "",
-    address: "123 Main St, Springfield",
-    notes: "",
-    status: "LEAD" as const,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  }*/
+  const Client = await GetClientDetails(client, workspace)
 
   return (
     <ClientNavProvider>

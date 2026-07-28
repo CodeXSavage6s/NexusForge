@@ -10,8 +10,9 @@ export function ClientCard({
   workspace,
   client,
   projectCount = 0,
-}: {
-  client: ClientSummary;
+}: {Wm
+  workspace: string,
+  client: Client;
   projectCount?: number;
 }) {
   const path = usePathname()

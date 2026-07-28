@@ -22,8 +22,8 @@ export interface CreateClientState {
   client?: typeof clients.$inferSelect;
 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const WEBSITE_RE = /^https?:\/\/.+/i;
+const EMAIL_RE = /^[^\s@]@[^\s@]\.[^\s@]$/;
+const WEBSITE_RE = /^https?:\/\/./i;
 
 export async function CreateClient(
   data: {
@@ -86,7 +86,10 @@ export async function CreateClient(
       };
     }
     
-    const [check] = await db.select().from(clients).where(eq(clients.name, name))
+    const [check] = await db
+      .select()
+      .from(clients)
+      .where(and(eq(clients.workspaceId, workspaceId), eq(clients.name, name)))
     
     if (check) return {
       success: false,
@@ -149,14 +152,14 @@ export async function GetWorkspaceClient(workspaceId: string) {
   }
 }
 
-export async function GetClientDetails(clientId) {
+export async function GetClientDetails(clientId: string, workspaceId: string) {
   try {
-    const [client] = await db.select().from(clients).where(eq(clients.id, clientId))
+    const [client] = await db.select().from(clients).where(and(eq(clients.id, clientId), eq(clients.workspaceId, workspaceId)))
     
     return client
   } catch (err) {
-    throw err
     console.error("Error fetching client details", err)
+    throw err
   }
 }
 
@@ -184,9 +187,8 @@ export async function UpdateClient(data: {
     industry,
     address,
     notes,
-    status = "PLANNING",
+    status,
   } = data;
-  console.log("update client hit", data)
   try {
     if (!id) {
       return { success: false, error: "Client ID is required." };

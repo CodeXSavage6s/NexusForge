@@ -158,7 +158,7 @@
     @apply my-3;
   }
   .editInput {
-    @apply w-full border-0 border-b border-gray-500 bg-transparent pb-1 font-medium outline-none
+    @apply w-full border-0 border-b border-gray-500 bg-transparent pb-1 font-medium outline-none focus:bg-card
   }
   .editLabel {
     @apply text-gray-500
@@ -171,10 +171,6 @@ html, body {
 
 .markdown {
   font-family: 'Share Tech Mono', monospace;
-}
-
-editInput {
-  font-family: 'JetBrains Mono Variable', monospace;
 }
 
 .light-blue-bg {

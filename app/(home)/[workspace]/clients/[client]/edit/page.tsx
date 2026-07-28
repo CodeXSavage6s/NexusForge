@@ -6,7 +6,7 @@ import { GetClientDetails } from "@/lib/actions/client"
 export default async function page({ params }) {
   const { workspace, client } = await params
   
-  const Client = await GetClientDetails(client)
+  const Client = await GetClientDetails(client, workspace)
   return (
     <div className="flex flex-col gap-3">
         <ClientInfoEdit client={Client}/>

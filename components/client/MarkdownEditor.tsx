@@ -5,14 +5,8 @@ import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button"
 import { UpdateClient } from '@/lib/actions/client'
 
-interface MarkdownEditorProps {
-  initialValue
-  onSave?: (content: string) => void;
-}
-
 export default function MarkdownEditor({
-  initialValue,
-  onSave,
+  initialValue: Client,
 }) {
   const [content, setContent] = useState(initialValue);
   const [mode, setMode] = useState<"edit" | "preview">("preview");

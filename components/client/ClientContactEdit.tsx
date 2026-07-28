@@ -4,16 +4,16 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 import { UpdateClient } from '@/lib/actions/client'
 
-// export interface ClientContactInfo {
-//   phone: string | null;
-//   email: string | null;
-//   website: string | null;
-//   address: string | null;
-// }
+export interface ClientContactInfo {
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+  address: string | null;
+}
 
 interface ClientContactEditProps {
   client: ClientContactInfo;
-  onSave?: (data: ClientContactInfo) => Promise<void> | void;
+  onSave?: (data: Client) => Promise<void> | void;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

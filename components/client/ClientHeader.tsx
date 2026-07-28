@@ -2,7 +2,13 @@ import Image from 'next/image'
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import ClientDropMenu from "@/components/client/ClientDropMenu"
 
-export default function ClientHeader({ name, logo, companyName}) {
+interface ClientHeaderProps {
+  name: string
+  logo?: string | null
+  companyName?: string | null
+}
+
+export default function ClientHeader({ name, logo, companyName }: ClientHeaderProps) {
   return (
     <div className="flex flex-row justify-between gap-12 p-2">
       <div className="flex gap-2">

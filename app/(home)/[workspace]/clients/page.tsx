@@ -4,6 +4,7 @@ import ClientsFilter from '@/components/dashboard/ClientsFilter'
 import { auth } from "@/lib/better-auth/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 export default async function ClientsPage({ params }) {
   const { workspace } = await params
@@ -15,6 +16,7 @@ export default async function ClientsPage({ params }) {
   const user = session.user
 
   const Workspace = await getWorkspace(workspace, user.id)
+  if (!Workspace) notFound()
 
   const response = await GetWorkspaceClient(Workspace.id)
 
