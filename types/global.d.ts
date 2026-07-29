@@ -69,4 +69,23 @@ declare global {
       updatedAt: Date
     }
 
+    interface Projects {
+      id: string
+      workspaceId: string
+      clientId: string
+      name: string 
+      slug: string
+      description: string
+      status: ClientStatus
+      priority: string
+      budget: number
+      currency: string
+      startDate: Date
+      dueDate: Date
+      completedAt: Date
+      progress: string
+      color: string
+      icon: string
+    }
+
 }

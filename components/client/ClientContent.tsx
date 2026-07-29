@@ -2,6 +2,7 @@
 
 import { useClientNav } from "./ClientNavContext"
 import type { Client } from "./types"
+import ReactMarkdown from "react-markdown";
 
 function ActivityPanel() {
   // Replace with a real activity/timeline query once you have one
@@ -32,7 +33,7 @@ function DetailPanel({ client }: { client: Client }) {
     <div className="flex flex-col gap-3 text-sm">
       <div>
         <span className="text-gray-400 block mb-1">Notes</span>
-        <p className="whitespace-pre-wrap">{client.notes ?? "No notes yet."}</p>
+        <ReactMarkdown>{client.notes ?? "___No notes yet.___"}</ReactMarkdown>
       </div>
     </div>
   )

@@ -13,6 +13,7 @@ export interface WorkspaceSummary {
   slug: string;
   clientCount: number;
   projectCount: number;
+  logo: string
 }
 
 export async function getUserWorkspaces(
@@ -28,7 +29,7 @@ export async function getUserWorkspaces(
 }
 
 export async function getWorkspace(
-  workspaceSlug: string, userId: string
+  workspaceSlug: string, userId: string | undefined
 ): Promise<WorkspaceSummary | null> {
   try {
     

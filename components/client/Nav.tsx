@@ -2,11 +2,11 @@
 
 import { CLIENT_TABS, useClientNav } from "./ClientNavContext"
 
-export default function Nav() {
+export default function Nav({className}) {
   const { active, setActive } = useClientNav()
 
   return (
-    <div className="flex justify-center items-center self-start ">
+    <div className={`flex justify-center items-center self-start ${className}`}>
       <div className="flex gap-3">
         {CLIENT_TABS.map((item) => (
           <button

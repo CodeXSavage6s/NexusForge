@@ -13,14 +13,12 @@ export interface ClientContactInfo {
 
 interface ClientContactEditProps {
   client: ClientContactInfo;
-  onSave?: (data: Client) => Promise<void> | void;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function ClientContactEdit({
-  client,
-  onSave,
+  client
 }) {
   const [data, setData] = useState(client);
   const [form, setForm] = useState(client);

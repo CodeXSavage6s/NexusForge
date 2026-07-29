@@ -26,7 +26,6 @@ export interface ClientBasicInfo {
 
 interface ClientInfoEditProps {
   client: ClientBasicInfo;
-  onSave?: (data: Client) => Promise<void> | void;
 }
 
 const STATUS_OPTIONS = [
@@ -42,7 +41,6 @@ const STATUS_OPTIONS = [
 
 export default function ClientInfoEdit({
   client,
-  onSave,
 }: ClientInfoEditProps) {
   const [data, setData] = useState(client);
   const [form, setForm] = useState(client);
