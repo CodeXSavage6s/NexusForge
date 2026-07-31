@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button"
 import { UpdateClient } from '@/lib/actions/client'
 
 export default function MarkdownEditor({
-  initialValue: Client,
+  initialValue,
 }) {
   const [content, setContent] = useState(initialValue);
   const [mode, setMode] = useState<"edit" | "preview">("preview");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("")
 
   const handleSave = async () => {
     console.log("Save hit", content)

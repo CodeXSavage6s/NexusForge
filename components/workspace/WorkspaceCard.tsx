@@ -4,11 +4,11 @@ import type { WorkspaceSummary } from "@/lib/actions/workspace";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function WorkspaceCard({ workspace,
-  clientCount = 0, projectCount = 0}: { workspace: WorkspaceSummary }) {
+  clientCount = 0, projectCount = 0}: { workspace: WorkspaceSummary, clientCount?: number, projectCount?: number }) {
   return (
     <Link
       href={`/${workspace.slug}/dashboard`}
-      className="flex justify-between gap-4 rounded-lg border p-4 transition-colors hover:bg-muted/50"
+      className="w-full flex justify-between gap-4 rounded-lg border p-4 transition-colors hover:bg-muted/50"
     >
       <div
       className="flex flex-col gap-3 "
@@ -27,7 +27,7 @@ export function WorkspaceCard({ workspace,
         </div>
       </div>
       <Avatar className="w-12 h-12">
-        <AvatarImage src={workspace.logo} />
+        <AvatarImage src={workspace?.logo} />
         <AvatarFallback className="font-bold text-xl">{workspace.name[0]}</AvatarFallback>
       </Avatar>
     </Link>

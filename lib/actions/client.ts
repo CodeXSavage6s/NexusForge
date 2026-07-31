@@ -22,7 +22,7 @@ export interface CreateClientState {
   client?: typeof clients.$inferSelect;
 }
 
-const EMAIL_RE = /^[^\s@]@[^\s@]\.[^\s@]$/;
+//const EMAIL_RE =
 const WEBSITE_RE = /^https?:\/\/./i;
 
 export async function CreateClient(
@@ -70,9 +70,9 @@ export async function CreateClient(
       fieldErrors.name = "Client name is required.";
     }
 
-    if (email && !EMAIL_RE.test(email)) {
-      fieldErrors.email = "Enter a valid email address.";
-    }
+    //if (email && !EMAIL_RE.test(email)) {
+    //  fieldErrors.email = "Enter a valid email address.";
+   // }
 
    /* if (website && !WEBSITE_RE.test(website)) {
       fieldErrors.website = "Enter a valid URL (starting with http:// or https://).";
@@ -152,10 +152,12 @@ export async function GetWorkspaceClient(workspaceId: string) {
   }
 }
 
-export async function GetClientDetails(clientId: string, workspaceId: string) {
+export async function GetClientDetails(clientId: string, workspaceId: string | undefined) {
   try {
+    console.log("Fetching client details for clientId:", clientId, "in workspaceId:", workspaceId);
     const [client] = await db.select().from(clients).where(and(eq(clients.id, clientId), eq(clients.workspaceId, workspaceId)))
     
+    console.log("client from server", client)
     return client
   } catch (err) {
     console.error("Error fetching client details", err)
