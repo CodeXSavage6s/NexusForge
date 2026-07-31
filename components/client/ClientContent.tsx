@@ -1,8 +1,10 @@
 "use client"
 
 import { useClientNav } from "./ClientNavContext"
-import type { Client } from "./types"
+import type { Client, Activities } from "@/types/client"
 import ReactMarkdown from "react-markdown";
+
+
 
 function ActivityPanel() {
   // Replace with a real activity/timeline query once you have one
@@ -39,7 +41,7 @@ function DetailPanel({ client }: { client: Client }) {
   )
 }
 
-export default function ClientContent({ client }: { client: Client }) {
+export default function ClientContent({ client, activities }: { client: Client, activities: Activities }) {
   const { active } = useClientNav()
 
   return (
