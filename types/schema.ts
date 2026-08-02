@@ -61,6 +61,21 @@ export interface Project {
   updatedAt: Date
 }
 
+interface CreateProjectDialogProps {
+  clientId: string;
+  clientName: string;
+  workspaceId: string;
+  onSubmit: (values: {
+    clientId: string;
+    workspaceId: string;
+    name: string;
+    description: string;
+    priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+    dueDate: string;
+  }) => void | Promise<void>;
+  trigger?: React.ReactNode;
+}
+
 export interface Task {
   id: string
   projectId: string

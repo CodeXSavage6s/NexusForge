@@ -1,5 +1,5 @@
 import { Mail, Phone, Globe, MapPin } from "lucide-react"
-import type { Client } from "./types"
+import type { Client } from "@/types/client"
 
 function Row({
   icon: Icon,

@@ -187,9 +187,9 @@ export function AppSidebar({
     : [];
 
   return (
-    <Sidebar collapsible="icon" className="bg-primary">
+    <Sidebar collapsible="icon" className="bg-background">
       <SidebarHeader className="gap-2">
-        <Link href="/homw" className="flex items-center gap-2.5 px-2 py-1.5">
+        <Link href="/home" className="flex items-center gap-2.5 px-2 py-1.5">
           <span className="relative shrink-0 overflow-hidden rounded-md">
             <Image src="/assets/logo.svg" alt={brandName} width={230} height={95} />
           </span>

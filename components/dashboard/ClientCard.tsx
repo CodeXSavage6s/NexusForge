@@ -4,13 +4,13 @@ import Link from "next/link";
 import { Mail, Phone, FolderKanban } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePathname } from 'next/navigation'
-
+import { Client } from "@/types/client";
 
 export function ClientCard({
   workspace,
   client,
   projectCount = 0,
-}: {Wm
+}: {
   workspace: string,
   client: Client;
   projectCount?: number;

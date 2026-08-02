@@ -1,16 +1,25 @@
 "use client"
 
 import { useClientNav } from "./ClientNavContext"
-import type { Client, Activities } from "@/types/client"
+import { Activity } from "@/types/schema"
+import { Client } from "@/types/client"
 import ReactMarkdown from "react-markdown";
 
 
 
-function ActivityPanel() {
+function ActivityPanel({ activities }: {activities: Activity[]}) {
   // Replace with a real activity/timeline query once you have one
   return (
     <div className="flex flex-col gap-2 text-sm text-gray-400">
-      <p>No activity yet.</p>
+      {activities ? 
+      activities?.map(act => (
+        <div className="activities">
+          <span>{act?.message}</span><span>{new Date(act?.createdAt).getDate().toString()}</span>
+        </div> 
+      ))
+      : <p>No activity yet.</p>
+    }
+    {/* activities */}
     </div>
   )
 }
@@ -41,12 +50,12 @@ function DetailPanel({ client }: { client: Client }) {
   )
 }
 
-export default function ClientContent({ client, activities }: { client: Client, activities: Activities }) {
+export default function ClientContent({ client, activities }: { client: Client, activities: Activity[] | undefined }) {
   const { active } = useClientNav()
 
   return (
     <div className="min-h-70">
-      {active === "Activity" && <ActivityPanel />}
+      {active === "Activity" && <ActivityPanel activities={activities}/>}
       {active === "Settings" && <SettingsPanel client={client} />}
       {active === "Detail" && <DetailPanel client={client} />}
     </div>

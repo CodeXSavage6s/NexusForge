@@ -4,15 +4,24 @@ import { projects } from '@/database/schema/schema'
 import db from '@/database/index'
 import { eq, count, and, ne } from 'drizzle-orm'
 import { PROJECT_PRIORITY, PROJECT_STATUS } from "@/lib/constants/client-constants"
+import { NewClientActivity } from "@/lib/actions/activity"
+import { auth } from "@/lib/better-auth/auth"
+import { headers } from "next/headers"
 import { success } from 'better-auth';
+
+
 
 export async function ProjectsCount(workspaceId: string): Promise<number> {
   const result = await db.select({ count: count() }).from(projects).where(eq(projects.workspaceId, workspaceId));
   return result[0]?.count ?? 0;
 }
 
+export async function ProjectsClientCount(clientId: string): Promise<number> {
+  const result = await db.select({ count: count() }).from(projects).where(eq(projects.clientId, clientId));
+  return result[0]?.count ?? 0;
+}
+
 export async function CreateProject(data: {
-    id: string;
     workspaceId: string;
     clientId: string;
     name: string;
@@ -24,51 +33,61 @@ export async function CreateProject(data: {
     currency?: string;
     startDate?: Date;
     dueDate?: Date;
-    completedAt?: Date;
-    progress?: string;
     color?: string;
     icon?: string;
 }) {
   try {
-    const { id, workspaceId, clientId, name, slug, description, status, priority, budget, currency, startDate, dueDate, completedAt, progress, color, icon } = data;
+    // console.log("create project hit")
+    // console.log("data", data)
+    const { workspaceId, clientId, name, slug, description, status, priority, budget, currency, startDate, dueDate, color, icon } = data;
 
-    const check = await db.select().from(projects).where(and(eq(projects.clientId, clientId), eq(projects.name, name), ne(projects.id, id)))
-   
+    const check = await db.select().from(projects).where(and(eq(projects.clientId, clientId), eq(projects.name, name)));
+
+    console.log("check", check)
     if (check.length > 0) {
-      throw new Error('Project with the same name already exists for this client in the workspace.');
+      return {
+        success: false,
+        error: 'duplicate',
+        message: 'Project with the same name already exists for this client in the workspace.',
+      };
     }
-  
-    const newProject = await db.insert(projects).values([{
-      workspaceId,
-      clientId,
-      name,
-      slug,
-      description,
-      status,
-      priority,
-      budget,
-      currency,
-      startDate,
-      dueDate,
-      completedAt,
-      progress,
-      color,
-      icon
-    } as any]);
 
+    const [insertedProject] = await db
+      .insert(projects)
+      .values({
+          clientId,
+          workspaceId,
+          name,
+          slug,
+          description,
+          status,
+          priority,
+          budget,
+          currency,
+          startDate,
+          dueDate,
+      })
+      .returning();
+
+    const session = await auth.api.getSession({ headers: await headers() });
+
+    const user = session?.user
+
+    const newActivity = await NewClientActivity({ clientId, userId: user?.id, type: "Create Project", projectId: insertedProject.id, message: "Created new Project"})
+
+      // console.log("Project created successfully:", insertedProject);
     return {
       success: true,
-      project: newProject
+      project: insertedProject,
     };
-    console.log('newproject', newProject)
 
   } catch (err) {
+    console.error("Failed to create project:", err);
     return {
       success: false,
-      error: err,
-      message: 'Failed to create project'
-    }
-    console.log("errror", err)
+      error: err instanceof Error ? err.message : String(err),
+      message: err instanceof Error ? err.message : 'Failed to create project',
+    };
   }
 
 }

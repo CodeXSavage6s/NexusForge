@@ -20,11 +20,15 @@ interface Activities {
  error?: undefined;
 }
 
-export async function NewClientActivity() {
+export async function NewClientActivity({clientId, projectId, userId, type= "Create Project", message}: {clientId: string, projectId: string, userId: string | undefined, type: string, message: string}) {
+    console.log("new activity hit")
     try {
+        const newActivity = await db.insert(activity).values({ clientId, projectId, userId, type, message }).returning()
+
+        console.log("New Activity", newActivity)
 
     } catch (err) {
-
+        console.error("failed to create activity", err)
     }
 }
 
