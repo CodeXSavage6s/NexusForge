@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 
-export default async function ClientsPage({ params }) {
+export default async function ClientsPage({ params }: { params: Promise<{ workspace: string }> }) {
   const { workspace } = await params
 
   const session = await auth.api.getSession({ headers: await headers() });
@@ -20,11 +20,11 @@ export default async function ClientsPage({ params }) {
 
   const response = await GetWorkspaceClient(Workspace.id)
 
-  const clients = response.client
+  const clients = response.client ?? []
 
   return (
     <div>
-      <ClientsFilter clients={clients} workspace={workspace} />
+      <ClientsFilter clients={clients} workspaceId={workspace} />
     </div>
   )
 }

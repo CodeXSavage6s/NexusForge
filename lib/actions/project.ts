@@ -1,6 +1,6 @@
 "use server"
 
-import { projects } from '@/database/schema/schema'
+import { projects, tasks } from '@/database/schema/schema'
 import db from '@/database/index'
 import { eq, count, and, ne } from 'drizzle-orm'
 import { PROJECT_PRIORITY, PROJECT_STATUS } from "@/lib/constants/client-constants"
@@ -19,6 +19,63 @@ export async function ProjectsCount(workspaceId: string): Promise<number> {
 export async function ProjectsClientCount(clientId: string): Promise<number> {
   const result = await db.select({ count: count() }).from(projects).where(eq(projects.clientId, clientId));
   return result[0]?.count ?? 0;
+}
+
+export async function getTaskCompletionProgress(totalTasks: number, completedTasks: number) {
+  if (totalTasks <= 0) {
+    return 0;
+  }
+
+  return Math.min(100, Math.max(0, Math.round((completedTasks / totalTasks) * 100)));
+}
+
+export async function calculateProjectTaskProgress(projectId: string) {
+  const totalResult = await db.select({ count: count() }).from(tasks).where(eq(tasks.projectId, projectId));
+  const completedResult = await db
+    .select({ count: count() })
+    .from(tasks)
+    .where(and(eq(tasks.projectId, projectId), eq(tasks.status, "DONE")));
+
+  const total = Number(totalResult[0]?.count ?? 0);
+  const completed = Number(completedResult[0]?.count ?? 0);
+
+  return {
+    total,
+    completed,
+    progress: await getTaskCompletionProgress(total, completed),
+  };
+}
+
+export async function syncProjectProgress(projectId: string) {
+  const { progress } = await calculateProjectTaskProgress(projectId);
+  const [updatedProject] = await db
+    .update(projects)
+    .set({ progress })
+    .where(eq(projects.id, projectId))
+    .returning();
+
+  return {
+    success: Boolean(updatedProject),
+    project: updatedProject,
+    progress,
+  };
+}
+
+export async function GetProjectsForClient(clientId: string) {
+  try {
+    const result = await db.select().from(projects).where(eq(projects.clientId, clientId));
+    return {
+      success: true,
+      projects: result,
+    };
+  } catch (err) {
+    console.error('Failed to fetch projects for client', err);
+    return {
+      success: false,
+      message: 'Failed to fetch projects for client',
+      err,
+    };
+  }
 }
 
 export async function CreateProject(data: {
@@ -151,5 +208,17 @@ export async function UpdateProject(data: {
       success: false,
       error: "Failed to Update Project"
     }
+  }
+}
+
+export async function DeleteProject(projectId: string, clientId?: string) {
+  try {
+    const whereClause = clientId ? and(eq(projects.id, projectId), eq(projects.clientId, clientId)) : eq(projects.id, projectId);
+    const [deleted] = await db.delete(projects).where(whereClause).returning();
+    if (!deleted) return { success: false, error: 'Project not found or not authorized' };
+    return { success: true, project: deleted };
+  } catch (err) {
+    console.error('Failed to delete project', err);
+    return { success: false, error: 'Failed to delete project' };
   }
 }

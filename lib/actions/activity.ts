@@ -23,7 +23,7 @@ interface Activities {
 export async function NewClientActivity({clientId, projectId, userId, type= "Create Project", message}: {clientId: string, projectId: string, userId: string | undefined, type: string, message: string}) {
     console.log("new activity hit")
     try {
-        const newActivity = await db.insert(activity).values({ clientId, projectId, userId, type, message }).returning()
+        const newActivity = await db.insert(activity).values({ clientId, projectId, userId, type, message, createdAt: new Date() }).returning()
 
         console.log("New Activity", newActivity)
 

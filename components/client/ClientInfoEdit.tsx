@@ -12,6 +12,10 @@ import {
 import { UpdateClient } from '@/lib/actions/client'
 import { Client } from "@/types/client";
 
+interface ClientInfoEditProps {
+  client: Client;
+}
+
 export type ClientStatus =
   | "ACTIVE"
   | "INACTIVE"
@@ -32,7 +36,7 @@ const STATUS_OPTIONS = [
 
 export default function ClientInfoEdit({
   client,
-}: Client) {
+}: ClientInfoEditProps) {
   const [data, setData] = useState(client);
   const [form, setForm] = useState(client);
   const [saving, setSaving] = useState(false);

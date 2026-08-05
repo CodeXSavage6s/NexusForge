@@ -10,7 +10,7 @@ import { headers } from "next/headers"
 import { GetClientActivities } from "@/lib/actions/activity"
 import { ProjectsClientCount } from "@/lib/actions/project"
 
-export default async function Page({ params }: { params: { workspace: string; client: string } }) {
+export default async function Page({ params }: { params: Promise<{ workspace: string; client: string }> }) {
   const { workspace, client } = await params
   
   const session = await auth.api.getSession({ headers: await headers() });
@@ -57,7 +57,7 @@ export default async function Page({ params }: { params: { workspace: string; cl
     <ClientNavProvider>
       <div className="p-1 flex flex-col gap-2">
         <div className="p-2 flex flex-col gap-2 justify-items-start ">
-          <ClientHeader logo={clientData?.logo} name={clientData?.name} companyName={clientData?.companyName} workspace={Workspace.id} client={client} />
+          <ClientHeader logo={clientData?.logo} name={clientData?.name} companyName={clientData?.companyName} workspace={Workspace?.id} client={client} />
           <div className="flex gap-2 items-center">
             <span className={`h-4 w-4 ${statusOption?.dot ?? 'bg-gray-400'} rounded-full`}></span>
             <p>{statusOption?.label ?? clientData?.status}</p>

@@ -36,10 +36,13 @@ export default async function WorkspacesPage() {
         </div>
       ) : (
         <section className="grid grid-cols-1 sm:grid-cols-2 mid:grid-cols-3 gap-2">
-          {workspaces.map((workspace) => (
-            <WorkspaceCard key={workspace.id} workspace={workspace} 
-            clientCount={ClientCount(workspace.id)} projectCount={ProjectsCount(workspace.id)} />
-          ))}
+          {await Promise.all(workspaces.map(async (workspace) => {
+            const clientCount = await ClientCount(workspace.id);
+            const projectCount = await ProjectsCount(workspace.id);
+            return (
+              <WorkspaceCard key={workspace.id} workspace={workspace} clientCount={clientCount} projectCount={projectCount} />
+            );
+          }))}
         </section>
       )}
     </div>

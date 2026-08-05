@@ -7,7 +7,7 @@ import ReactMarkdown from "react-markdown";
 
 
 
-function ActivityPanel({ activities }: {activities: Activity[]}) {
+function ActivityPanel({ activities }: { activities: Activity[] | undefined }) {
   // Replace with a real activity/timeline query once you have one
   return (
     <div className="flex flex-col gap-2 text-sm text-gray-400">

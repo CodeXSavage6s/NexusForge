@@ -3,23 +3,17 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { UpdateClient } from '@/lib/actions/client'
-
-export interface ClientContactInfo {
-  phone: string | null;
-  email: string | null;
-  website: string | null;
-  address: string | null;
-}
+import type { Client } from "@/types/client";
 
 interface ClientContactEditProps {
-  client: ClientContactInfo;
+  client: Client;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function ClientContactEdit({
   client
-}) {
+}: ClientContactEditProps) {
   const [data, setData] = useState(client);
   const [form, setForm] = useState(client);
   const [saving, setSaving] = useState(false);

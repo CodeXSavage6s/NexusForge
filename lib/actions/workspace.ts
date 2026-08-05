@@ -67,3 +67,22 @@ export async function createWorkspace(
     return { message: "Failed to create Workspace" };
   }
 }
+
+export async function DeleteWorkspace(workspaceId: string) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) return { success: false, error: 'Not authenticated' };
+
+  try {
+    const [deleted] = await db
+      .delete(workspaces)
+      .where(and(eq(workspaces.id, workspaceId), eq(workspaces.ownerId, session.user.id)))
+      .returning();
+
+    if (!deleted) return { success: false, error: 'Workspace not found or not authorized' };
+
+    return { success: true, workspace: deleted };
+  } catch (err) {
+    console.error('Failed to delete workspace', err);
+    return { success: false, error: 'Failed to delete workspace' };
+  }
+}

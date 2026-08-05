@@ -21,9 +21,9 @@ export default async function Layout({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ workspace: string, client: string }>;
+  params: Promise<{ workspace: string }>;
 }) {
-    const { workspace: workspaceSlug, client } = await params;
+    const { workspace: workspaceSlug } = await params;
 
     const session = await auth.api.getSession({ headers: await headers() });
 
