@@ -6,7 +6,7 @@ interface ClientHeaderProps {
   name: string
   logo?: string | null | undefined
   companyName?: string | null
-  workspace: string | undefined
+  workspace: string
   client: string
 }
 

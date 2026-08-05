@@ -29,7 +29,7 @@ import { PROJECT_PRIORITY, PROJECT_STATUS } from "@/lib/constants/client-constan
 type CreateProjectDialogProps = {
   clientId: string;
   clientName: string;
-  workspaceId: string;
+  workspaceId?: string;
   trigger?: React.ReactNode;
   onSubmit?: () => void;
 };

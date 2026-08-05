@@ -52,7 +52,19 @@ export default function ClientInfoEdit({
 
     try {
       console.log("Save hit 2", form)
-      const response = await UpdateClient(form)
+      const response = await UpdateClient({
+        id: form.id,
+        workspaceId: form.workspaceId,
+        name: form.name,
+        companyName: form.companyName ?? undefined,
+        email: form.email ?? undefined,
+        phone: form.phone ?? undefined,
+        website: form.website ?? undefined,
+        industry: form.industry ?? undefined,
+        address: form.address ?? undefined,
+        notes: form.notes ?? undefined,
+        status: form.status,
+      })
       console.log("Response", response)
       
       //setData(form);

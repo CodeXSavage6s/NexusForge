@@ -18,6 +18,7 @@ export default async function Page({ params }: { params: Promise<{ workspace: st
   const user = session?.user
 
   const Workspace = await getWorkspace(workspace, user?.id)
+  if (!Workspace) throw new Error("Workspace not found")
 
   const activities = await GetClientActivities(client)
 
@@ -25,7 +26,7 @@ export default async function Page({ params }: { params: Promise<{ workspace: st
 
   const projectCount = await ProjectsClientCount(client)
 
-  const clientData = await GetClientDetails(client, Workspace?.id)
+  const clientData = await GetClientDetails(client, Workspace.id)
   console.log("Client from page.tsx", clientData)
 
   const STATUS_OPTIONS: ({

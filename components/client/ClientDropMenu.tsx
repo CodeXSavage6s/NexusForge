@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link";
 import { CreateProjectDialog } from "@/components/project/CreateProject";
 
-export default function ClientDropMenu({ className, clientId, clientName, workspaceId }: { className: string; clientId: string; clientName: string; workspaceId: string }) {
+export default function ClientDropMenu({ className, clientId, clientName, workspaceId }: { className: string; clientId: string; clientName: string; workspaceId?: string }) {
   return (
     <div className={className}>
       <DropdownMenu>

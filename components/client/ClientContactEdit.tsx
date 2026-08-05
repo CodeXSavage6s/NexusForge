@@ -14,8 +14,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export default function ClientContactEdit({
   client
 }: ClientContactEditProps) {
-  const [data, setData] = useState(client);
-  const [form, setForm] = useState(client);
+  const [data, setData] = useState<Client>(client);
+  const [form, setForm] = useState<Client>(client);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +29,14 @@ export default function ClientContactEdit({
 
     try {
       console.log("Save hit 2", form)
-      const response = await UpdateClient(form)
+      const response = await UpdateClient({
+        id: form.id,
+        workspaceId: form.workspaceId,
+        email: form.email ?? undefined,
+        phone: form.phone ?? undefined,
+        website: form.website ?? undefined,
+        address: form.address ?? undefined,
+      })
       console.log("Response", response)
       
     } catch {
