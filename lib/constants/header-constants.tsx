@@ -14,6 +14,6 @@ export const demoMenuItems: NavbarMenuItem[] = [
 
 export const demoNavLinks: NavLink[] = [
   { label: "Overview", href: "/" },
-  { label: "Projects", href: "/projects" },
-  { label: "Docs", href: "/docs" },
+  { label: "Projects", href: "projects" },
+  { label: "Docs", href: "docs" },
 ];

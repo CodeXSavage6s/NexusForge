@@ -1,7 +1,7 @@
 "use server";
 
 import db from "@/database";
-import { clients } from "@/database/schema/schema";
+import { clients, projects } from "@/database/schema/schema";
 import { eq, count, and, ne } from "drizzle-orm";
 import type { ClientStatus } from "@/lib/constants/client-constants";
 
@@ -245,5 +245,27 @@ export async function UpdateClient(data: {
   } catch (err) {
     console.error("Update Client Error:", err);
     return { success: false, error: "Update failed." };
+  }
+}
+
+export async function DeleteClient(clientId: string, workspaceId?: string) {
+  try {
+    // Check for existing projects that reference this client (projects.clientId has onDelete: restrict)
+    const projectCountRes = await db.select({ count: count() }).from(projects).where(eq(projects.clientId, clientId));
+    const projectCount = projectCountRes[0]?.count ?? 0;
+    if (projectCount > 0) {
+      return { success: false, error: 'Client has projects. Delete projects first.' };
+    }
+
+    const whereClause = workspaceId ? and(eq(clients.id, clientId), eq(clients.workspaceId, workspaceId)) : eq(clients.id, clientId);
+
+    const [deleted] = await db.delete(clients).where(whereClause).returning();
+
+    if (!deleted) return { success: false, error: 'Client not found or not authorized' };
+
+    return { success: true, client: deleted };
+  } catch (err) {
+    console.error('Failed to delete client', err);
+    return { success: false, error: 'Failed to delete client' };
   }
 }

@@ -13,23 +13,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
-type Client = {
-  id: string
-  name: string
-  companyName?: string | null
-  email?: string | null
-  status?: string | null
-  [key: string]: unknown
-}
+import type { Client } from "@/types/client"
 
 interface ClientsFilterProps {
-  clients: Client[]
+  clients: Client[],
+  workspaceId: string
 }
 
 const ALL_STATUSES = "ALL"
 
-export default function ClientsFilter({ clients, workspace }: ClientsFilterProps) {
+export default function ClientsFilter({ clients, workspaceId }: ClientsFilterProps) {
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState<string>(ALL_STATUSES)
 
@@ -88,7 +81,7 @@ export default function ClientsFilter({ clients, workspace }: ClientsFilterProps
           </p>
         ) : (
           filteredClients.map((client) => (
-            <ClientCard key={client.id} client={client} workspace={workspace} />
+            <ClientCard key={client.id} client={client} workspace={workspaceId} />
           ))
         )}
       </div>

@@ -1,14 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import type { Client } from "@/types/client";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button"
 import { UpdateClient } from '@/lib/actions/client'
 
+interface MarkdownEditorProps {
+  initialValue: Client;
+}
+
 export default function MarkdownEditor({
   initialValue,
-}) {
-  const [content, setContent] = useState(initialValue);
+}: MarkdownEditorProps) {
+  const [content, setContent] = useState<Client>(initialValue);
   const [mode, setMode] = useState<"edit" | "preview">("preview");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("")

@@ -10,6 +10,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { UpdateClient } from '@/lib/actions/client'
+import { Client } from "@/types/client";
+
+interface ClientInfoEditProps {
+  client: Client;
+}
 
 export type ClientStatus =
   | "ACTIVE"
@@ -17,16 +22,6 @@ export type ClientStatus =
   | "LEAD"
   | "ARCHIVED";
 
-export interface ClientBasicInfo {
-  name: string;
-  companyName: string | null;
-  industry: string | null;
-  status: ClientStatus;
-}
-
-interface ClientInfoEditProps {
-  client: ClientBasicInfo;
-}
 
 const STATUS_OPTIONS = [
   { value: "ACTIVE", label: "Active", dot: "bg-green-500" },
@@ -52,15 +47,24 @@ export default function ClientInfoEdit({
 
   const handleSave = async () => {
     console.log("Save hit", form)
-    // if (!form.name.trim()) {
-    //   setError("Name can't be empty.");
-    //   return;
 
     setSaving(true);
 
     try {
       console.log("Save hit 2", form)
-      const response = await UpdateClient(form)
+      const response = await UpdateClient({
+        id: form.id,
+        workspaceId: form.workspaceId,
+        name: form.name,
+        companyName: form.companyName ?? undefined,
+        email: form.email ?? undefined,
+        phone: form.phone ?? undefined,
+        website: form.website ?? undefined,
+        industry: form.industry ?? undefined,
+        address: form.address ?? undefined,
+        notes: form.notes ?? undefined,
+        status: form.status,
+      })
       console.log("Response", response)
       
       //setData(form);
@@ -136,9 +140,12 @@ export default function ClientInfoEdit({
 
         <Select
           value={form.status}
-          onValueChange={(value) =>
-            update("status", value as ClientStatus)
-          }
+          onValueChange={(e) => {
+              setForm((prev) => ({
+                ...prev,
+                status: e
+              }))
+            }}
         >
           <SelectTrigger>
             <SelectValue />

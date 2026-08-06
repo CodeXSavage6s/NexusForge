@@ -7,7 +7,7 @@ import { auth } from "@/lib/better-auth/auth"
 import { headers } from "next/headers"
 
 
-export default async function page({ params }: { params: { workspace: string; client: string } }) {
+export default async function page({ params }: { params: Promise<{ workspace: string; client: string }> }) {
   const { workspace, client } = await params
     
     const session = await auth.api.getSession({ headers: await headers() });
