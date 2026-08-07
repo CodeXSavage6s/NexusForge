@@ -32,11 +32,15 @@ export async function NewClientActivity({clientId, projectId, userId, type= "Cre
     }
 }
 
-export async function NewProjectActivity() {
+export async function NewProjectActivity({clientId, projectId, userId, type= "Create Project", message}: {clientId: string, projectId: string, userId: string | undefined, type: string, message: string}) {
+    console.log("new activity hit")
     try {
+        const newActivity = await db.insert(activity).values({ clientId, projectId, userId, type, message, createdAt: new Date() }).returning()
+
+        console.log("New Activity", newActivity)
 
     } catch (err) {
-
+        console.error("failed to create activity", err)
     }
 }
 
@@ -57,11 +61,20 @@ export async function GetClientActivities(clientId: string) {
     }
 }
 
-export async function GetProjectActivities(projectId: string) {
+export async function GetProjectActivities(projectId: string | undefined) {
     try {
+        const activities = await db.select().from(activity).where(eq(activity.projectId, projectId))
 
+        return {
+            success: true,
+            activities: activities
+        }
     } catch (err) {
-
+        console.error("Failed to fetch project activities")
+        return {
+            success: false,
+            error: "Failed to fetch project activities"
+        }
     }
 }
 

@@ -16,13 +16,14 @@ import {
 import type { Client } from "@/types/client"
 
 interface ClientsFilterProps {
-  clients: Client[],
-  workspaceId: string
+  clients: Client[];
+  workspaceId: string;
+  projectCount?: Record<string, number>;
 }
 
 const ALL_STATUSES = "ALL"
 
-export default function ClientsFilter({ clients, workspaceId }: ClientsFilterProps) {
+export default function ClientsFilter({ clients, workspaceId, projectCount }: ClientsFilterProps) {
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState<string>(ALL_STATUSES)
 
@@ -81,7 +82,12 @@ export default function ClientsFilter({ clients, workspaceId }: ClientsFilterPro
           </p>
         ) : (
           filteredClients.map((client) => (
-            <ClientCard key={client.id} client={client} workspace={workspaceId} />
+            <ClientCard
+              key={client.id}
+              client={client}
+              workspace={workspaceId}
+              projectCount={projectCount?.[client.id] ?? 0}
+            />
           ))
         )}
       </div>

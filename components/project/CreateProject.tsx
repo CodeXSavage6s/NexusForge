@@ -32,6 +32,7 @@ type CreateProjectDialogProps = {
   workspaceId?: string;
   trigger?: React.ReactNode;
   onSubmit?: () => void;
+  children?: React.ReactNode;
 };
 
 type ProjectFormData = {
@@ -72,6 +73,7 @@ export function CreateProjectDialog({
   workspaceId,
   trigger,
   onSubmit,
+  children,
 }: CreateProjectDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -145,14 +147,18 @@ export function CreateProjectDialog({
         if (!nextOpen) resetForm();
       }}
     >
-      <DialogTrigger asChild>
-        {trigger ?? (
+      {children ?? trigger ? (
+        <DialogTrigger asChild>
+          <span>{children ?? trigger}</span>
+        </DialogTrigger>
+      ) : (
+        <DialogTrigger asChild>
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             New Project
           </Button>
-        )}
-      </DialogTrigger>
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-106.25 w-full">
         <DialogHeader>
           <DialogTitle>Create project</DialogTitle>

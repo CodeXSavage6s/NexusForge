@@ -3,6 +3,11 @@ import { GetProjectDetails } from "@/lib/actions/project";
 import Link from "next/link";
 import ProjectTasks from "@/components/project/ProjectTasks";
 import { GetTask } from "@/lib/actions/task";
+import { GetProjectActivities } from "@/lib/actions/activity";
+import { Activity } from "@/types/schema";
+import { user } from "@/database/schema/auth-schema";
+import { auth } from "@/lib/better-auth/auth"
+import { headers } from "next/headers"
 
 type Props = {
   params: Promise<{
@@ -16,6 +21,10 @@ type Props = {
 
 export default async function Page({ params }: Props) {
     const { workspace, client, project } = await params;
+    
+    const session = await auth.api.getSession({ headers: await headers() });
+    
+    const user = session?.user
     
     const res = await GetProjectDetails(project, client);
     const proj = res.success && Array.isArray(res.project) && res.project.length > 0 ? res.project[0] : null;
@@ -46,6 +55,10 @@ export default async function Page({ params }: Props) {
 
       const tasks = await GetTask(project)
 
+      const response = await (await GetProjectActivities(proj?.id))
+
+      const activities: Activity[] = response.activities
+
   if (!proj) {
     return (
       <div className="p-6">
@@ -73,8 +86,29 @@ export default async function Page({ params }: Props) {
           <span>{proj?.dueDate ? new Date(proj.dueDate).toLocaleDateString() : "No due date"}</span>
         </div>
       </div>
-      <div className="mt-6">
-         <ProjectTasks task={tasks.tasks} projectId={proj.id} />
+      <div className="grid lg:grid-cols-2 gap-2 p-4 mb-2 border rounded-md">
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Project Activities</h2>
+          {
+            !activities ? <span>No Activities</span> :
+            <div className="lg:min-h-[50vh] border rounded-md p-4 mt-4 space-y-2">
+              {activities.map((act) => (
+                <div key={act.id} className="flex justify-between">
+                  <span>{act.message}</span><span>{act.createdAt.toLocaleDateString()}</span>
+                </div>
+              ))}
+            </div>
+          }
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Project Tasks</h2>
+         <ProjectTasks task={tasks.tasks} projectId={proj.id} clientId={client} userId={user?.id} />
+        </div>
+      </div>
+      <div>
+        <h2 className="text-lg font-semibold mb-2">Documents And Others</h2>
+        <div className="min-h-50 border rounded-md p-4 mt-4">
+        </div>
       </div>
     </div>
   );

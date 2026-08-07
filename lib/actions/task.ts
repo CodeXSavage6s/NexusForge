@@ -3,7 +3,10 @@
 import db from "@/database";
 import { tasks } from "@/database/schema/schema";
 import { Task } from "@/types/schema";
+import { success } from "better-auth";
+import { error } from "console";
 import { eq } from "drizzle-orm"
+import { NewProjectActivity } from "./activity";
 
 type TASK = {
     success: boolean,
@@ -46,3 +49,33 @@ export async function CreateTask({ projectId, title, description }: { projectId:
         };
     }
 }   
+
+export async function DeleteTask({taskId, clientId, projectId, userId}: {
+    taskId: string; clientId: string; projectId: string; userId: string | undefined
+}) {
+    try {
+        const [deleted] = await db.delete(tasks).where(eq(tasks.id, taskId)).returning()
+
+        const newActivity = await NewProjectActivity({
+            message: `Deleted ${deleted?.title ?? "task"} task`,
+            clientId,
+            projectId,
+            userId,
+            type: "Delete Task"
+        })
+
+        return{
+            success: true,
+            deleted: deleted,
+            newActivity
+        }
+        
+    } catch (err) {
+        console.error("Failed to delete task", err);
+        return {
+            success: false,
+            error: "Failed to delete task"
+        }
+        
+    }
+}

@@ -1,10 +1,12 @@
 "use client"
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Mail, Phone, FolderKanban } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePathname } from 'next/navigation'
 import { Client } from "@/types/client";
+import { ProjectCount } from "@/lib/actions/client";
 
 export function ClientCard({
   workspace,
@@ -16,7 +18,17 @@ export function ClientCard({
   projectCount?: number;
 }) {
   const path = usePathname()
-  
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    async function fetchProjectCount() {
+      const count = await ProjectCount(client.id);
+      setCount(count);
+      console.log('Project count for client', client.id, ':', count);
+    }
+    fetchProjectCount();
+  }, [client.id]);
+
   return (
     <Link
       href={`/${workspace}/clients/${client.id}`}
@@ -45,7 +57,7 @@ export function ClientCard({
 
         <div className="flex items-center gap-3 text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
-            <FolderKanban className="h-3.5 w-3.5" /> {projectCount} projects
+            <FolderKanban className="h-3.5 w-3.5" /> {count} projects
           </span>
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-medium ${client.status}`}

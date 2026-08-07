@@ -8,48 +8,6 @@ import { CreateTask } from "@/lib/actions/task";
 
 const STATUS_OPTIONS: (TaskStatus | "ALL")[] = ["ALL", "TODO", "IN_PROGRESS", "REVIEW", "DONE"];
 
-const DEFAULT_TASKS: Task[] = [
-  {
-    id: "demo-task-1",
-    projectId: "demo",
-    title: "Review project brief",
-    description: "Check the client requirements and prepare the first draft.",
-    status: "TODO",
-    priority: "MEDIUM",
-    dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-    assignedTo: "Ana",
-    position: 0,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: "demo-task-2",
-    projectId: "demo",
-    title: "Finalize wireframes",
-    description: "Complete the initial wireframes for the homepage and dashboard.",
-    status: "IN_PROGRESS",
-    priority: "HIGH",
-    dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
-    assignedTo: "Ben",
-    position: 1,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: "demo-task-3",
-    projectId: "demo",
-    title: "Send update to client",
-    description: "Share the latest progress and ask for feedback.",
-    status: "DONE",
-    priority: "LOW",
-    dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-    assignedTo: "Charlie",
-    position: 2,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
-
 function generateId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
@@ -58,8 +16,8 @@ function getNextStatus(status: TaskStatus) {
   return status === "DONE" ? "TODO" : "DONE";
 }
 
-export default function ProjectTasks({ task, projectId }: { task: Task[] | undefined; projectId: string }) {
-  const [tasks, setTasks] = useState<Task[]>(task ?? DEFAULT_TASKS);
+export default function ProjectTasks({ task, projectId, clientId, userId }: { task: Task[] | undefined; projectId: string, clientId: string, userId: string | undefined }) {
+  const [tasks, setTasks] = useState<Task[] | undefined>(task);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<TaskStatus | "ALL">("ALL");
   const [newTaskTitle, setNewTaskTitle] = useState("");
@@ -68,14 +26,14 @@ export default function ProjectTasks({ task, projectId }: { task: Task[] | undef
   const [editingDescription, setEditingDescription] = useState("");
 
   const filteredTasks = useMemo(() => {
-    return tasks.filter((task) => {
+    return tasks?.filter((task) => {
       const matchesSearch = task.title.toLowerCase().includes(search.toLowerCase());
       const matchesStatus = filterStatus === "ALL" || task.status === filterStatus;
       return matchesSearch && matchesStatus;
     });
   }, [tasks, search, filterStatus]);
 
-  const completedCount = tasks.filter((task) => task.status === "DONE").length;
+  const completedCount = tasks?.filter((task) => task.status === "DONE").length;
 
   const addTask = async () => {
     const trimmed = newTaskTitle.trim();
@@ -92,7 +50,7 @@ export default function ProjectTasks({ task, projectId }: { task: Task[] | undef
       if (result.success && result.task) {
         setTasks((current) => [result.task, ...current]);
       } else {
-        console.error("Failed to add task", result.error ?? result.message);
+        console.error("Failed to add task", result.error );
       }
     } catch (error) {
       console.error("Failed to add task", error);
@@ -119,7 +77,7 @@ export default function ProjectTasks({ task, projectId }: { task: Task[] | undef
     if (!trimmed) return;
 
     setTasks((current) =>
-      current.map((task) =>
+      current?.map((task) =>
         task.id === editingTaskId
           ? {
               ...task,
@@ -136,7 +94,7 @@ export default function ProjectTasks({ task, projectId }: { task: Task[] | undef
 
   const updateStatus = (taskId: string) => {
     setTasks((current) =>
-      current.map((task) =>
+      current?.map((task) =>
         task.id === taskId
           ? { ...task, status: getNextStatus(task.status), updatedAt: new Date() }
           : task
@@ -182,7 +140,7 @@ export default function ProjectTasks({ task, projectId }: { task: Task[] | undef
       <div className="grid gap-3 rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground">
         <div className="flex items-center justify-between">
           <span>Total tasks</span>
-          <strong className="text-foreground">{tasks.length}</strong>
+          <strong className="text-foreground">{tasks?.length}</strong>
         </div>
         <div className="flex items-center justify-between">
           <span>Completed</span>
@@ -208,12 +166,12 @@ export default function ProjectTasks({ task, projectId }: { task: Task[] | undef
       </div>
 
       <div className="space-y-3">
-        {filteredTasks.length === 0 ? (
+        {filteredTasks?.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border bg-background p-6 text-center text-sm text-muted-foreground">
             No tasks match your search or filter.
           </div>
         ) : (
-          filteredTasks.map((task) =>
+          filteredTasks?.map((task) =>
             task.id === editingTaskId ? (
               <div key={task.id} className="rounded-3xl border border-border bg-card p-4 shadow-sm">
                 <div className="flex flex-col gap-3">
@@ -259,6 +217,9 @@ export default function ProjectTasks({ task, projectId }: { task: Task[] | undef
                 task={task}
                 onStatusChange={() => updateStatus(task.id)}
                 onEdit={() => startEdit(task)}
+                projectId={projectId}
+                clientId={clientId}
+                userId={userId}
               />
             )
           )
