@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button"
 import Link from "next/link";
 import { CreateProjectDialog } from "@/components/project/CreateProject";
+import { Plus } from "lucide-react";
 
 export default function ClientDropMenu({ className, clientId, clientName, workspaceId }: { className: string; clientId: string; clientName: string; workspaceId?: string }) {
   return (
@@ -18,20 +19,22 @@ export default function ClientDropMenu({ className, clientId, clientName, worksp
           <Button className="flex items-center justify-center" variant="ghost"><span>•</span><span>•</span><span>•</span></Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <Link href="edit">
+          <DropdownMenuItem>
+            <Link href={`${clientId}/projects`} className="w-full">
+              View Projects
+            </Link>
+          </DropdownMenuItem>
+          <Link href={`${clientId}/edit`} className="w-full">
             Edit
           </Link>
           <CreateProjectDialog
             clientId={clientId}
             clientName={clientName}
             workspaceId={workspaceId}
-          />
-          <DropdownMenuItem>
-            Item 2
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            Item 3
-          </DropdownMenuItem>
+          >
+            <button>
+              New Project</button>
+          </CreateProjectDialog>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

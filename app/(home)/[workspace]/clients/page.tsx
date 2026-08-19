@@ -21,10 +21,13 @@ export default async function ClientsPage({ params }: { params: Promise<{ worksp
   const response = await GetWorkspaceClient(Workspace.id)
 
   const clients = response.client ?? []
+  const projectCountByClientId = Object.fromEntries(
+    (response?.projectCount ?? []).map((item: { clientId: string; count: number }) => [item.clientId, item.count])
+  ) as Record<string, number>
 
   return (
     <div>
-      <ClientsFilter clients={clients} workspaceId={workspace} />
+      <ClientsFilter clients={clients} workspaceId={workspace} projectCount={projectCountByClientId} />
     </div>
   )
 }

@@ -137,10 +137,28 @@ export async function CreateClient(
 export async function GetWorkspaceClient(workspaceId: string) {
   try {
     const client = await db.select().from(clients).where(eq(clients.workspaceId, workspaceId))
-    console.log("client from server", client)
+
+    const projectCounts = await db
+      .select({ count: count(), clientId: clients.id })
+      .from(clients)
+      .leftJoin(projects, eq(clients.id, projects.clientId))
+      .where(eq(clients.workspaceId, workspaceId))
+      .groupBy(clients.id)
+
+    // Map clientId -> project count for O(1) lookup instead of an N+1 query loop
+    const countsByClientId = new Map(projectCounts.map((row) => [row.clientId, row.count]))
+
+    // Keep projectCount as its own array, aligned to `client` by clientId,
+    // so every client's count is included (not just the first row).
+    const projectCount = client.map((c) => ({
+      clientId: c.id,
+      count: countsByClientId.get(c.id) ?? 0,
+    }))
+
     return {
       success: true,
       client,
+      projectCount,
       message: "Success"
     }
   } catch (err) {
@@ -267,5 +285,19 @@ export async function DeleteClient(clientId: string, workspaceId?: string) {
   } catch (err) {
     console.error('Failed to delete client', err);
     return { success: false, error: 'Failed to delete client' };
+  }
+}
+
+export async function ProjectCount(clientId: string): Promise<number> {
+  try {
+    const [projectCountRes] = await db
+      .select({ count: count() })
+      .from(projects)
+      .where(eq(projects.clientId, clientId));
+
+    return projectCountRes?.count ?? 0;
+  } catch (err) {
+    console.error("Failed to get clientProject count", err);
+    return 0;
   }
 }

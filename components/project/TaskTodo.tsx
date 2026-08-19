@@ -2,7 +2,8 @@
 
 import { CheckCircle2, Circle, CalendarCheck, Flag, Pencil } from "lucide-react";
 import { Task, TaskStatus } from "@/types/schema";
-
+import { Trash2 } from "lucide-react";
+import { DeleteTask } from "@/lib/actions/task";
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
   TODO: "To Do",
@@ -37,6 +38,9 @@ type TaskTodoProps = {
   onStatusChange?: (taskId: string, nextStatus: TaskStatus) => void;
   onEdit?: () => void;
   onClick?: () => void;
+  clientId: string;
+  projectId: string;
+  userId: string | undefined
 };
 
 function formatDueDate(value: Task["dueDate"]) {
@@ -49,7 +53,11 @@ function formatDueDate(value: Task["dueDate"]) {
   }).format(date);
 }
 
-export default function TaskTodo({ task, onStatusChange, onEdit, onClick }: TaskTodoProps) {
+async function handleDeleteTask({taskId, userId, projectId, clientId}: {taskId: string, userId: string | undefined, projectId: string, clientId: string}) {
+  const deleted = await DeleteTask({taskId, userId, projectId, clientId})
+}
+
+export default function TaskTodo({ task, onStatusChange, onEdit, onClick, clientId, userId, projectId }: TaskTodoProps) {
   const isDone = task.status === "DONE";
   const dueDate = formatDueDate(task.dueDate);
 
@@ -85,10 +93,10 @@ export default function TaskTodo({ task, onStatusChange, onEdit, onClick }: Task
             <h3 className="min-w-0 flex-1 truncate text-base font-semibold text-foreground">
               {task.title}
             </h3>
-            <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${STATUS_STYLES[task.status]}`}>
+            <span className={`text-[11px] font-semibold ${STATUS_STYLES[task.status]}`}>
               {STATUS_LABELS[task.status]}
             </span>
-            <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${PRIORITY_STYLES[task.priority]}`}>
+            <span className={`text-[11px] font-semibold ${PRIORITY_STYLES[task.priority]}`}>
               {PRIORITY_LABELS[task.priority]}
             </span>
             {onEdit && (
@@ -104,6 +112,13 @@ export default function TaskTodo({ task, onStatusChange, onEdit, onClick }: Task
                 <Pencil className="h-4 w-4" />
               </button>
             )}
+            <button
+              onClick={() => handleDeleteTask({taskId: task.id, userId, projectId, clientId})}
+              className="flex items-center gap-1 text-red-500 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              <span className="text-sm">Delete</span>
+          </button>
           </div>
 
           {task.description ? (
