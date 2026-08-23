@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Bell, ChevronDown, User, Settings, LogOut } from "lucide-react";
@@ -15,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ThemeToggle from '@/components/theme-toggle'
+import { signOut } from "@/lib/actions/auth"
 
 
 export function Header({
@@ -72,7 +72,7 @@ export function Header({
         {/* Right: notifications + avatar */}
         <div className="flex items-center gap-4 sm:gap-5">
           <Link
-          href="/notifications"
+          href="/settings/notifications"
             aria-label={
               notificationCount > 0
                 ? `${notificationCount} unread notifications`
@@ -136,7 +136,8 @@ export function Header({
                   );
                 })}
                 <DropdownMenuItem>
-                  <div className="text-red-500 flex font-black w-full justify-end gap-1">
+                  <div className="text-red-500 flex font-black w-full justify-end gap-1"
+                    onClick={signOut}>
                     <LogOut /> Logout
                   </div>
                 </DropdownMenuItem>

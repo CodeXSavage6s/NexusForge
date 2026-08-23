@@ -4,7 +4,9 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { signOut } from "@/lib/actions/auth"
 import {
+  Bell,
   Home,
   LayoutDashboard,
   FolderKanban,
@@ -254,10 +256,21 @@ export function AppSidebar({
             </SidebarGroupContent>
           </SidebarGroup>
         )}
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Settings</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem className="font-bold text-lg"><SidebarMenuButton asChild><Link href="/settings/profile"><Users className="h-4 w-4" /> Profile</Link></SidebarMenuButton></SidebarMenuItem>
+                <SidebarMenuItem className="font-bold text-lg"><SidebarMenuButton asChild><Link href="/settings/notifications"><Bell className="h-4 w-4" /> Notifications</Link></SidebarMenuButton></SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>
-        <div className="text-red-500 flex font-black w-full justify-end gap-1">
+        <div className="text-red-500 flex font-black w-full justify-end gap-1"
+          onClick={signOut}>
           <LogOut /> Logout
         </div>
       </SidebarFooter>

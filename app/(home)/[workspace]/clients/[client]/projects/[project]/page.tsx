@@ -53,12 +53,6 @@ export default async function Page({ params }: Props) {
     
       const statusOption = STATUS_OPTIONS.find(s => s.value === proj?.status)
 
-      const tasks = await GetTask(project)
-
-      const response = await (await GetProjectActivities(proj?.id))
-
-      const activities: Activity[] = response.activities
-
   if (!proj) {
     return (
       <div className="p-6">
@@ -67,6 +61,12 @@ export default async function Page({ params }: Props) {
       </div>
     );
   }
+
+      const tasks = await GetTask(project)
+
+      const response = await GetProjectActivities(proj.id)
+
+      const activities: Activity[] = response.success ? response.activities : []
 
   return (
     <div className="">
@@ -90,7 +90,7 @@ export default async function Page({ params }: Props) {
         <div>
           <h2 className="text-lg font-semibold mb-2">Project Activities</h2>
           {
-            !activities ? <span>No Activities</span> :
+            activities.length === 0 ? <span>No Activities</span> :
             <div className="lg:min-h-[50vh] border rounded-md p-4 mt-4 space-y-2">
               {activities.map((act) => (
                 <div key={act.id} className="flex justify-between">

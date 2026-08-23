@@ -19,22 +19,26 @@ export default function ClientDropMenu({ className, clientId, clientName, worksp
           <Button className="flex items-center justify-center" variant="ghost"><span>•</span><span>•</span><span>•</span></Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link href={`${clientId}/projects`} className="w-full">
               View Projects
             </Link>
           </DropdownMenuItem>
-          <Link href={`${clientId}/edit`} className="w-full">
-            Edit
-          </Link>
-          <CreateProjectDialog
-            clientId={clientId}
-            clientName={clientName}
-            workspaceId={workspaceId}
-          >
-            <button>
-              New Project</button>
-          </CreateProjectDialog>
+          <DropdownMenuItem asChild>
+	          <Link href={`${clientId}/edit`} className="w-full">
+	            Edit
+	          </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+	          <CreateProjectDialog
+	            clientId={clientId}
+	            clientName={clientName}
+	            workspaceId={workspaceId}
+	          >
+	            <button>
+	              New Project</button>
+	          </CreateProjectDialog>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
