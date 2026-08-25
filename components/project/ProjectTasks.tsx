@@ -132,7 +132,7 @@ export default function ProjectTasks({ task, projectId, clientId, userId }: { ta
         </div>
       </div>
 
-      <div className="grid gap-3 rounded-lg border border-border bg-muted p-3 text-sm text-transparent">
+      <div className="grid gap-3 rounded-lg border border-border bg-transparent p-3 text-sm ">
         <div className="flex items-center justify-between">
           <span>Total tasks</span>
           <strong className="text-foreground">{tasks?.length}</strong>
@@ -148,12 +148,12 @@ export default function ProjectTasks({ task, projectId, clientId, userId }: { ta
           value={newTaskTitle}
           onChange={(event) => setNewTaskTitle(event.target.value)}
           placeholder="Add a new task"
-          className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none"
+          className="rounded-lg border border-input bg-background p-2 text-sm outline-none "
         />
         <button
           type="button"
           onClick={addTask}
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+          className="w-fit inline-flex items-center rounded-lg bg-primary p-1 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
         >
           <Plus className="h-4 w-4" />
           Add Task

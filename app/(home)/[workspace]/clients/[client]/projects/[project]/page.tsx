@@ -70,6 +70,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <div className="">
+      
       <div className="p-6 flex flex-row justify-between items-center gap-4 border rounded-md">
         <div className="flex gap-2 flex-col">
             
@@ -86,7 +87,8 @@ export default async function Page({ params }: Props) {
           <span>{proj?.dueDate ? new Date(proj.dueDate).toLocaleDateString() : "No due date"}</span>
         </div>
       </div>
-      <div className="grid lg:grid-cols-2 gap-2 p-4 mb-2 border rounded-md">
+      
+      <div className="grid lg:grid-cols-2 gap-2 p-1 mb-2 rounded-md">
         <div>
           <h2 className="text-lg font-semibold mb-2">Project Activities</h2>
           {

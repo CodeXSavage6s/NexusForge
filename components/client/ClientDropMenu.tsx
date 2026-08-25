@@ -1,3 +1,5 @@
+"use client"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,16 +31,15 @@ export default function ClientDropMenu({ className, clientId, clientName, worksp
 	            Edit
 	          </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-	          <CreateProjectDialog
-	            clientId={clientId}
-	            clientName={clientName}
-	            workspaceId={workspaceId}
-	          >
-	            <button>
-	              New Project</button>
-	          </CreateProjectDialog>
-          </DropdownMenuItem>
+          <CreateProjectDialog
+            clientId={clientId}
+            clientName={clientName}
+            workspaceId={workspaceId}
+          >
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              New Project
+            </DropdownMenuItem>
+          </CreateProjectDialog>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

@@ -14,7 +14,7 @@ function ActivityPanel({ activities }: { activities: Activity[] | undefined }) {
       {activities ? 
       activities?.map(act => (
         <div className="activities">
-          <span>{act?.message}</span><span>{new Date(act?.createdAt).getDate().toString()}</span>
+          <span>{act?.message}</span><span>{act?.createdAt.toLocaleDateString()}</span>
         </div> 
       ))
       : <p>No activity yet.</p>

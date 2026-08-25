@@ -68,6 +68,7 @@ export default async function ProfilePage() {
         <div className="flex flex-col gap-2">
         <div className="flex">
           <Link
+          aria-label="Back to Settings"
           href="/settings"
           className="rounded-lg p-2 hover:bg-muted"
         >

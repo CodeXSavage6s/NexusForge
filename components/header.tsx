@@ -136,10 +136,10 @@ export function Header({
                   );
                 })}
                 <DropdownMenuItem>
-                  <div className="text-red-500 flex font-black w-full justify-end gap-1"
+                  <button className="text-red-500 flex font-black w-full justify-end gap-1"
                     onClick={signOut}>
                     <LogOut /> Logout
-                  </div>
+                  </button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

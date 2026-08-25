@@ -82,6 +82,16 @@ import { auth } from '@/lib/better-auth/auth'
 import { headers } from 'next/headers'
 import db from "@/database/index";
 import { user } from "@/database/schema/auth-schema";
+// NOTE: adjust this import path to wherever schema.ts actually lives in this project
+import {
+  workspaces,
+  workspaceMembers,
+  projectMembers,
+  activity,
+  notifications,
+  files,
+  timeEntries,
+} from "@/database/schema/schema";
 import { eq } from "drizzle-orm";
 import { authClient } from '@/lib/better-auth/auth-client'
 
@@ -249,7 +259,27 @@ export async function deleteAccount(): Promise<DeleteAccountState> {
 
   try {
     // Sessions and accounts cascade-delete via the FK constraints on `user.id`.
-    await db.delete(user).where(eq(user.id, userId));
+    // Everything below has no DB-level FK to user.id (see schema TODOs), so it
+    // won't cascade — clean it up explicitly, in the same transaction, before
+    // removing the user row.
+    await db.transaction(async (tx) => {
+      // Memberships the user holds in workspaces/projects owned by others.
+      await tx.delete(workspaceMembers).where(eq(workspaceMembers.userId, userId));
+      await tx.delete(projectMembers).where(eq(projectMembers.userId, userId));
+
+      // Records the user authored/owns, regardless of whose workspace they're in.
+      await tx.delete(timeEntries).where(eq(timeEntries.userId, userId));
+      await tx.delete(files).where(eq(files.uploadedBy, userId));
+      await tx.delete(activity).where(eq(activity.userId, userId));
+      await tx.delete(notifications).where(eq(notifications.recipientId, userId));
+
+      // Workspaces the user owns cascade-delete their clients/projects/tasks/
+      // documents/activity/files/timeEntries/projectMembers/invoices via
+      // existing workspaceId FK constraints.
+      await tx.delete(workspaces).where(eq(workspaces.ownerId, userId));
+
+      await tx.delete(user).where(eq(user.id, userId));
+    });
 
     // Best-effort: clear the session cookie now that the underlying row is gone.
     try {

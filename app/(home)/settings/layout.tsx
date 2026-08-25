@@ -7,7 +7,7 @@ import { demoMenuItems, demoNavLinks } from "@/lib/constants/header-constants";
 import { auth } from "@/lib/better-auth/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { UnreadNotificationsCount } from "@/lib/actions/notifications";
+// import { UnreadNotificationsCount } from "@/lib/actions/notifications";
 import { getUserWorkspaces } from "@/lib/actions/workspace";
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default async function Layout({
   if (!session?.user) redirect("/sign-in");
 
   const user = session.user;
-  const count = await UnreadNotificationsCount(user.id);
+  const count = 3 //awiat UnreadNotificationsCount(user.id);
   const workspaces = await getUserWorkspaces(user.id);
 
   return (

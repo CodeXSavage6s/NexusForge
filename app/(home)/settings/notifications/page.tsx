@@ -6,6 +6,7 @@ export default function page() {
     <div>
       <div className="flex">
         <Link
+            aria-label="Back to Settings"
             href="/settings/"
             className="rounded-lg p-2 hover:bg-muted"
           >

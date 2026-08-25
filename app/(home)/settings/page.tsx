@@ -109,7 +109,7 @@ export default function SettingsPage() {
 
       <section className="border-t pt-5">
         <button
-          onClick={signOut}
+          onClick={() => signOut()}
           className="flex w-full items-center gap-3 rounded-xl p-3 text-left text-destructive transition hover:bg-destructive/10"
         >
           <LogOut className="h-5 w-5" />

@@ -25,9 +25,10 @@ function slugify(name: string) {
 
 export function CreateWorkspaceDialog({
   label = "New Workspace",
-  
+  children,
 }: {
   label?: string;
+  children?: React.ReactNode;
 }) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
@@ -68,10 +69,12 @@ export function CreateWorkspaceDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="border border-gray-400 p-1 text-sm" variant="ghost">
-          <Plus className="h-8 w-8 stroke-[3px]" />
-          {label}
-        </Button>
+        {children ?? (
+          <Button className="border border-gray-400 p-1 text-sm" variant="ghost">
+            <Plus className="h-8 w-8 stroke-[3px]" />
+            {label}
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

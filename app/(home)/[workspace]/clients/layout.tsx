@@ -7,7 +7,7 @@ import { demoUser, demoMenuItems, demoNavLinks } from "@/lib/constants/header-co
 import {auth} from "@/lib/better-auth/auth";
 import {headers} from "next/headers";
 import {redirect, notFound} from "next/navigation";
-import { UnreadNotificationsCount } from '@/lib/actions/notifications'
+// import { UnreadNotificationsCount } from '@/lib/actions/notifications'
 import { getUserWorkspaces, getWorkspace } from '@/lib/actions/workspace'
 
 export const metadata: Metadata = {
@@ -32,7 +32,7 @@ export default async function Layout({
       const user = session?.user
       const workspace = await getWorkspace(workspaceSlug, user.id);
       if (!workspace) notFound();
-      const count = await UnreadNotificationsCount(user.id)
+      const count = 3 //await UnreadNotificationsCount(user.id)
       const workspaces = await getUserWorkspaces(user.id)
   return (
       <div className="min-h-screen">

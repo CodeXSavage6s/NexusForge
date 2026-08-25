@@ -71,30 +71,32 @@ export default function ProjectsList({ projects, workspace, client }: Props) {
           placeholder="Search projects..."
           className="flex-1 border rounded-md px-3 py-2 text-sm"
         />
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value as ProjectStatus | "ALL")}
-          className="border rounded-md px-3 py-2 text-sm"
-        >
-          <option value="ALL">All statuses</option>
-          {STATUS_OPTIONS.map((s) => (
-            <option key={s.value} value={s.value}>
-              {s.label}
-            </option>
-          ))}
-        </select>
-        <select
-          value={priority}
-          onChange={(e) => setPriority(e.target.value as Priority | "ALL")}
-          className="border rounded-md px-3 py-2 text-sm"
-        >
-          <option value="ALL">All priorities</option>
-          {PRIORITY_OPTIONS.map((p) => (
-            <option key={p.value} value={p.value}>
-              {p.label}
-            </option>
-          ))}
-        </select>
+        <div className="flex justify-between gap-2">
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value as ProjectStatus | "ALL")}
+            className="border rounded-md p-2 text-sm w-full"
+          >
+            <option value="ALL">All statuses</option>
+            {STATUS_OPTIONS.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+          <select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value as Priority | "ALL")}
+            className="border rounded-md p-2 text-sm w-full"
+          >
+            <option value="ALL">All priorities</option>
+            {PRIORITY_OPTIONS.map((p) => (
+              <option key={p.value} value={p.value}>
+                {p.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <p className="text-xs text-muted-foreground mb-3">
@@ -109,18 +111,19 @@ export default function ProjectsList({ projects, workspace, client }: Props) {
             const sMeta = statusMeta(p.status);
             const pMeta = priorityMeta(p.priority);
             return (
-              <div
+              <Link
+                href={`/${workspace}/clients/${client}/projects/${p.id}`}
                 key={p.id}
                 className="flex flex-row justify-between items-center gap-4 p-4 border rounded-md"
               >
-                <div className="flex-1 min-w-0">
+                <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Link
+                    <div
                       href={`/${workspace}/clients/${client}/projects/${p.id}`}
                       className="text-lg font-semibold"
                     >
                       {p.name}
-                    </Link>
+                    </div>
                     <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-transparent">
                       <span className={`h-2 w-2 rounded-full ${sMeta?.dot ?? "bg-gray-400"}`} />
                       {sMeta?.label ?? p.status}
@@ -139,7 +142,12 @@ export default function ProjectsList({ projects, workspace, client }: Props) {
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-xs text-muted-foreground">
                     <span>Progress: {p.progress ?? 0}%</span>
                     <span>
-                      Due: {p.dueDate ? new Date(p.dueDate).toLocaleDateString() : "No due date"}
+                      Due:{" "}
+                      {p.dueDate
+                        ? new Date(p.dueDate).toLocaleDateString("en-US", {
+                            timeZone: "UTC",
+                          })
+                        : "No due date"}
                     </span>
                     {p.budget != null && (
                       <span>Budget: {formatCurrency(p.budget, p.currency)}</span>
@@ -147,7 +155,7 @@ export default function ProjectsList({ projects, workspace, client }: Props) {
                   </div>
                 </div>
                 <DeleteBtn projectId={p.id} />
-              </div>
+              </Link>
             );
           })
         )}
