@@ -69,15 +69,15 @@ export interface AppSidebarProps {
 // ---------- Demo data (swap out with real data) ----------
 
 export const demoGeneralNavItems: SidebarNavItem[] = [
-  { title: "Home", href: "/", icon: Home },
+  { title: "Home", href: "/home", icon: Home },
   { title: "Settings", href: "/settings", icon: Settings },
 ];
 
 function getWorkspaceNavItems(workspaceSlug: string): SidebarNavItem[] {
   return [
     { title: "Dashboard", href: `/${workspaceSlug}/dashboard`, icon: LayoutDashboard },
+    { title: "Clients", href: `/${workspaceSlug}/clients`, icon: Users },
     { title: "Projects", href: `/${workspaceSlug}/projects`, icon: FolderKanban },
-    { title: "Analytics", href: `/${workspaceSlug}/analytics`, icon: BarChart3 },
     { title: "Team", href: `/${workspaceSlug}/team`, icon: Users },
   ];
 }

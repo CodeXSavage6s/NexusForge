@@ -7,6 +7,7 @@ import { success } from "better-auth";
 import { error } from "console";
 import { eq } from "drizzle-orm"
 import { NewProjectActivity } from "./activity";
+import { syncProjectProgress } from "./project";
 
 type TASK = {
     success: boolean,
@@ -36,7 +37,9 @@ export async function GetTask(projectId: string): Promise<TASK> {
 export async function CreateTask({ projectId, title, description }: { projectId: string; title: string; description: string }) {
     try {
         const [newTask] = await db.insert(tasks).values({ projectId, title, description, status: "TODO", priority: "MEDIUM", position: 0, createdAt: new Date(), updatedAt: new Date() }).returning();
-        
+
+        await syncProjectProgress(projectId);
+
         return {
             success: true,
             task: newTask
@@ -81,6 +84,8 @@ export async function ToggleTask({ taskId, clientId, projectId, userId }: {
             userId,
             type: "Toggle Task"
         });
+
+        await syncProjectProgress(projectId);
 
         return {
             success: true,
@@ -134,6 +139,10 @@ export async function UpdateTask({ taskId, clientId, projectId, userId, title, d
             type: "Update Task"
         });
 
+        if (status !== undefined) {
+            await syncProjectProgress(projectId);
+        }
+
         return {
             success: true,
             task: updated,
@@ -161,6 +170,8 @@ export async function DeleteTask({taskId, clientId, projectId, userId}: {
             userId,
             type: "Delete Task"
         })
+
+        await syncProjectProgress(projectId);
 
         return{
             success: true,

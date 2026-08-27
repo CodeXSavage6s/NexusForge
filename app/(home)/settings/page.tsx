@@ -1,15 +1,15 @@
-"use client";
-
 import Link from "next/link";
+import { headers } from "next/headers";
+import { auth } from "@/lib/better-auth/auth";
 import ThemeToggle from "@/components/theme-toggle";
-import { signOut } from "@/lib/actions/auth";
+import DangerZoneSection from "@/components/settings/DangerZoneSection";
+import SignOutButton from "@/components/settings/SignOutButton";
 
 import {
   Bell,
   Building2,
   ChevronRight,
   CreditCard,
-  LogOut,
   Palette,
   Shield,
   UserRound,
@@ -48,7 +48,10 @@ const settings = [
   },
 ];
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  const userEmail = session?.user?.email ?? "";
+
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 p-3">
       <div>
@@ -108,21 +111,15 @@ export default function SettingsPage() {
       </section>
 
       <section className="border-t pt-5">
-        <button
-          onClick={() => signOut()}
-          className="flex w-full items-center gap-3 rounded-xl p-3 text-left text-destructive transition hover:bg-destructive/10"
-        >
-          <LogOut className="h-5 w-5" />
-
-          <div>
-            <p className="font-semibold">Sign out</p>
-
-            <p className="text-sm opacity-80">
-              Sign out of this NexusForge account.
-            </p>
-          </div>
-        </button>
+        <SignOutButton />
       </section>
+      
+      {userEmail && (
+        <section className="border-t pt-5">
+          <DangerZoneSection userEmail={userEmail} />
+        </section>
+      )}
+
     </div>
   );
 }

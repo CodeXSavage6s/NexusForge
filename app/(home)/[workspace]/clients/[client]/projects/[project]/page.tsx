@@ -1,5 +1,5 @@
 import React from "react";
-import { GetProjectDetails } from "@/lib/actions/project";
+import { GetProjectDetails, getTaskCompletionProgress } from "@/lib/actions/project";
 import Link from "next/link";
 import ProjectTasks from "@/components/project/ProjectTasks";
 import { GetTask } from "@/lib/actions/task";
@@ -16,6 +16,25 @@ type Props = {
     project: string;
   }>;
 };
+
+function formatOrdinalDate(date: Date) {
+  const day = date.getDate()
+  const suffix =
+    day % 10 === 1 && day !== 11 ? "st" :
+    day % 10 === 2 && day !== 12 ? "nd" :
+    day % 10 === 3 && day !== 13 ? "rd" : "th"
+  const month = date.toLocaleDateString("en-US", { month: "long" })
+  const year = date.getFullYear()
+  return `${day}${suffix}, ${month} ${year}`
+}
+
+
+
+function progressColor(progress: number) {
+  if (progress < 20) return "text-red-500"
+  if (progress < 50) return "text-yellow-500"
+  return "text-green-500"
+}
 
 
 
@@ -64,6 +83,13 @@ export default async function Page({ params }: Props) {
 
       const tasks = await GetTask(project)
 
+      // Derive progress from the tasks we already fetched, rather than
+      // the stored proj.progress column, which only updates when
+      // syncProjectProgress() happens to be called elsewhere.
+      const taskList = tasks.tasks ?? []
+      const completedTaskCount = taskList.filter((t) => t.status === "DONE").length
+      const progress = await getTaskCompletionProgress(taskList.length, completedTaskCount)
+
       const response = await GetProjectActivities(proj.id)
 
       const activities: Activity[] = response.success ? response.activities : []
@@ -83,7 +109,7 @@ export default async function Page({ params }: Props) {
             <p>{statusOption?.label ?? proj?.status}</p>
             <div>Priority: <span>{proj?.priority}</span></div>
           </div>
-          <span>Project progress: {proj?.progress ?? 0}%</span>
+          <span className={progressColor(progress)}>Project progress: {progress}%</span>
           <span>{proj?.dueDate ? new Date(proj.dueDate).toLocaleDateString() : "No due date"}</span>
         </div>
       </div>
@@ -95,8 +121,8 @@ export default async function Page({ params }: Props) {
             activities.length === 0 ? <span>No Activities</span> :
             <div className="lg:min-h-[50vh] border rounded-md p-4 mt-4 space-y-2">
               {activities.map((act) => (
-                <div key={act.id} className="flex justify-between">
-                  <span>{act.message}</span><span>{act.createdAt.toLocaleDateString()}</span>
+                <div key={act.id} className="flex flex-col ">
+                  <span>{act.message}</span><span className="text-gray-400">{formatOrdinalDate(act.createdAt)}</span>
                 </div>
               ))}
             </div>

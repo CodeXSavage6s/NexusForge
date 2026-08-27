@@ -1,8 +1,8 @@
 "use server"
 
-import { projects, tasks } from '@/database/schema/schema'
+import { projects, tasks, clients } from '@/database/schema/schema'
 import db from '@/database/index'
-import { eq, count, and, ne } from 'drizzle-orm'
+import { eq, count, and, ne, sql, inArray } from 'drizzle-orm'
 import { PROJECT_PRIORITY, PROJECT_STATUS } from "@/lib/constants/client-constants"
 import { NewClientActivity } from "@/lib/actions/activity"
 import { auth } from "@/lib/better-auth/auth"
@@ -14,6 +14,80 @@ import { success } from 'better-auth';
 export async function ProjectsCount(workspaceId: string): Promise<number> {
   const result = await db.select({ count: count() }).from(projects).where(eq(projects.workspaceId, workspaceId));
   return result[0]?.count ?? 0;
+}
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0]!.toUpperCase())
+    .join("");
+}
+
+// Fetches every project across every client in the workspace (not scoped
+// to a single client), with live progress derived from tasks — same
+// approach as GetProjectsForClient, just workspace-wide.
+export async function GetWorkspaceProjects(workspaceId: string) {
+  try {
+    const rows = await db
+      .select({
+        id: projects.id,
+        name: projects.name,
+        status: projects.status,
+        dueDate: projects.dueDate,
+        clientId: clients.id,
+        clientName: clients.name,
+      })
+      .from(projects)
+      .innerJoin(clients, eq(projects.clientId, clients.id))
+      .where(eq(projects.workspaceId, workspaceId));
+
+    if (rows.length === 0) {
+      return { success: true, projects: [] };
+    }
+
+    const projectIds = rows.map((r) => r.id);
+
+    const taskCounts = await db
+      .select({
+        projectId: tasks.projectId,
+        total: count(),
+        completed: count(sql`CASE WHEN ${tasks.status} = 'DONE' THEN 1 END`),
+      })
+      .from(tasks)
+      .where(inArray(tasks.projectId, projectIds))
+      .groupBy(tasks.projectId);
+
+    const countsByProject = new Map(
+      taskCounts.map((t) => [t.projectId, { total: Number(t.total), completed: Number(t.completed) }])
+    );
+
+    const projectsWithProgress = await Promise.all(
+      rows.map(async (r) => {
+        const { total, completed } = countsByProject.get(r.id) ?? { total: 0, completed: 0 };
+        const progress = await getTaskCompletionProgress(total, completed);
+
+        return {
+          id: r.id,
+          name: r.name,
+          client: {
+            id: r.clientId,
+            name: r.clientName,
+            initials: getInitials(r.clientName),
+          },
+          status: r.status,
+          progress,
+          dueDate: r.dueDate ? r.dueDate.toISOString() : null,
+        };
+      })
+    );
+
+    return { success: true, projects: projectsWithProgress };
+  } catch (err) {
+    console.error("Failed to fetch workspace projects", err);
+    return { success: false, message: "Failed to fetch workspace projects", err, projects: [] as never[] };
+  }
 }
 
 export async function ProjectsClientCount(clientId: string): Promise<number> {
@@ -64,9 +138,44 @@ export async function syncProjectProgress(projectId: string) {
 export async function GetProjectsForClient(clientId: string) {
   try {
     const result = await db.select().from(projects).where(eq(projects.clientId, clientId));
+
+    if (result.length === 0) {
+      return {
+        success: true,
+        projects: result,
+      };
+    }
+
+    // Compute live progress from tasks in one batched query instead of
+    // trusting the stored `progress` column, which only updates when
+    // syncProjectProgress() happens to be called elsewhere.
+    const projectIds = result.map((p) => p.id);
+
+    const taskCounts = await db
+      .select({
+        projectId: tasks.projectId,
+        total: count(),
+        completed: count(sql`CASE WHEN ${tasks.status} = 'DONE' THEN 1 END`),
+      })
+      .from(tasks)
+      .where(inArray(tasks.projectId, projectIds))
+      .groupBy(tasks.projectId);
+
+    const countsByProject = new Map(
+      taskCounts.map((t) => [t.projectId, { total: Number(t.total), completed: Number(t.completed) }])
+    );
+
+    const projectsWithProgress = await Promise.all(
+      result.map(async (p) => {
+        const { total, completed } = countsByProject.get(p.id) ?? { total: 0, completed: 0 };
+        const progress = await getTaskCompletionProgress(total, completed);
+        return { ...p, progress };
+      })
+    );
+
     return {
       success: true,
-      projects: result,
+      projects: projectsWithProgress,
     };
   } catch (err) {
     console.error('Failed to fetch projects for client', err);
