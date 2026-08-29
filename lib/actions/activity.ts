@@ -3,7 +3,7 @@
 import db from "@/database";
 import { activity } from "@/database/schema/schema";
 import { success } from "better-auth";
-import { and, eq, ne, } from  "drizzle-orm"
+import { and, eq, ne, desc } from  "drizzle-orm"
 
 interface Activities {
  success: boolean;
@@ -46,7 +46,7 @@ export async function NewProjectActivity({clientId, projectId, userId, type= "Cr
 
 export async function GetClientActivities(clientId: string) {
     try {
-        const activities = await db.select().from(activity).where(eq(activity.clientId, clientId))
+        const activities = await db.select().from(activity).where(eq(activity.clientId, clientId)).orderBy(desc(activity.createdAt))
 
         return {
             success: true,
@@ -63,7 +63,7 @@ export async function GetClientActivities(clientId: string) {
 
 export async function GetProjectActivities(projectId: string | undefined) {
     try {
-        const activities = await db.select().from(activity).where(eq(activity.projectId, projectId))
+        const activities = await db.select().from(activity).where(eq(activity.projectId, projectId)).orderBy(desc(activity.createdAt))
 
         return {
             success: true,

@@ -78,7 +78,7 @@ export async function ToggleTask({ taskId, clientId, projectId, userId }: {
             .returning();
 
         const newActivity = await NewProjectActivity({
-            message: `Marked ${updated?.title ?? "task"} as ${nextStatus === "DONE" ? "done" : "not done"}`,
+            message: `Marked Task "${updated?.title ?? "task"}" as ${nextStatus === "DONE" ? "done" : "not done"}`,
             clientId,
             projectId,
             userId,
@@ -131,8 +131,8 @@ export async function UpdateTask({ taskId, clientId, projectId, userId, title, d
 
         const newActivity = await NewProjectActivity({
             message: status !== undefined
-                ? `Updated ${updated.title} to ${status.replace("_", " ")}`
-                : `Updated ${updated.title} task`,
+                ? `Updated Task "${updated.title}" to ${status.replace("_", " ")}`
+                : `Updated Task "${updated.title}"`,
             clientId,
             projectId,
             userId,
@@ -164,7 +164,7 @@ export async function DeleteTask({taskId, clientId, projectId, userId}: {
         const [deleted] = await db.delete(tasks).where(eq(tasks.id, taskId)).returning()
 
         const newActivity = await NewProjectActivity({
-            message: `Deleted ${deleted?.title ?? "task"} task`,
+            message: `Deleted Task "${deleted?.title ?? "task"}"`,
             clientId,
             projectId,
             userId,

@@ -239,7 +239,7 @@ export async function CreateProject(data: {
 
     const user = session?.user
 
-    const newActivity = await NewClientActivity({ clientId, userId: user?.id, type: "Create Project", projectId: insertedProject.id, message: "Created new Project"})
+    const newActivity = await NewClientActivity({ clientId, userId: user?.id, type: "Create Project", projectId: insertedProject.id, message: `Created new Project ${insertedProject.name}`})
 
       // console.log("Project created successfully:", insertedProject);
     return {

@@ -50,6 +50,7 @@ export default function ProfileEditForm({
       onSubmit={handleSubmit}
       className="mx-auto w-full max-w-2xl space-y-5 p-3"
     >
+      <div>
       <div className="flex items-center gap-3">
         <Link
           href="/settings/profile"
@@ -58,15 +59,14 @@ export default function ProfileEditForm({
           <ArrowLeft className="h-5 w-5" />
         </Link>
 
-        <div>
           <h1 className="text-2xl font-bold italic">
             Edit Profile
           </h1>
 
+        </div>
           <p className="text-sm text-muted-foreground">
             Update your personal information.
           </p>
-        </div>
       </div>
 
       <section className="rounded-2xl border bg-card p-5">

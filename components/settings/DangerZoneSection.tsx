@@ -73,8 +73,8 @@ export default function DangerZoneSection({ userEmail }: { userEmail: string }) 
           </DialogHeader>
 
           <div className="flex flex-col gap-2 py-2">
-            <Label htmlFor="confirm-delete">
-              Type <span className="font-semibold">{userEmail}</span> to confirm
+            <Label htmlFor="confirm-delete" className="flex">
+              Type <span className="font-semibold">"{userEmail}"</span> to confirm
             </Label>
             <Input
               id="confirm-delete"

@@ -2,59 +2,110 @@
 
 > Forge your freelance business.
 
-NexusForge is a modern SaaS platform built to help freelancers organize every aspect of their business—from managing clients and projects to generating invoices and tracking productivity—all from one beautiful workspace.
+NexusForge is a freelancer workspace designed to bring clients, projects, tasks, notes, invoices, and business activity into one place.
 
----
+Instead of jumping between multiple tools, freelancers can manage their work from a single workspace.
 
-## ✨ Overview
-
-Freelancers often juggle multiple tools for managing clients, projects, notes, invoices, and deadlines.
-
-NexusForge brings everything together into one intuitive workspace, allowing freelancers to spend less time managing work and more time creating value.
-
----
-
-## 🚀 Features
+## ✨ Current Features
 
 ### 👥 Client Management
-- Add, edit and archive clients
+- Create and manage clients
 - Store contact information
-- Track client history
+- Client status tracking
+- Client notes with Markdown
+- Client activity history
+- Project count per client
 
 ### 📁 Project Management
 - Create projects
-- Track project status
-- Set deadlines
-- Organize project details
+- Project status and priority
+- Project budgets and currencies
+- Start and due dates
+- Project progress
+- Project tasks
+- Project activity history
+
+### ✅ Task Management
+- Create tasks
+- Task status tracking
+- Task priorities
+- Task filtering
+- Task deletion
 
 ### 📝 Notes
-- Rich text editor
-- Organize project notes
-- Personal workspace
-
-### 💰 Invoice Generator
-- Generate professional invoices
-- Track payment status
-- Download invoices as PDF
+- Markdown editor
+- Preview mode
+- Project/client notes
 
 ### 📊 Dashboard
-- Active projects
-- Total clients
-- Revenue overview
-- Recent activity
+- Workspace overview
+- Client count
+- Project count
+- Client overview
+- Workspace-based navigation
 
 ### 🔐 Authentication
-- Secure sign up
-- Secure sign in
+- Email/password authentication
+- Google authentication
 - Protected routes
 - Session management
+- Email verification
+- Password reset
+- Password change
+- Account deletion
 
 ### ⚙️ Settings
-- Update profile
-- Account preferences
-- Workspace customization
+- Profile management
+- Password management
+- Appearance preferences
+- Account deletion
 
----
+## 🚧 Currently In Development
+
+- Project editing improvements
+- Complete task editing/status persistence
+- Activity system
+- Notifications
+- Invoice generation
+- Dashboard financial/task statistics
+- Production hardening and testing
+
+## 🗺 Roadmap
+
+### MVP
+- [x] Landing page
+- [x] Authentication
+- [x] Workspaces
+- [x] Client management
+- [x] Client notes
+- [x] Project management foundation
+- [x] Task management foundation
+- [ ] Complete project/task workflows
+- [ ] Activity timeline
+- [ ] Notifications
+- [ ] Invoice generator
+- [ ] Dashboard completion
+- [ ] Security audit
+- [ ] Testing and production polish
+
+### Post-MVP
+- [ ] File uploads
+- [ ] Calendar
+- [ ] Analytics
+- [ ] Lead/prospect pipeline
+- [ ] Client approval workflows
+
+### V2
+- [ ] Team collaboration
+- [ ] Member invitations
+- [ ] Roles and permissions
+
+### V3
+- [ ] Real-time collaboration
+- [ ] Live comments
+- [ ] Presence indicators
+- [ ] Collaborative editing
+- [ ] AI-powered features
 
 ## 🛠 Tech Stack
 
@@ -66,83 +117,30 @@ NexusForge brings everything together into one intuitive workspace, allowing fre
 - shadcn/ui
 
 ### Backend
+- Next.js Server Actions
 - Next.js Route Handlers
-- Server Actions
 
 ### Database
 - PostgreSQL
 - Drizzle ORM
+- Neon
 
 ### Authentication
 - Better Auth
 
-### Deployment
-- Vercel
-- Neon PostgreSQL
-
----
-
-## 🗺 Roadmap
-
-### Version 1.0
-- [x] Landing Page
-- [ ] Authentication
-- [ ] Dashboard
-- [ ] Client Management
-- [ ] Project Management
-- [ ] Notes
-- [ ] Invoice Generator
-- [ ] Settings
-
-### Version 1.5
-- [ ] File Uploads
-- [ ] Calendar
-- [ ] Notifications
-- [ ] Analytics
-
-### Version 2.0
-- [ ] Team Collaboration
-- [ ] Member Invitations
-- [ ] Roles & Permissions
-
-### Version 3.0
-- [ ] Real-Time Collaboration
-- [ ] Live Comments
-- [ ] Presence Indicators
-- [ ] Live Editing
-
----
+### Email
+- Nodemailer
 
 ## 🎯 Vision
 
-NexusForge aims to become the all-in-one operating system for freelancers by providing professional tools in one seamless workspace.
+NexusForge aims to become a practical operating system for freelancers—helping them manage their clients, projects, work, and business operations from one workspace.
 
-Instead of switching between multiple applications, freelancers can manage their entire workflow from a single platform.
+The goal is simple:
 
----
-
-## 📸 Preview
-
-Coming Soon...
-
----
-
-## 🤝 Contributing
-
-Contributions, feature requests and feedback are always welcome.
-
-If you'd like to contribute, feel free to fork the repository and submit a pull request.
-
----
-
-## 📜 License
-
-This project is licensed under the MIT License.
-
----
+> Spend less time managing the business and more time doing the work.
 
 ## 👨‍💻 Author
 
-Built with ❤️ by **CodeXSavage**
+Built by **CodeXSavage**
 
 > "Forge your future, one project at a time."
