@@ -295,3 +295,35 @@ html {
 .btn-press:active {
   transform: scale(0.96);
 }
+
+/* ==========================================================================
+   Invoice printing
+   ========================================================================== */
+
+@media print {
+  [data-slot="sidebar"],
+  [data-slot="sidebar-rail"],
+  [data-slot="sidebar-trigger"],
+  header {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  #invoice-preview {
+    color: black !important;
+    background: white !important;
+  }
+
+  @page {
+    size: auto;
+    margin: 12mm;
+  }
+}

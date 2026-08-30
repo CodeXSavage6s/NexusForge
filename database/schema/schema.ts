@@ -81,6 +81,7 @@ export const invoiceStatusEnum = pgEnum("invoice_status", [
   "SENT",
   "PAID",
   "OVERDUE",
+  "CANCELLED",
 ]);
 
 // ═════════════════════════════════════════════════════════════
@@ -387,10 +388,16 @@ export const timeEntries = pgTable(
 );
 
 // ── Invoice ─────────────────────────────────────────────────
+// NOTE: workspaceId is denormalized from clients.workspaceId (same
+// pattern as projects.workspaceId) so every invoice can be scoped and
+// authorized against a workspace without joining through clients first.
 export const invoices = pgTable(
   "invoices",
   {
     id: cuid(),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
     clientId: text("client_id")
       .notNull()
       .references(() => clients.id, { onDelete: "restrict" }),
@@ -398,17 +405,55 @@ export const invoices = pgTable(
       onDelete: "set null",
     }),
     invoiceNumber: text("invoice_number").notNull(),
-    amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
+    // Denormalized total, always recalculated server-side from the sum of
+    // invoiceLineItems (quantity * rate) plus taxRate. Never trust a value
+    // for this posted from the browser.
+    amount: numeric("amount", { precision: 12, scale: 2, mode: "number" }).notNull().default(0),
     currency: text("currency").notNull().default("USD"),
     status: invoiceStatusEnum("status").notNull().default("DRAFT"),
     issueDate: timestamp("issue_date").notNull().defaultNow(),
     dueDate: timestamp("due_date").notNull(),
+    // Percentage, e.g. 7.5 for 7.5%. Null/omitted means no tax applied.
+    taxRate: numeric("tax_rate", { precision: 5, scale: 2, mode: "number" }),
+    notes: text("notes"),
+    // Cryptographically random token that gates the public /invoice/[publicToken]
+    // route. Null until the freelancer generates a share link. Never derived
+    // from the invoice id, so it can't be guessed/enumerated from it.
+    publicToken: text("public_token"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (t) => ({
-    invoiceNumberUnique: uniqueIndex("invoices_invoice_number_unique").on(
-      t.invoiceNumber
+    // Scoped per workspace (like projects.slug) rather than globally unique,
+    // so two different freelancers can both have an "INV-0001".
+    workspaceInvoiceNumberUnique: uniqueIndex(
+      "invoices_workspace_invoice_number_unique"
+    ).on(t.workspaceId, t.invoiceNumber),
+    publicTokenUnique: uniqueIndex("invoices_public_token_unique").on(
+      t.publicToken
     ),
+    workspaceIdx: index("invoices_workspace_idx").on(t.workspaceId),
     clientIdx: index("invoices_client_idx").on(t.clientId),
+    projectIdx: index("invoices_project_idx").on(t.projectId),
+    statusIdx: index("invoices_status_idx").on(t.status),
+  })
+);
+
+// ── InvoiceLineItem ─────────────────────────────────────────
+export const invoiceLineItems = pgTable(
+  "invoice_line_items",
+  {
+    id: cuid(),
+    invoiceId: text("invoice_id")
+      .notNull()
+      .references(() => invoices.id, { onDelete: "cascade" }),
+    description: text("description").notNull(),
+    quantity: numeric("quantity", { precision: 12, scale: 2, mode: "number" }).notNull().default(1),
+    rate: numeric("rate", { precision: 12, scale: 2, mode: "number" }).notNull().default(0),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    invoiceIdx: index("invoice_line_items_invoice_idx").on(t.invoiceId),
   })
 );
 
@@ -420,6 +465,7 @@ export const workspacesRelations = relations(workspaces, ({ many }) => ({
   members: many(workspaceMembers),
   clients: many(clients),
   projects: many(projects),
+  invoices: many(invoices),
 }));
 
 export const workspaceMembersRelations = relations(workspaceMembers, ({ one }) => ({
@@ -491,7 +537,19 @@ export const timeEntriesRelations = relations(timeEntries, ({ one }) => ({
   project: one(projects, { fields: [timeEntries.projectId], references: [projects.id] }),
 }));
 
-export const invoicesRelations = relations(invoices, ({ one }) => ({
+export const invoicesRelations = relations(invoices, ({ one, many }) => ({
+  workspace: one(workspaces, {
+    fields: [invoices.workspaceId],
+    references: [workspaces.id],
+  }),
   client: one(clients, { fields: [invoices.clientId], references: [clients.id] }),
   project: one(projects, { fields: [invoices.projectId], references: [projects.id] }),
+  lineItems: many(invoiceLineItems),
+}));
+
+export const invoiceLineItemsRelations = relations(invoiceLineItems, ({ one }) => ({
+  invoice: one(invoices, {
+    fields: [invoiceLineItems.invoiceId],
+    references: [invoices.id],
+  }),
 }));

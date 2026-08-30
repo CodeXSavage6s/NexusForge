@@ -28,7 +28,7 @@ export default function InfoCard({
   return (
     <Link
       href={href}
-      className="flex flex-col gap-3 p-3 bg-card rounded-lg shadow shadow-foreground-secondary/20 transition-shadow hover:shadow-md"
+      className="flex flex-col gap-3 p-3 bg-card rounded-lg shadow shadow-foreground-secondary/20 transition-shadow hover:shadow-md text-center"
     >
       <div className="flex items-center gap-2 flex-col md:flex-row">
         {Icon && (

@@ -17,6 +17,7 @@ import {
   ChevronsUpDown,
   Check,
   Plus,
+  Receipt,
 } from "lucide-react";
 
 import {
@@ -78,6 +79,7 @@ function getWorkspaceNavItems(workspaceSlug: string): SidebarNavItem[] {
     { title: "Dashboard", href: `/${workspaceSlug}/dashboard`, icon: LayoutDashboard },
     { title: "Clients", href: `/${workspaceSlug}/clients`, icon: Users },
     { title: "Projects", href: `/${workspaceSlug}/projects`, icon: FolderKanban },
+    { title: "Invoices", href: `/${workspaceSlug}/invoices`, icon: Receipt },
     { title: "Team", href: `/${workspaceSlug}/team`, icon: Users },
   ];
 }
@@ -159,7 +161,7 @@ export function AppSidebar({
   // The URL segment is the workspace SLUG (see the Link hrefs below,
   // which route to `/${workspace.slug}/...`), so we must match against
   // `slug`, not `id`.
-  const workspaceSlugInPath = pathname.match(/^\/([^/]+)\/(?:dashboard|projects|analytics|team)/)?.[1] ?? null;
+  const workspaceSlugInPath = pathname.match(/^\/([^/]+)\/(?:dashboard|clients|projects|invoices|analytics|team)/)?.[1] ?? null;
   // const currentWorkspace =
   //   workspaces.find((w) => w.slug === workspaceSlugInPath) ?? null;
 
