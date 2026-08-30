@@ -4,7 +4,9 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { signOut } from "@/lib/actions/auth"
 import {
+  Bell,
   Home,
   LayoutDashboard,
   FolderKanban,
@@ -67,15 +69,15 @@ export interface AppSidebarProps {
 // ---------- Demo data (swap out with real data) ----------
 
 export const demoGeneralNavItems: SidebarNavItem[] = [
-  { title: "Home", href: "/", icon: Home },
+  { title: "Home", href: "/home", icon: Home },
   { title: "Settings", href: "/settings", icon: Settings },
 ];
 
 function getWorkspaceNavItems(workspaceSlug: string): SidebarNavItem[] {
   return [
     { title: "Dashboard", href: `/${workspaceSlug}/dashboard`, icon: LayoutDashboard },
+    { title: "Clients", href: `/${workspaceSlug}/clients`, icon: Users },
     { title: "Projects", href: `/${workspaceSlug}/projects`, icon: FolderKanban },
-    { title: "Analytics", href: `/${workspaceSlug}/analytics`, icon: BarChart3 },
     { title: "Team", href: `/${workspaceSlug}/team`, icon: Users },
   ];
 }
@@ -89,80 +91,59 @@ function WorkspaceSwitcher({
   workspaces: WorkspaceSummary[];
   currentWorkspace: WorkspaceSummary | null | undefined;
 }) {
-  // Controlled separately from the dropdown so the dialog can stay mounted
-  // and open *after* the dropdown closes. Nesting a Dialog trigger inside a
-  // DropdownMenuItem via `asChild` causes Radix to close/unmount the menu
-  // (and the dialog trigger along with it) before the dialog gets a chance
-  // to open — see bug notes.
-  const [createWorkspaceOpen, setCreateWorkspaceOpen] = React.useState(false);
-
   return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <SidebarMenuButton
-            className="justify-between"
-            tooltip={currentWorkspace?.name ?? "Select workspace"}
-          >
-            <span className="truncate text-sm font-medium">
-              {currentWorkspace ? currentWorkspace.name : "Select workspace"}
-            </span>
-            <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-60" />
-          </SidebarMenuButton>
-        </DropdownMenuTrigger>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <SidebarMenuButton
+          className="justify-between"
+          tooltip={currentWorkspace?.name ?? "Select workspace"}
+        >
+          <span className="truncate text-sm font-medium">
+            {currentWorkspace ? currentWorkspace.name : "Select workspace"}
+          </span>
+          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-60" />
+        </SidebarMenuButton>
+      </DropdownMenuTrigger>
 
-        <DropdownMenuContent align="start" className="w-56">
-          <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
-          <DropdownMenuSeparator />
+      <DropdownMenuContent align="start" className="w-56">
+        <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+        <DropdownMenuSeparator />
 
-          {workspaces.length === 0 && (
-            <p className="px-2 py-1.5 text-xs text-muted-foreground">
-              No workspaces yet
-            </p>
-          )}
+        {workspaces.length === 0 && (
+          <p className="px-2 py-1.5 text-xs text-muted-foreground">
+            No workspaces yet
+          </p>
+        )}
 
-          {workspaces.map((workspace) => (
-            <DropdownMenuItem key={workspace.id} asChild>
-              <Link
-                href={`/${workspace.slug}/dashboard`}
-                className="flex items-center justify-between"
-              >
-                <span className="truncate">{workspace.name}</span>
-                {currentWorkspace?.id === workspace.id && (
-                  <Check className="h-4 w-4" />
-                )}
-              </Link>
-            </DropdownMenuItem>
-          ))}
-
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onSelect={(e) => {
-              // Keep the item from trying to auto-close/navigate before we
-              // can open the dialog on the next tick.
-              e.preventDefault();
-              setCreateWorkspaceOpen(true);
-            }}
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Create Workspace
+        {workspaces.map((workspace) => (
+          <DropdownMenuItem key={workspace.id} asChild>
+            <Link
+              href={`/${workspace.slug}/dashboard`}
+              className="flex items-center justify-between"
+            >
+              <span className="truncate">{workspace.name}</span>
+              {currentWorkspace?.id === workspace.id && (
+                <Check className="h-4 w-4" />
+              )}
+            </Link>
           </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+        ))}
 
-      {/* Rendered outside the DropdownMenu so it isn't unmounted when the
-          menu closes. Assumes CreateWorkspaceDialog accepts controlled
-          `open`/`onOpenChange` props (same pattern as CreateClientDialog).
-          If it currently manages its own internal `open` state instead,
-          add those two props to it. */}
-      <CreateWorkspaceDialog
-        open={createWorkspaceOpen}
-        onOpenChange={setCreateWorkspaceOpen}
-      />
-    </>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onSelect={(e) => e.preventDefault()} // keeps the menu from closing before the dialog can open
+        >
+          <CreateWorkspaceDialog>
+            <button className="flex w-full items-center">
+              <Plus className="mr-2 h-4 w-4" />
+              Create Workspace
+            </button>
+          </CreateWorkspaceDialog>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
-
 // ---------- Component ----------
 
 export function AppSidebar({
@@ -254,12 +235,23 @@ export function AppSidebar({
             </SidebarGroupContent>
           </SidebarGroup>
         )}
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Settings</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem className="font-bold text-lg"><SidebarMenuButton asChild><Link href="/settings/profile"><Users className="h-4 w-4" /> Profile</Link></SidebarMenuButton></SidebarMenuItem>
+                <SidebarMenuItem className="font-bold text-lg"><SidebarMenuButton asChild><Link href="/settings/notifications"><Bell className="h-4 w-4" /> Notifications</Link></SidebarMenuButton></SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>
-        <div className="text-red-500 flex font-black w-full justify-end gap-1">
+        <button className="text-red-500 flex font-black w-full justify-end gap-1"
+          onClick={signOut}>
           <LogOut /> Logout
-        </div>
+        </button>
       </SidebarFooter>
     </Sidebar>
   );

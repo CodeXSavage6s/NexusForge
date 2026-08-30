@@ -7,7 +7,7 @@ export const demoUser: NavbarUser = {
 };
 
 export const demoMenuItems: NavbarMenuItem[] = [
-  { label: "Profile", href: "/profile", icon: <User className="h-4 w-4" /> },
+  { label: "Profile", href: "/settings/profile", icon: <User className="h-4 w-4" /> },
   { label: "Settings", href: "/settings", icon: <Settings className="h-4 w-4" /> },
   //{ label: "Log out", icon: <LogOut className="h-4 w-4" /> },
 ];

@@ -1,37 +1,18 @@
 "use client";
 
-import { CheckCircle2, Circle, CalendarCheck, Flag, Pencil } from "lucide-react";
+import { useState } from "react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Task, TaskStatus } from "@/types/schema";
-import { Trash2 } from "lucide-react";
-import { DeleteTask } from "@/lib/actions/task";
+import { DeleteTask, ToggleTask, UpdateTask } from "@/lib/actions/task";
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
   TODO: "To Do",
   IN_PROGRESS: "In Progress",
   REVIEW: "Review",
-  DONE: "Done",  
+  DONE: "Done",
 };
 
-const STATUS_STYLES: Record<TaskStatus, string> = {
-  TODO: "bg-slate-100 text-slate-700",
-  IN_PROGRESS: "bg-blue-100 text-blue-700",
-  REVIEW: "bg-amber-100 text-amber-700",
-  DONE: "bg-emerald-100 text-emerald-700",
-};
-
-const PRIORITY_LABELS: Record<Task["priority"], string> = {
-  LOW: "Low",
-  MEDIUM: "Medium",
-  HIGH: "High",
-  URGENT: "Urgent",
-};
-
-const PRIORITY_STYLES: Record<Task["priority"], string> = {
-  LOW: "bg-slate-100 text-slate-700",
-  MEDIUM: "bg-indigo-100 text-indigo-700",
-  HIGH: "bg-orange-100 text-orange-700",
-  URGENT: "bg-rose-100 text-rose-700",
-};
+const STATUS_OPTIONS: TaskStatus[] = ["TODO", "IN_PROGRESS", "REVIEW", "DONE"];
 
 type TaskTodoProps = {
   task: Task;
@@ -40,111 +21,109 @@ type TaskTodoProps = {
   onClick?: () => void;
   clientId: string;
   projectId: string;
-  userId: string | undefined
+  userId: string | undefined;
 };
 
-function formatDueDate(value: Task["dueDate"]) {
-  if (!value) return "No due date";
-  const date = typeof value === "string" ? new Date(value) : value;
-  return new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
-}
-
-async function handleDeleteTask({taskId, userId, projectId, clientId}: {taskId: string, userId: string | undefined, projectId: string, clientId: string}) {
-  const deleted = await DeleteTask({taskId, userId, projectId, clientId})
+async function handleDeleteTask({ taskId, userId, projectId, clientId }: { taskId: string; userId: string | undefined; projectId: string; clientId: string }) {
+  await DeleteTask({ taskId, userId, projectId, clientId });
 }
 
 export default function TaskTodo({ task, onStatusChange, onEdit, onClick, clientId, userId, projectId }: TaskTodoProps) {
+  const [expanded, setExpanded] = useState(false);
   const isDone = task.status === "DONE";
-  const dueDate = formatDueDate(task.dueDate);
 
-  const handleToggle = () => {
-    if (!onStatusChange) return;
-    onStatusChange(task.id, isDone ? "TODO" : "DONE");
+  const handleToggle = async () => {
+    const result = await ToggleTask({ taskId: task.id, userId, projectId, clientId });
+    if (result.success && result.task) {
+      onStatusChange?.(task.id, result.task.status);
+    }
+  };
+
+  const handleStatusSelect = async (nextStatus: TaskStatus) => {
+    const result = await UpdateTask({ taskId: task.id, userId, projectId, clientId, status: nextStatus });
+    if (result.success && result.task) {
+      onStatusChange?.(task.id, result.task.status);
+    }
   };
 
   return (
     <article
-      className="group rounded-3xl border border-border bg-card p-2 shadow-sm transition hover:shadow-md"
+      className="group border-b border-border/60 py-2 transition-colors last:border-b-0 hover:bg-muted/20"
       onClick={onClick}
     >
-      <div className="flex items-start gap-3">
-        <button
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            handleToggle();
-          }}
-          className="flex h-10 w-10 items-center justify-center rounded-2xl border border-input bg-background text-slate-600 transition hover:bg-primary/10 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+      <div className="flex items-center gap-3">
+        <input
+          type="checkbox"
+          checked={isDone}
+          onClick={(event) => event.stopPropagation()}
+          onChange={handleToggle}
+          className="h-4 w-4 shrink-0 cursor-pointer rounded border-input accent-primary"
           aria-label={isDone ? "Mark task as active" : "Mark task as done"}
+        />
+
+        <span
+          className={`min-w-0 flex-1 truncate text-sm transition-all duration-300 ${
+            isDone ? "text-muted-foreground line-through opacity-50" : "font-medium text-foreground"
+          }`}
         >
-          {isDone ? (
-            <CheckCircle2 className="h-5 w-5" />
-          ) : (
-            <Circle className="h-5 w-5" />
-          )}
-        </button>
+          {task.title}
+        </span>
 
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="min-w-0 flex-1 truncate text-base font-semibold text-foreground">
-              {task.title}
-            </h3>
-            <span className={`text-[11px] font-semibold ${STATUS_STYLES[task.status]}`}>
-              {STATUS_LABELS[task.status]}
-            </span>
-            <span className={`text-[11px] font-semibold ${PRIORITY_STYLES[task.priority]}`}>
-              {PRIORITY_LABELS[task.priority]}
-            </span>
-            {onEdit && (
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onEdit();
-                }}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-input bg-background text-slate-500 transition hover:bg-muted hover:text-foreground"
-                aria-label="Edit task"
-              >
-                <Pencil className="h-4 w-4" />
-              </button>
-            )}
+        <select
+          value={task.status}
+          onClick={(event) => event.stopPropagation()}
+          onChange={(event) => handleStatusSelect(event.target.value as TaskStatus)}
+          className="shrink-0 rounded-md border-none bg-transparent py-1 text-xs text-muted-foreground outline-none transition-opacity hover:text-foreground"
+        >
+          {STATUS_OPTIONS.map((status) => (
+            <option key={status} value={status}>
+              {STATUS_LABELS[status]}
+            </option>
+          ))}
+        </select>
+
+        <div className="flex shrink-0 items-center gap-0.5">
+          {onEdit && (
             <button
-              onClick={() => handleDeleteTask({taskId: task.id, userId, projectId, clientId})}
-              className="flex items-center gap-1 text-red-500 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                onEdit();
+              }}
+              className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              aria-label="Edit task"
             >
-              <Trash2 className="h-4 w-4" />
-              <span className="text-sm">Delete</span>
-          </button>
-          </div>
-
-          {task.description ? (
-            <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
-              {task.description}
-            </p>
-          ) : (
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              No description provided.
-            </p>
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
           )}
 
-          <div className="mt-4 flex flex-wrap gap-2 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-1">
-              <CalendarCheck className="h-3.5 w-3.5" />
-              {dueDate}
-            </span>
-            {task.assignedTo ? (
-              <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-1">
-                <Flag className="h-3.5 w-3.5" />
-                {task.assignedTo}
-              </span>
-            ) : null}
-          </div>
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              handleDeleteTask({ taskId: task.id, userId, projectId, clientId });
+            }}
+            className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground text-red-600"
+            aria-label="Delete task"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
+
+      {task.description && (
+        <p
+          onClick={(event) => {
+            event.stopPropagation();
+            setExpanded((current) => !current);
+          }}
+          className={`mt-1 cursor-pointer pl-7 text-xs text-muted-foreground transition-opacity ${
+            isDone ? "opacity-50" : ""
+          } ${expanded ? "whitespace-pre-wrap" : "truncate"}`}
+        >
+          {task.description}
+        </p>
+      )}
     </article>
   );
 }

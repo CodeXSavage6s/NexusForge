@@ -1,3 +1,5 @@
+"use client"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,21 +21,24 @@ export default function ClientDropMenu({ className, clientId, clientName, worksp
           <Button className="flex items-center justify-center" variant="ghost"><span>•</span><span>•</span><span>•</span></Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link href={`${clientId}/projects`} className="w-full">
               View Projects
             </Link>
           </DropdownMenuItem>
-          <Link href={`${clientId}/edit`} className="w-full">
-            Edit
-          </Link>
+          <DropdownMenuItem asChild>
+	          <Link href={`${clientId}/edit`} className="w-full">
+	            Edit
+	          </Link>
+          </DropdownMenuItem>
           <CreateProjectDialog
             clientId={clientId}
             clientName={clientName}
             workspaceId={workspaceId}
           >
-            <button>
-              New Project</button>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              New Project
+            </DropdownMenuItem>
           </CreateProjectDialog>
         </DropdownMenuContent>
       </DropdownMenu>

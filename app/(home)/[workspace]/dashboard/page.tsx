@@ -56,7 +56,7 @@ export default async function WorkspaceDashboard({
 
         <InfoCard
           title="Projects"
-          href="/projects"
+          href="projects"
           icon={FolderKanban}
           iconBg="rgba(59,130,246,0.15)"
           iconColor="#3b82f6"

@@ -30,9 +30,9 @@ type CreateProjectDialogProps = {
   clientId: string;
   clientName: string;
   workspaceId?: string;
-  trigger?: React.ReactNode;
+  trigger?: React.ReactElement;
   onSubmit?: () => void;
-  children?: React.ReactNode;
+  children?: React.ReactElement;
 };
 
 type ProjectFormData = {
@@ -149,7 +149,7 @@ export function CreateProjectDialog({
     >
       {children ?? trigger ? (
         <DialogTrigger asChild>
-          <span>{children ?? trigger}</span>
+          {children ?? trigger}
         </DialogTrigger>
       ) : (
         <DialogTrigger asChild>
