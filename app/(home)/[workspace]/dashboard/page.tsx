@@ -9,6 +9,7 @@ import { redirect, notFound } from "next/navigation";
 import { ProjectsCount } from "@/lib/actions/project"
 import { ClientCount, GetWorkspaceClient } from "@/lib/actions/client"
 import { getWorkspace, getUserWorkspaces } from "@/lib/actions/workspace"
+import { InvoiceCount } from "@/lib/actions/invoice"
 
 export default async function WorkspaceDashboard({
   params,
@@ -32,6 +33,7 @@ export default async function WorkspaceDashboard({
 
   const projectCount = await ProjectsCount(workspace.id)
   const clientCount = await ClientCount(workspace.id)
+  const invoiceCount = await InvoiceCount(workspace.id)
 
   const clients = await GetWorkspaceClient(workspace.id)
   return (
@@ -89,7 +91,7 @@ export default async function WorkspaceDashboard({
           iconColor="#22c55e"
           subtitleColor="#22c55e"
           progressColor="#22c55e"
-          count={undefined} 
+          count={invoiceCount} 
           subtitle={undefined} 
           progress={undefined} 
         />
