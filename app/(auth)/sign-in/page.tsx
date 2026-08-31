@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import InputField from "@/components/form/InputField";
 import FooterLink from '@/components/form/FooterLink'
@@ -78,6 +79,12 @@ const SignIn = () => {
                 },
               }}
             />
+
+            <div className="flex justify-end">
+              <Link href="/forgot-password" className="footer-link text-sm">
+                Forgot password?
+              </Link>
+            </div>
 
             <Button type="submit" className="w-full h-[45px] text-xl font-semibold" disabled={isSubmitting}>
               {isSubmitting ? "Signing in..." : "Sign in"}

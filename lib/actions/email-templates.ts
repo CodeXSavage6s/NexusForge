@@ -221,3 +221,30 @@ export function passwordResetEmailHtml({
     `Reset the password for your ${BRAND.name} account.`
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* 4. Waitlist confirmation email                                      */
+/* ------------------------------------------------------------------ */
+
+export function waitlistEmailHtml({ name }: { name?: string }): string {
+  const greeting = name ? `Hi ${name},` : "Hi there,";
+  const body = `
+    <h1 style="margin:0 0 16px 0; font-size:22px; line-height:28px; font-weight:700; color:${BRAND.textDark};">
+      You're on the list! 🎉
+    </h1>
+    <p style="margin:0 0 8px 0; font-size:15px; line-height:24px; color:${BRAND.textDark};">
+      ${greeting}
+    </p>
+    <p style="margin:0 0 8px 0; font-size:15px; line-height:24px; color:${BRAND.textDark};">
+      Thanks for your interest in ${BRAND.name} Pro. We'll email you as soon as it's ready — no spam, just one note when it's your turn.
+    </p>
+    <p style="margin: 24px 0 0 0; font-size:13px; line-height:20px; color:${BRAND.textMuted};">
+      In the meantime, you can keep using ${BRAND.name} on the free plan.
+    </p>
+  `;
+  return shell(
+    `You're on the ${BRAND.name} waitlist`,
+    body,
+    `Thanks for joining the ${BRAND.name} Pro waitlist — we'll let you know when it's ready.`
+  );
+}

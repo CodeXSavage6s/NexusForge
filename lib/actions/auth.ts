@@ -81,7 +81,7 @@
 import { auth } from '@/lib/better-auth/auth'
 import { headers } from 'next/headers'
 import db from "@/database/index";
-import { user } from "@/database/schema/auth-schema";
+import { user, account } from "@/database/schema/auth-schema";
 // NOTE: adjust this import path to wherever schema.ts actually lives in this project
 import {
   workspaces,
@@ -206,6 +206,115 @@ export async function updateProfile(data: {
 export interface ChangePasswordState {
   success: boolean;
   error?: string;
+}
+
+export interface ResendVerificationEmailState {
+  success: boolean;
+  error?: string;
+}
+
+export async function resendVerificationEmail(): Promise<ResendVerificationEmailState> {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session?.user) {
+    return { success: false, error: "You must be signed in to do that." };
+  }
+
+  if (session.user.emailVerified) {
+    return { success: true };
+  }
+
+  try {
+    await auth.api.sendVerificationEmail({
+      body: {
+        email: session.user.email,
+        callbackURL: "/settings/profile",
+      },
+      headers: await headers(),
+    });
+
+    return { success: true };
+  } catch (err: any) {
+    console.error("Failed to resend verification email:", err);
+    const message =
+      err?.message || err?.body?.message || "Failed to send verification email.";
+    return { success: false, error: message };
+  }
+}
+
+export async function hasPasswordAccount(userId: string): Promise<boolean> {
+  const accounts = await db
+    .select({ providerId: account.providerId, password: account.password })
+    .from(account)
+    .where(eq(account.userId, userId));
+
+  return accounts.some((a) => a.providerId === "credential" && !!a.password);
+}
+
+export interface RequestPasswordResetState {
+  success: boolean;
+  error?: string;
+}
+
+export async function requestPasswordReset(
+  email: string
+): Promise<RequestPasswordResetState> {
+  const trimmedEmail = email?.trim().toLowerCase();
+
+  if (!trimmedEmail) {
+    return { success: false, error: "Enter your email address." };
+  }
+
+  try {
+    await auth.api.forgetPassword({
+      body: {
+        email: trimmedEmail,
+        redirectTo: "/reset-password",
+      },
+    });
+
+    // Always report success, whether or not that email has an account —
+    // otherwise this becomes a way to check which emails are registered.
+    return { success: true };
+  } catch (err) {
+    console.error("Failed to request password reset:", err);
+    // Same reasoning: don't leak anything more specific to the caller.
+    return { success: true };
+  }
+}
+
+export interface ResetPasswordState {
+  success: boolean;
+  error?: string;
+}
+
+export async function resetPassword({
+  token,
+  newPassword,
+}: {
+  token: string;
+  newPassword: string;
+}): Promise<ResetPasswordState> {
+  if (!token) {
+    return { success: false, error: "This reset link is invalid or has expired." };
+  }
+
+  if (!newPassword || newPassword.length < 8) {
+    return { success: false, error: "New password must be at least 8 characters." };
+  }
+
+  try {
+    await auth.api.resetPassword({
+      body: { newPassword, token },
+    });
+
+    return { success: true };
+  } catch (err: any) {
+    console.error("Failed to reset password:", err);
+    const message =
+      err?.message || err?.body?.message || "This reset link is invalid or has expired.";
+    return { success: false, error: message };
+  }
 }
 
 export async function changePassword(data: {

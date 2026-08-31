@@ -80,7 +80,6 @@ function getWorkspaceNavItems(workspaceSlug: string): SidebarNavItem[] {
     { title: "Clients", href: `/${workspaceSlug}/clients`, icon: Users },
     { title: "Projects", href: `/${workspaceSlug}/projects`, icon: FolderKanban },
     { title: "Invoices", href: `/${workspaceSlug}/invoices`, icon: Receipt },
-    { title: "Team", href: `/${workspaceSlug}/team`, icon: Users },
   ];
 }
 

@@ -42,6 +42,7 @@ const Home = () => {
         <nav className="hidden md:flex items-center gap-6 text-sm text-gray-600">
           <Link href="#features">Features</Link>
           <Link href="#pricing">Pricing</Link>
+          <Link href="/reviews">Reviews</Link>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -80,11 +81,11 @@ const Home = () => {
               Get Started &ndash; It&apos;s Free
             </Link>
           </Button>
-          <Button className="black-btn btn-press" variant="outline">
+          {/*<Button className="black-btn btn-press" variant="outline">
             <Link href="/demo" className="w-full">
               View Demo
             </Link>
-          </Button>
+          </Button>*/}
         </div>
 
         <div className="load-fade-up delay-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px] text-gray-500 mb-6">
