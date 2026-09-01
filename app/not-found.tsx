@@ -11,7 +11,7 @@ export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="header flex items-center justify-between border-b px-4 py-3">
-        <Link href="/" className="flex items-center">
+        <Link href="/home" className="flex items-center">
           <Image src="/assets/logo.svg" width={170} height={60} alt="NexusForge" />
         </Link>
         <ThemeToggle />
@@ -25,14 +25,16 @@ export default function NotFound() {
         </p>
 
         <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-          <Link href="/">
-            <Button className="blue-btn btn-press w-full">Back to Home</Button>
-          </Link>
-          <Link href="/home">
-            <Button variant="outline" className="black-btn btn-press w-full">
+          <Button className="blue-btn btn-press w-full" asChild>
+            <Link href="/home">
+              Back to Home
+            </Link>
+          </Button>
+          <Button variant="outline" className="black-btn btn-press w-full" asChild>
+            <Link href="/dashboard">
               Go to Dashboard
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </section>
     </div>

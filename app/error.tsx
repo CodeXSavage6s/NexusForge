@@ -20,7 +20,7 @@ export default function Error({
   return (
     <div className="flex min-h-screen flex-col">
       <header className="header flex items-center justify-between border-b px-4 py-3">
-        <Link href="/" className="flex items-center">
+        <Link href="/home" className="flex items-center">
           <Image src="/assets/logo.svg" width={170} height={60} alt="NexusForge" />
         </Link>
         <ThemeToggle />
@@ -41,11 +41,11 @@ export default function Error({
           <Button onClick={() => reset()} className="blue-btn btn-press w-full">
             Try Again
           </Button>
-          <Link href="/">
-            <Button variant="outline" className="black-btn btn-press w-full">
+          <Button variant="outline" className="black-btn btn-press w-full" asChild>
+            <Link href="/home">
               Back to Home
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </section>
     </div>

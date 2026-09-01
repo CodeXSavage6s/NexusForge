@@ -44,9 +44,11 @@ export default function ComingSoonSection({
         <p className="max-w-sm text-sm text-muted-foreground">{description}</p>
 
         {cta ? (
-          <Link href={cta.href} className="mt-2">
-            <Button className="blue-btn btn-press">{cta.label}</Button>
-          </Link>
+          <Button className="blue-btn btn-press" asChild>
+            <Link href={cta.href} className="mt-2">
+              {cta.label}
+            </Link>
+          </Button>
         ) : null}
       </div>
     </div>

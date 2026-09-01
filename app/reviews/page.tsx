@@ -32,9 +32,11 @@ export default async function ReviewsPage() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
           {!session?.user ? (
-            <Link href="/sign-in">
-              <Button>Sign In</Button>
-            </Link>
+            <Button asChild>
+              <Link href="/sign-in">
+                Sign In
+              </Link>
+            </Button>
           ) : null}
         </div>
       </header>

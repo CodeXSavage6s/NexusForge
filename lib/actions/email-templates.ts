@@ -20,6 +20,21 @@ const BRAND = {
   border: "#e5e7eb",
 };
 
+/**
+ * Escapes user-supplied text before it's interpolated into these HTML email
+ * bodies. Names (waitlist signups, account names) are attacker-controlled
+ * input, and without this a crafted name could inject arbitrary HTML/links
+ * into an email sent from our domain to any recipient.
+ */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /** Wraps body content in the shared header/footer shell used by every email. */
 function shell(title: string, bodyHtml: string, preheader: string): string {
   return `<!DOCTYPE html>
@@ -122,7 +137,7 @@ export function verificationEmailHtml({
   verificationUrl: string;
   expiresInMinutes?: number;
 }): string {
-  const greeting = name ? `Hi ${name},` : "Hi there,";
+  const greeting = name ? `Hi ${escapeHtml(name)},` : "Hi there,";
   const body = `
     <h1 style="margin:0 0 16px 0; font-size:22px; line-height:28px; font-weight:700; color:${BRAND.textDark};">
       Verify your email address
@@ -157,7 +172,7 @@ export function welcomeEmailHtml({
   name?: string;
   loginUrl: string;
 }): string {
-  const greeting = name ? `Welcome, ${name}! 🎉` : "Welcome! 🎉";
+  const greeting = name ? `Welcome, ${escapeHtml(name)}! 🎉` : "Welcome! 🎉";
   const body = `
     <h1 style="margin:0 0 16px 0; font-size:22px; line-height:28px; font-weight:700; color:${BRAND.textDark};">
       ${greeting}
@@ -198,7 +213,7 @@ export function passwordResetEmailHtml({
   resetUrl: string;
   expiresInMinutes?: number;
 }): string {
-  const greeting = name ? `Hi ${name},` : "Hi there,";
+  const greeting = name ? `Hi ${escapeHtml(name)},` : "Hi there,";
   const body = `
     <h1 style="margin:0 0 16px 0; font-size:22px; line-height:28px; font-weight:700; color:${BRAND.textDark};">
       Reset your password
@@ -227,7 +242,7 @@ export function passwordResetEmailHtml({
 /* ------------------------------------------------------------------ */
 
 export function waitlistEmailHtml({ name }: { name?: string }): string {
-  const greeting = name ? `Hi ${name},` : "Hi there,";
+  const greeting = name ? `Hi ${escapeHtml(name)},` : "Hi there,";
   const body = `
     <h1 style="margin:0 0 16px 0; font-size:22px; line-height:28px; font-weight:700; color:${BRAND.textDark};">
       You're on the list! 🎉
