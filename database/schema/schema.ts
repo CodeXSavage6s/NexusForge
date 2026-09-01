@@ -553,3 +553,42 @@ export const invoiceLineItemsRelations = relations(invoiceLineItems, ({ one }) =
     references: [invoices.id],
   }),
 }));
+
+// ── Waitlist ────────────────────────────────────────────────
+// Public, pre-signup capture — intentionally NOT tied to a user/workspace,
+// since most people submitting this won't have an account yet.
+export const waitlistEntries = pgTable(
+  "waitlist_entries",
+  {
+    id: cuid(),
+    email: text("email").notNull(),
+    name: text("name"),
+    // Where the CTA was clicked from, e.g. "pricing_pro", "landing_hero" —
+    // useful later for seeing which section actually drives signups.
+    source: text("source"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    emailUnique: uniqueIndex("waitlist_entries_email_unique").on(t.email),
+  })
+);
+
+// ── Reviews ─────────────────────────────────────────────────
+// App-wide (not scoped to a workspace) — a public testimonials/feedback
+// page. One review per user (see uniqueIndex below): submitting again
+// edits their existing review rather than piling up duplicates, since
+// there's no moderation step in front of what gets shown.
+export const reviews = pgTable(
+  "reviews",
+  {
+    id: cuid(),
+    userId: text("user_id").notNull(), // TODO: .references(() => user.id, { onDelete: "cascade" }) — see NOTE ON USER REFERENCES above
+    rating: integer("rating").notNull(),
+    comment: text("comment").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => ({
+    userIdUnique: uniqueIndex("reviews_user_id_unique").on(t.userId),
+  })
+);

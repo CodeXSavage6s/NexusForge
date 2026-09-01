@@ -9,7 +9,7 @@ import {
   projects,
   workspaces,
 } from "@/database/schema/schema";
-import { and, desc, eq, isNotNull, count } from "drizzle-orm";
+import { and, desc, eq, isNotNull, count, sql } from "drizzle-orm";
 import { requireWorkspaceAccess } from "@/lib/authz";
 import {
   calculateTotal,

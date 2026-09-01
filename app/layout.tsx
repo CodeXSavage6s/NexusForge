@@ -14,9 +14,40 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://nexusforge.dev";
+const siteName = "NexusForge";
+const siteDescription =
+  "The all-in-one workspace for freelancers to manage clients, projects, tasks, and invoices.";
+// TODO: swap for a real 1200x630 og-image.png once you have one — logo.png is
+// a 2417x500 wordmark, which is far too wide for OG's ~1.91:1 aspect ratio
+// and will get awkwardly cropped/letterboxed on most platforms.
+const ogImage = "/logo.png";
+
 export const metadata: Metadata = {
-  title: "Nexus Forge",
-  description: "",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: `${siteName} — Freelance client & project management`,
+    template: `%s | ${siteName}`,
+  },
+  description: siteDescription,
+  openGraph: {
+    title: siteName,
+    description: siteDescription,
+    url: siteUrl,
+    siteName,
+    images: [{ url: ogImage, width: 2417, height: 500, alt: siteName }],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteName,
+    description: siteDescription,
+    images: [ogImage],
+    // TODO: add once you have a handle, e.g. "@nexusforge"
+    // site: "@nexusforge",
+    // creator: "@nexusforge",
+  },
 };
 
 export default function RootLayout({

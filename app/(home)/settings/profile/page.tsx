@@ -18,6 +18,7 @@ import {
 
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileStats from "@/components/profile/ProfileStats";
+import VerifyEmailButton from "@/components/profile/VerifyEmailButton";
 
 export default async function ProfilePage() {
   const session = await auth.api.getSession({
@@ -123,11 +124,13 @@ export default async function ProfilePage() {
               <p className="truncate font-medium">{dbUser.email}</p>
             </div>
 
-            {dbUser.emailVerified && (
+            {dbUser.emailVerified ? (
               <span className="flex items-center gap-1 text-sm text-green-500">
                 <CheckCircle2 className="h-4 w-4" />
                 Verified
               </span>
+            ) : (
+              <VerifyEmailButton />
             )}
           </div>
 

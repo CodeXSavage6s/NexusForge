@@ -36,7 +36,7 @@ export default function InvoiceShareDialog({
     setOpen(nextOpen);
     setCopied(false);
 
-    if (nextOpen && !token) {
+    if (nextOpen && !token && !loading) {
       setLoading(true);
       setError(null);
       const result = await GeneratePublicInvoiceToken(workspaceId, invoiceId);

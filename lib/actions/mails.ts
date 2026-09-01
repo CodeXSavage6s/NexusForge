@@ -6,6 +6,7 @@ import {
   verificationEmailHtml,
   welcomeEmailHtml,
   passwordResetEmailHtml,
+  waitlistEmailHtml,
 } from "./email-templates";
 
 // Path to the logo file used as the inline (cid) image in every email.
@@ -115,6 +116,23 @@ export async function sendPasswordResetEmail({
     to,
     subject: "Reset your password",
     text: `Reset your password by visiting: ${resetUrl}`,
+    html,
+    attachments: [logoAttachment],
+  });
+}
+
+export async function sendWaitlistConfirmationEmail({
+  to,
+  name,
+}: {
+  to: string;
+  name?: string;
+}) {
+  const html = waitlistEmailHtml({ name });
+  await sendEmail({
+    to,
+    subject: "You're on the NexusForge waitlist",
+    text: "Thanks for joining the NexusForge Pro waitlist. We'll email you as soon as it's ready.",
     html,
     attachments: [logoAttachment],
   });
