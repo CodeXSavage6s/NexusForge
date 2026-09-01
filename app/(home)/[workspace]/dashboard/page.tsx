@@ -85,7 +85,7 @@ export default async function WorkspaceDashboard({
 
         <InfoCard
           title="Invoices"
-          href={`/${workspace.slug}/invoices`"
+          href={`/${workspace.slug}/invoices`}
           icon={DollarSign}
           iconBg="rgba(34,197,94,0.15)"
           iconColor="#22c55e"
