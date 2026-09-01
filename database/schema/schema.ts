@@ -185,7 +185,7 @@ export const projects = pgTable(
     description: text("description"),
     status: projectStatusEnum("status").notNull().default("PLANNING"),
     priority: priorityEnum("priority").notNull().default("MEDIUM"),
-    budget: numeric("budget", { precision: 12, scale: 2 }),
+    budget: numeric("budget", { precision: 12, scale: 2, mode: "number" }),
     currency: text("currency").notNull().default("USD"),
     startDate: timestamp("start_date"),
     dueDate: timestamp("due_date"),
