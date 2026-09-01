@@ -25,7 +25,7 @@ export default async function Layout({
   if (!session?.user) redirect("/sign-in");
 
   const user = session.user;
-  const count = 3 //awiat UnreadNotificationsCount(user.id);
+  const count = 0 //awiat UnreadNotificationsCount(user.id);
   const workspaces = await getUserWorkspaces(user.id);
 
   return (
