@@ -23,7 +23,9 @@ export default function Error({
         <Link href="/home" className="flex items-center">
           <Image src="/assets/logo.svg" width={170} height={60} alt="NexusForge" />
         </Link>
-        <ThemeToggle />
+        <div>
+          <ThemeToggle />
+        </div>
       </header>
 
       <section className="flex flex-1 flex-col items-center justify-center px-4 py-16 text-center">
