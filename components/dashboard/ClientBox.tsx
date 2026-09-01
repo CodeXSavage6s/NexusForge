@@ -1,6 +1,6 @@
 import ClientCard from '@/components/dashboard/ClientCard'
 
-export default function ClientBox({ title, clients = [], workspace, projectCount }: { title: string; clients?: Client[], workspace: string, projectCount: number | undefined }) {
+export default function ClientBox({ title, clients = [], workspace, projectCount }: { title: string; clients?: Client[], workspace: string, projectCount?: number | undefined }) {
     
   
   return (
