@@ -97,7 +97,7 @@ export default async function WorkspaceDashboard({
         />
       </div>
 
-      <ClientBox title="Clients" clients={clients.client} workspace={workspace.slug} projectCount={clients.projectCount}/>
+      <ClientBox title="Clients" clients={clients.client} workspace={workspace.slug}/>
     </div>
   )
 }
