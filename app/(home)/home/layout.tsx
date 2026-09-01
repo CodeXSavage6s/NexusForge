@@ -26,7 +26,7 @@ export default async function Layout({
       if(!session?.user) redirect('/sign-in');
       
       const user = session?.user
-      const count = 3 //await UnreadNotificationsCount(user.id)
+      const count = 0 //await UnreadNotificationsCount(user.id)
       const workspaces = await getUserWorkspaces(user.id)
   return (
       <div className="min-h-screen">
