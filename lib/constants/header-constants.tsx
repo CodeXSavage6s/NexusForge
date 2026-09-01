@@ -1,4 +1,4 @@
-import { Menu, Bell, ChevronDown, User, Settings, LogOut } from "lucide-react";
+import { Menu, Bell, ChevronDown, User, Settings, LogOut, Star } from "lucide-react";
 
 export const demoUser: NavbarUser = {
   name: "Jordan Blake",
@@ -9,7 +9,7 @@ export const demoUser: NavbarUser = {
 export const demoMenuItems: NavbarMenuItem[] = [
   { label: "Profile", href: "/settings/profile", icon: <User className="h-4 w-4" /> },
   { label: "Settings", href: "/settings", icon: <Settings className="h-4 w-4" /> },
-  { label: "Review", href: "/reviews" },
+  { label: "Review", href: "/reviews", icon: <Star className="h-4 w-4" /> }, 
   //{ label: "Log out", icon: <LogOut className="h-4 w-4" /> },
 ];
 
