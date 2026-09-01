@@ -32,7 +32,7 @@ export default async function Layout({
       const user = session?.user
       const workspace = await getWorkspace(workspaceSlug, user.id);
       if (!workspace) notFound();
-      const count = 3 //awiat UnreadNotificationsCount(user.id)
+      const count = 0 //awiat UnreadNotificationsCount(user.id)
       const workspaces = await getUserWorkspaces(user.id)
   return (
       <div className="min-h-screen">
