@@ -2,22 +2,14 @@
 
 import db from "@/database";
 import { activity } from "@/database/schema/schema";
-import { success } from "better-auth";
 import { and, eq, ne, desc } from  "drizzle-orm"
 
-interface Activities {
- success: boolean;
- activities: {
- id: string;
- clientId: string;
- projectId: string;
- userId: string;
- type: string;
- message: string;
- metadata: unknown;
- createdAt: Date;
- }[];
- error?: undefined;
+import { Activity } from "@/types/schema";
+
+interface GetActivitiesResult {
+  success: boolean;
+  activities: Activity[];
+  error?: string;
 }
 
 export async function NewClientActivity({clientId, projectId, userId, type= "Create Project", message}: {clientId: string, projectId: string, userId: string | undefined, type: string, message: string}) {
@@ -44,7 +36,7 @@ export async function NewProjectActivity({clientId, projectId, userId, type= "Cr
     }
 }
 
-export async function GetClientActivities(clientId: string) {
+export async function GetClientActivities(clientId: string): Promise<GetActivitiesResult> {
     try {
         const activities = await db.select().from(activity).where(eq(activity.clientId, clientId)).orderBy(desc(activity.createdAt))
 
@@ -56,12 +48,13 @@ export async function GetClientActivities(clientId: string) {
         console.error("Failed to fetch activities")
         return {
             success: false,
+            activities: [],
             error: "Failed to fetch client activities"
         }
     }
 }
 
-export async function GetProjectActivities(projectId: string | undefined) {
+export async function GetProjectActivities(projectId: string | undefined): Promise<GetActivitiesResult> {
     try {
         const activities = await db.select().from(activity).where(eq(activity.projectId, projectId)).orderBy(desc(activity.createdAt))
 
@@ -73,6 +66,7 @@ export async function GetProjectActivities(projectId: string | undefined) {
         console.error("Failed to fetch project activities")
         return {
             success: false,
+            activities: [],
             error: "Failed to fetch project activities"
         }
     }
