@@ -30,7 +30,7 @@ export default async function Layout({
   const workspace = await getWorkspace(workspaceSlug, user.id);
   if (!workspace) notFound();
 
-  const count = 3;
+  const count = 0;
   const workspaces = await getUserWorkspaces(user.id);
 
   return (
