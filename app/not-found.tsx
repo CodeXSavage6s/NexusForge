@@ -7,8 +7,7 @@ export const metadata = {
   title: "Page Not Found | NexusForge",
 };
 
-export default async function NotFound({ params }) {
-  const { workspace } = await params
+export default async function NotFound() {
   
   return (
     <div className="flex  flex-col">
@@ -35,7 +34,7 @@ export default async function NotFound({ params }) {
             </Link>
           </Button>
           <Button variant="outline" className="black-btn btn-press w-full" asChild>
-            <Link href={workspace ? `${workspace}/dashboard` : "/home"}>
+            <Link href="/home">
               Go to Dashboard
             </Link>
           </Button>
