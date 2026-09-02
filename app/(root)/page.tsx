@@ -39,7 +39,7 @@ const Home = () => {
         </Link>
         
 
-        <nav className="hidden md:flex items-center gap-6 text-sm text-gray-600">
+        <nav className="hidden md:flex items-center gap-6 text-sm text-gray-500 dark:text-gray-300 font-bold">
           <Link href="#features">Features</Link>
           <Link href="#pricing">Pricing</Link>
           <Link href="/reviews">Reviews</Link>
@@ -63,14 +63,14 @@ const Home = () => {
         </div>
 
         <article className="load-fade-up delay-1">
-          <h1 className="h1">
+          <h1 className="h1 md:text-5xl">
             Manage Clients,
             <br />
             <span className="text-blue-500">Projects, and Invoices</span>
             <br />
             from One Dashboard
           </h1>
-          <p className="text-sm text-gray-500 text-center mt-3 max-w-sm mx-auto">
+          <p className="text-sm md:text-lg text-gray-400 text-center mt-3 max-w-sm mx-auto">
             A simple workspace for freelancers to track clients, projects, deadlines, and payments.
           </p>
         </article>
@@ -88,7 +88,7 @@ const Home = () => {
           </Button>*/}
         </div>
 
-        <div className="load-fade-up delay-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px] text-gray-500 mb-6">
+        <div className="load-fade-up delay-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px] text-gray-400 mb-6 md:text-lg">
           <span>No credit card required</span>
           <span>Free forever plan</span>
           <span>Cancel anytime</span>
@@ -97,13 +97,13 @@ const Home = () => {
 
       {/* Problem */}
       <section className="bg-card px-4 py-8">
-        <article className="scroll-fade-up text-center">
-          <h2>
+        <article className="scroll-fade-up text-center ">
+          <h2 className="md:text-4xl">
             Freelancing is hard enough,
             <br />
             <span className="text-blue-500">Managing it shouldn&apos;t be.</span>
           </h2>
-          <p className="text-sm text-gray-500 mt-2 max-w-md mx-auto">
+          <p className="text-sm md:text-lg text-gray-400 mt-2 max-w-md mx-auto">
             Juggling between multiple tools leads to missed deadlines, lost information, and late payments.
           </p>
         </article>
@@ -181,7 +181,7 @@ const Home = () => {
             >
               <Image src={fea.path} width={30} height={30} alt={fea.title} />
               <strong className="mt-2">{fea.title}</strong>
-              <small className="text-gray-500">{fea.description}</small>
+              <small className="text-gray-400">{fea.description}</small>
             </div>
           ))}
         </div>
@@ -204,7 +204,7 @@ const Home = () => {
               </div>
               <div className="text-left md:text-center">
                 <p className="font-bold text-sm">{step.title}</p>
-                <p className="text-[12px] text-gray-500">{step.description}</p>
+                <p className="text-[12px] text-gray-400">{step.description}</p>
               </div>
             </div>
           ))}
@@ -214,7 +214,7 @@ const Home = () => {
       {/* Pricing */}
       <section id="pricing" className="bg-card px-4 py-10 text-center">
         <h2 className="scroll-fade-up">Simple, transparent pricing</h2>
-        <p className="scroll-fade-up text-sm text-gray-500 mt-2">Start free and upgrade when you&apos;re ready.</p>
+        <p className="scroll-fade-up text-sm text-gray-400 mt-2">Start free and upgrade when you&apos;re ready.</p>
 
         <div className="scroll-stagger flex flex-col md:flex-row justify-center gap-4 mt-6 max-w-2xl mx-auto">
           {pricingPlans.map((plan) => (
@@ -233,7 +233,7 @@ const Home = () => {
                 :
                 <span className="text-2xl font-bold">{plan.price}</span>
                 }
-                {plan.period && <span className="text-gray-500 text-sm">{plan.period}</span>}
+                {plan.period && <span className="text-gray-400 text-sm">{plan.period}</span>}
               </p>
             </div>
 
@@ -260,11 +260,11 @@ const Home = () => {
       {/* CTA */}
       <section className="px-4 py-8">
         <div className="scroll-scale bg-card rounded-xl p-5 flex flex-col items-center text-center gap-3 max-w-2xl mx-auto">
-          <p className="font-bold">Ready to organize your freelance business?</p>
+          <p className="font-bold md:text-2xl">Ready to organize your freelance business?</p>
           <Link href="/sign-up" className="w-full max-w-xs">
             <Button className="blue-btn btn-press w-full">Get Started &ndash; It&apos;s Free</Button>
           </Link>
-          <p className="text-[11px] text-gray-500">
+          <p className="text-[11px] text-gray-400">
             No credit card required &middot; Free forever plan &middot; Cancel anytime
           </p>
         </div>
@@ -275,7 +275,7 @@ const Home = () => {
         <div className="flex flex-col md:flex-row md:justify-between gap-8 max-w-4xl mx-auto">
           <div className="max-w-xs">
             <Image src="/assets/logo.svg" width={150} height={40} alt="NexusForge" />
-            <p className="text-[12px] text-gray-500 mt-2">
+            <p className="text-[12px] text-gray-400 mt-2">
               The all-in-one workspace for freelancers to manage clients, projects, and payments.
             </p>
           </div>
@@ -287,7 +287,7 @@ const Home = () => {
                 <ul className="flex flex-col gap-1">
                   {col.links.map((link) => (
                     <li key={link.label}>
-                      <Link href={link.href} className="text-[13px] text-gray-500">
+                      <Link href={link.href} className="text-[13px] text-gray-400">
                         {link.label}
                       </Link>
                     </li>
