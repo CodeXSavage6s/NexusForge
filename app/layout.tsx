@@ -18,10 +18,7 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://nexusforge.dev";
 const siteName = "NexusForge";
 const siteDescription =
   "The all-in-one workspace for freelancers to manage clients, projects, tasks, and invoices.";
-// TODO: swap for a real 1200x630 og-image.png once you have one — logo.png is
-// a 2417x500 wordmark, which is far too wide for OG's ~1.91:1 aspect ratio
-// and will get awkwardly cropped/letterboxed on most platforms.
-const ogImage = "/logo.png";
+const ogImage = "/og-image.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -35,7 +32,7 @@ export const metadata: Metadata = {
     description: siteDescription,
     url: siteUrl,
     siteName,
-    images: [{ url: ogImage, width: 2417, height: 500, alt: siteName }],
+    images: [{ url: ogImage, width: 1200, height: 630, alt: siteName }],
     locale: "en_US",
     type: "website",
   },
