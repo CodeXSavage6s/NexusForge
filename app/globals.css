@@ -327,3 +327,65 @@ html {
     margin: 12mm;
   }
 }
+
+
+/* ==========================================================================
+   Hero write-out (typewriter on load)
+   ========================================================================== */
+
+@keyframes write-on {
+  from { clip-path: inset(-15% 100% -15% 0); }
+  to   { clip-path: inset(-15% 0% -15% 0); }
+}
+
+@keyframes caret-blink {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes caret-on  { to { opacity: 1; } }
+@keyframes caret-off { to { opacity: 0; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .write-row {
+    display: block;
+  }
+
+  .write-line {
+    display: inline-block;
+    clip-path: inset(-15% 100% -15% 0);
+  }
+
+  /* Line 1: 27 chars → 27 steps ≈ 55ms per character */
+  .line-1 {
+    animation: write-on 1.5s steps(27, end) 0.35s forwards;
+  }
+
+  /* Line 2: 19 chars, starts the moment line 1 finishes */
+  .line-2 {
+    animation: write-on 1.05s steps(19, end) 1.85s forwards;
+  }
+
+  .write-caret {
+    display: inline-block;
+    width: 3px;
+    height: 0.78em;
+    margin-left: 0.12em;
+    background: currentColor;
+    vertical-align: -0.06em;
+  }
+
+  .caret-1 {
+    animation:
+      caret-blink 0.8s steps(2, jump-none) 0.35s 2,
+      caret-off 0.05s linear 1.95s forwards;
+  }
+
+  .caret-2 {
+    opacity: 0;
+    animation:
+      caret-on 0.05s linear 1.95s forwards,
+      caret-blink 0.8s steps(2, jump-none) 1.95s 2,
+      caret-off 0.05s linear 3.55s forwards;
+  }
+}

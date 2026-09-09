@@ -16,8 +16,12 @@ import {
 import InvoiceShareDialog from "@/components/invoices/InvoiceShareDialog";
 import PrintInvoiceButton from "@/components/invoices/PrintInvoiceButton";
 import DeleteInvoiceButton from "@/components/invoices/DeleteInvoiceButton";
+import RecordPaymentDialog from "@/components/invoices/RecordPaymentDialog";
 import { UpdateInvoiceStatus } from "@/lib/actions/invoice";
-import { INVOICE_STATUSES, INVOICE_STATUS_LABELS } from "@/lib/constants/invoice-constants";
+import {
+  MANUALLY_SETTABLE_INVOICE_STATUSES,
+  INVOICE_STATUS_LABELS,
+} from "@/lib/constants/invoice-constants";
 import type { InvoiceStatus } from "@/lib/constants/invoice-constants";
 
 export default function InvoiceActions({
@@ -25,17 +29,35 @@ export default function InvoiceActions({
   workspaceSlug,
   invoiceId,
   status,
+  displayStatus,
+  currency,
+  remainingBalance,
   publicToken,
 }: {
   workspaceId: string;
   workspaceSlug: string;
   invoiceId: string;
   status: InvoiceStatus;
+  displayStatus: InvoiceStatus;
+  currency: string;
+  remainingBalance: number;
   publicToken: string | null;
 }) {
   const router = useRouter();
   const [currentStatus, setCurrentStatus] = useState(status);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  // The dropdown only ever shows/sets DRAFT/SENT/CANCELLED — PAID and
+  // PARTIALLY_PAID come from the payment dialog so amountPaid/paidAt stay
+  // consistent, and OVERDUE is a derived display state, never stored.
+  const dropdownValue = MANUALLY_SETTABLE_INVOICE_STATUSES.includes(
+    currentStatus as (typeof MANUALLY_SETTABLE_INVOICE_STATUSES)[number]
+  )
+    ? currentStatus
+    : undefined;
+
+  const isCancelled = currentStatus === "CANCELLED";
+  const isFullyPaid = currentStatus === "PAID";
 
   async function handleStatusChange(nextStatus: string) {
     setIsUpdating(true);
@@ -54,18 +76,27 @@ export default function InvoiceActions({
 
   return (
     <div className="flex flex-wrap items-center gap-2 print:hidden">
-      <Select value={currentStatus} onValueChange={handleStatusChange} disabled={isUpdating}>
-        <SelectTrigger className="w-36">
-          <SelectValue />
+      <Select value={dropdownValue} onValueChange={handleStatusChange} disabled={isUpdating}>
+        <SelectTrigger className="w-40">
+          <SelectValue placeholder={INVOICE_STATUS_LABELS[displayStatus]} />
         </SelectTrigger>
         <SelectContent>
-          {INVOICE_STATUSES.map((s) => (
+          {MANUALLY_SETTABLE_INVOICE_STATUSES.map((s) => (
             <SelectItem key={s} value={s}>
               {INVOICE_STATUS_LABELS[s]}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
+
+      {!isCancelled && !isFullyPaid ? (
+        <RecordPaymentDialog
+          workspaceId={workspaceId}
+          invoiceId={invoiceId}
+          currency={currency}
+          remainingBalance={remainingBalance}
+        />
+      ) : null}
 
       <Button asChild variant="outline">
         <Link href={`/${workspaceSlug}/invoices/${invoiceId}/edit`}>

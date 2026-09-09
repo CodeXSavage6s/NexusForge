@@ -15,12 +15,22 @@ import {
   calculateTotal,
   validateLineItem,
   validateTaxRate,
+  deriveInvoiceDisplayStatus,
+  remainingBalance,
+  validatePaymentAmount,
+  statusForPaymentState,
+  round2,
 } from "@/lib/invoices/calculations";
 import type { InvoiceStatus } from "@/lib/constants/invoice-constants";
-import { INVOICE_STATUSES } from "@/lib/constants/invoice-constants";
+import {
+  INVOICE_STATUSES,
+  INVOICE_CURRENCIES,
+  MANUALLY_SETTABLE_INVOICE_STATUSES,
+} from "@/lib/constants/invoice-constants";
 import type {
   InvoiceActionResult,
   InvoiceListItem,
+  InvoiceSummaryTotals,
   InvoiceWithDetails,
   PublicInvoiceView,
 } from "@/types/invoice";
@@ -42,6 +52,7 @@ interface InvoiceInput {
   invoiceNumber: string;
   issueDate: Date;
   dueDate: Date;
+  currency?: string;
   taxRate?: number | null;
   notes?: string | null;
   lineItems: InvoiceLineItemInput[];
@@ -111,6 +122,10 @@ function validateInvoiceInput(input: InvoiceInput): Record<string, string> {
 
   const taxRateError = validateTaxRate(input.taxRate ?? null);
   if (taxRateError) fieldErrors.taxRate = taxRateError;
+
+  if (input.currency && !INVOICE_CURRENCIES.includes(input.currency as (typeof INVOICE_CURRENCIES)[number])) {
+    fieldErrors.currency = "Unsupported currency.";
+  }
 
   if (!input.lineItems || input.lineItems.length === 0) {
     fieldErrors.lineItems = "Add at least one line item.";
@@ -195,6 +210,7 @@ export async function CreateInvoice(input: InvoiceInput): Promise<InvoiceActionR
           projectId: input.projectId || null,
           invoiceNumber: input.invoiceNumber.trim(),
           amount: total,
+          currency: input.currency ?? "USD",
           status: "DRAFT",
           issueDate: input.issueDate,
           dueDate: input.dueDate,
@@ -240,11 +256,26 @@ export async function UpdateInvoice(
     }
 
     const [existing] = await db
-      .select({ id: invoices.id })
+      .select({ id: invoices.id, amountPaid: invoices.amountPaid, currency: invoices.currency })
       .from(invoices)
       .where(and(eq(invoices.id, invoiceId), eq(invoices.workspaceId, input.workspaceId)));
     if (!existing) {
       return { success: false, error: "Invoice not found." };
+    }
+
+    // Changing currency after money has already been recorded against the
+    // invoice would silently re-denominate the amount paid. Block it rather
+    // than guess a conversion.
+    if (
+      input.currency &&
+      input.currency !== existing.currency &&
+      existing.amountPaid > 0
+    ) {
+      return {
+        success: false,
+        error: "Cannot change currency after a payment has been recorded on this invoice.",
+        fieldErrors: { currency: "Currency is locked once a payment has been recorded." },
+      };
     }
 
     await assertClientAndProjectOwnership(input.workspaceId, input.clientId, input.projectId);
@@ -268,7 +299,33 @@ export async function UpdateInvoice(
 
     const { total } = calculateTotal(input.lineItems, input.taxRate ?? null);
 
+    // Never allow the new total to drop below what's already been paid —
+    // that would create an impossible "amountPaid > total" state. Require
+    // the freelancer to adjust the recorded payment first.
+    if (round2(total) < round2(existing.amountPaid)) {
+      return {
+        success: false,
+        error: `The new total (${total.toFixed(2)}) is less than the amount already paid (${existing.amountPaid.toFixed(2)}). Adjust the recorded payment before lowering the total.`,
+        fieldErrors: { lineItems: "Total cannot be less than the amount already paid." },
+      };
+    }
+
     const invoice = await db.transaction(async (tx) => {
+      // Read current status inside the transaction so the recompute below
+      // is based on fresh data (protects against a concurrent payment).
+      const [current] = await tx
+        .select({ status: invoices.status, amountPaid: invoices.amountPaid })
+        .from(invoices)
+        .where(eq(invoices.id, invoiceId));
+
+      // If the invoice already has a payment recorded, the total just
+      // changed — recheck whether it's still fully paid or has become
+      // partially paid relative to the new total.
+      const nextStatus =
+        current && (current.status === "PAID" || current.status === "PARTIALLY_PAID")
+          ? statusForPaymentState(current.amountPaid, total)
+          : undefined;
+
       const [updated] = await tx
         .update(invoices)
         .set({
@@ -276,6 +333,8 @@ export async function UpdateInvoice(
           projectId: input.projectId || null,
           invoiceNumber: input.invoiceNumber.trim(),
           amount: total,
+          currency: input.currency ?? existing.currency,
+          ...(nextStatus ? { status: nextStatus } : {}),
           issueDate: input.issueDate,
           dueDate: input.dueDate,
           taxRate: input.taxRate ?? null,
@@ -325,6 +384,19 @@ export async function UpdateInvoiceStatus(
       return { success: false, error: "Invalid status." };
     }
 
+    // PAID / PARTIALLY_PAID must go through RecordInvoicePayment or
+    // MarkInvoiceAsPaid so amountPaid/paidAt stay consistent with the
+    // status. OVERDUE is never stored directly — it's derived at read time.
+    if (!MANUALLY_SETTABLE_INVOICE_STATUSES.includes(status as (typeof MANUALLY_SETTABLE_INVOICE_STATUSES)[number])) {
+      return {
+        success: false,
+        error:
+          status === "OVERDUE"
+            ? "Overdue is calculated automatically from the due date and can't be set manually."
+            : "Use the payment actions to mark an invoice paid or partially paid.",
+      };
+    }
+
     const [updated] = await db
       .update(invoices)
       .set({ status, updatedAt: new Date() })
@@ -341,6 +413,111 @@ export async function UpdateInvoiceStatus(
     return {
       success: false,
       error: err instanceof Error ? err.message : "Failed to update invoice status.",
+    };
+  }
+}
+
+/**
+ * Records a (possibly partial) payment against an invoice. Moves the
+ * invoice to PARTIALLY_PAID or PAID depending on whether the new
+ * amountPaid reaches the total. Never allows amountPaid to exceed the
+ * invoice total.
+ */
+export async function RecordInvoicePayment(
+  workspaceId: string,
+  invoiceId: string,
+  input: { amount: number; method?: string | null }
+): Promise<InvoiceActionResult> {
+  try {
+    await requireWorkspaceAccess(workspaceId);
+
+    const [invoice] = await db
+      .select()
+      .from(invoices)
+      .where(and(eq(invoices.id, invoiceId), eq(invoices.workspaceId, workspaceId)));
+
+    if (!invoice) {
+      return { success: false, error: "Invoice not found." };
+    }
+
+    if (invoice.status === "CANCELLED") {
+      return { success: false, error: "Cannot record a payment against a cancelled invoice." };
+    }
+
+    const paymentError = validatePaymentAmount({
+      amount: input.amount,
+      invoiceTotal: invoice.amount,
+      alreadyPaid: invoice.amountPaid,
+    });
+    if (paymentError) {
+      return { success: false, error: paymentError, fieldErrors: { amount: paymentError } };
+    }
+
+    const nextAmountPaid = round2(invoice.amountPaid + input.amount);
+    const nextStatus = statusForPaymentState(nextAmountPaid, invoice.amount);
+
+    const [updated] = await db
+      .update(invoices)
+      .set({
+        amountPaid: nextAmountPaid,
+        status: nextStatus,
+        paidAt: nextStatus === "PAID" ? new Date() : invoice.paidAt,
+        paymentMethod: input.method?.trim() || invoice.paymentMethod,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(invoices.id, invoiceId), eq(invoices.workspaceId, workspaceId)))
+      .returning();
+
+    return { success: true, invoiceId, invoice: updated };
+  } catch (err) {
+    console.error("Failed to record invoice payment:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to record payment.",
+    };
+  }
+}
+
+/** Marks an invoice fully paid in one step (amountPaid = total, paidAt = now). */
+export async function MarkInvoiceAsPaid(
+  workspaceId: string,
+  invoiceId: string,
+  input?: { method?: string | null }
+): Promise<InvoiceActionResult> {
+  try {
+    await requireWorkspaceAccess(workspaceId);
+
+    const [invoice] = await db
+      .select()
+      .from(invoices)
+      .where(and(eq(invoices.id, invoiceId), eq(invoices.workspaceId, workspaceId)));
+
+    if (!invoice) {
+      return { success: false, error: "Invoice not found." };
+    }
+
+    if (invoice.status === "CANCELLED") {
+      return { success: false, error: "Cannot mark a cancelled invoice as paid." };
+    }
+
+    const [updated] = await db
+      .update(invoices)
+      .set({
+        amountPaid: invoice.amount,
+        status: "PAID",
+        paidAt: new Date(),
+        paymentMethod: input?.method?.trim() || invoice.paymentMethod,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(invoices.id, invoiceId), eq(invoices.workspaceId, workspaceId)))
+      .returning();
+
+    return { success: true, invoiceId, invoice: updated };
+  } catch (err) {
+    console.error("Failed to mark invoice as paid:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Failed to mark invoice as paid.",
     };
   }
 }
@@ -434,6 +611,7 @@ export async function GetWorkspaceInvoices(
         id: invoices.id,
         invoiceNumber: invoices.invoiceNumber,
         amount: invoices.amount,
+        amountPaid: invoices.amountPaid,
         currency: invoices.currency,
         status: invoices.status,
         issueDate: invoices.issueDate,
@@ -453,8 +631,16 @@ export async function GetWorkspaceInvoices(
       id: row.id,
       invoiceNumber: row.invoiceNumber,
       amount: row.amount,
+      amountPaid: row.amountPaid,
+      remainingBalance: remainingBalance(row.amount, row.amountPaid),
       currency: row.currency,
       status: row.status as InvoiceStatus,
+      displayStatus: deriveInvoiceDisplayStatus({
+        status: row.status as InvoiceStatus,
+        dueDate: row.dueDate,
+        amountPaid: row.amountPaid,
+        amount: row.amount,
+      }),
       issueDate: row.issueDate,
       dueDate: row.dueDate,
       client: { id: row.clientId, name: row.clientName },
@@ -466,6 +652,70 @@ export async function GetWorkspaceInvoices(
     console.error("Failed to fetch workspace invoices:", err);
     return { success: false, invoices: [], error: "Failed to fetch invoices." };
   }
+}
+
+/**
+ * Aggregate totals for the invoice list summary cards and the dashboard.
+ * Computed with a single grouped query rather than pulling every invoice
+ * row into memory.
+ */
+export async function GetInvoiceSummary(workspaceId: string): Promise<InvoiceSummaryTotals> {
+  await requireWorkspaceAccess(workspaceId);
+
+  const rows = await db
+    .select({
+      status: invoices.status,
+      amount: invoices.amount,
+      amountPaid: invoices.amountPaid,
+      dueDate: invoices.dueDate,
+    })
+    .from(invoices)
+    .where(eq(invoices.workspaceId, workspaceId));
+
+  let totalInvoiced = 0;
+  let totalPaid = 0;
+  let totalOutstanding = 0;
+  let totalOverdue = 0;
+  let overdueCount = 0;
+  const now = new Date();
+
+  for (const row of rows) {
+    const status = row.status as InvoiceStatus;
+    if (status === "CANCELLED") continue;
+
+    totalInvoiced = round2(totalInvoiced + row.amount);
+    totalPaid = round2(totalPaid + row.amountPaid);
+
+    if (status === "PAID") continue;
+
+    const balance = remainingBalance(row.amount, row.amountPaid);
+    totalOutstanding = round2(totalOutstanding + balance);
+
+    const displayStatus = deriveInvoiceDisplayStatus({
+      status,
+      dueDate: row.dueDate,
+      amountPaid: row.amountPaid,
+      amount: row.amount,
+      now,
+    });
+    if (displayStatus === "OVERDUE") {
+      totalOverdue = round2(totalOverdue + balance);
+      overdueCount += 1;
+    }
+  }
+
+  // Workspaces are effectively single-currency for MVP invoicing (the
+  // currency picker is per-invoice, but summing across currencies without
+  // conversion would be misleading — see IMPLEMENTATION_NOTES for the
+  // multi-currency caveat).
+  return {
+    totalInvoiced,
+    totalPaid,
+    totalOutstanding,
+    totalOverdue,
+    overdueCount,
+    currency: "USD",
+  };
 }
 
 export async function GetInvoiceDetails(
@@ -500,9 +750,18 @@ export async function GetInvoiceDetails(
       .where(eq(invoiceLineItems.invoiceId, invoiceId))
       .orderBy(invoiceLineItems.createdAt);
 
+    const status = row.invoice.status as InvoiceStatus;
+
     return {
       ...row.invoice,
-      status: row.invoice.status as InvoiceStatus,
+      status,
+      displayStatus: deriveInvoiceDisplayStatus({
+        status,
+        dueDate: row.invoice.dueDate,
+        amountPaid: row.invoice.amountPaid,
+        amount: row.invoice.amount,
+      }),
+      remainingBalance: remainingBalance(row.invoice.amount, row.invoice.amountPaid),
       client: row.client,
       project: row.project?.id ? row.project : null,
       lineItems,
@@ -531,9 +790,15 @@ export async function GetPublicInvoice(publicToken: string): Promise<PublicInvoi
         dueDate: invoices.dueDate,
         currency: invoices.currency,
         taxRate: invoices.taxRate,
+        amountPaid: invoices.amountPaid,
         notes: invoices.notes,
         businessName: workspaces.name,
         businessLogo: workspaces.logo,
+        businessEmail: workspaces.businessEmail,
+        businessPhone: workspaces.businessPhone,
+        businessAddress: workspaces.businessAddress,
+        businessTaxId: workspaces.taxId,
+        paymentInstructions: workspaces.paymentInstructions,
         clientName: clients.name,
         clientEmail: clients.email,
         clientAddress: clients.address,
@@ -558,20 +823,37 @@ export async function GetPublicInvoice(publicToken: string): Promise<PublicInvoi
       .orderBy(invoiceLineItems.createdAt);
 
     const { subtotal, tax, total } = calculateTotal(lineItemRows, row.taxRate);
+    const status = row.status as InvoiceStatus;
 
     return {
       invoiceNumber: row.invoiceNumber,
-      status: row.status as InvoiceStatus,
+      status,
+      displayStatus: deriveInvoiceDisplayStatus({
+        status,
+        dueDate: row.dueDate,
+        amountPaid: row.amountPaid,
+        amount: total,
+      }),
       issueDate: row.issueDate,
       dueDate: row.dueDate,
       currency: row.currency,
       subtotal,
       tax,
       total,
+      amountPaid: row.amountPaid,
+      remainingBalance: remainingBalance(total, row.amountPaid),
       taxRate: row.taxRate,
       notes: row.notes,
       lineItems: lineItemRows,
-      business: { name: row.businessName, logo: row.businessLogo },
+      business: {
+        name: row.businessName,
+        logo: row.businessLogo,
+        email: row.businessEmail,
+        phone: row.businessPhone,
+        address: row.businessAddress,
+        taxId: row.businessTaxId,
+        paymentInstructions: row.paymentInstructions,
+      },
       client: { name: row.clientName, email: row.clientEmail, address: row.clientAddress },
     };
   } catch (err) {
@@ -586,4 +868,35 @@ export async function InvoiceCount(workspaceId: string): Promise<number> {
     .from(invoices)
     .where(eq(invoices.workspaceId, workspaceId));
   return result[0]?.count ?? 0;
+}
+
+/** Unpaid invoice count + outstanding amount for a single client — used on the client detail page. */
+export async function GetClientInvoiceSummary(
+  workspaceId: string,
+  clientId: string
+): Promise<{ unpaidCount: number; outstandingAmount: number; currency: string }> {
+  await requireWorkspaceAccess(workspaceId);
+
+  const rows = await db
+    .select({
+      status: invoices.status,
+      amount: invoices.amount,
+      amountPaid: invoices.amountPaid,
+      currency: invoices.currency,
+    })
+    .from(invoices)
+    .where(and(eq(invoices.workspaceId, workspaceId), eq(invoices.clientId, clientId)));
+
+  let unpaidCount = 0;
+  let outstandingAmount = 0;
+  let currency = "USD";
+
+  for (const row of rows) {
+    if (row.status === "CANCELLED" || row.status === "PAID") continue;
+    unpaidCount += 1;
+    outstandingAmount = round2(outstandingAmount + remainingBalance(row.amount, row.amountPaid));
+    currency = row.currency;
+  }
+
+  return { unpaidCount, outstandingAmount, currency };
 }

@@ -22,7 +22,7 @@ export default async function PublicInvoicePage({
 
         <InvoicePreview
           invoiceNumber={invoice.invoiceNumber}
-          status={invoice.status}
+          status={invoice.displayStatus}
           issueDate={invoice.issueDate}
           dueDate={invoice.dueDate}
           currency={invoice.currency}
@@ -31,8 +31,18 @@ export default async function PublicInvoicePage({
           subtotal={invoice.subtotal}
           tax={invoice.tax}
           total={invoice.total}
+          amountPaid={invoice.amountPaid}
+          remainingBalance={invoice.remainingBalance}
           lineItems={invoice.lineItems}
-          business={{ name: invoice.business.name, logoUrl: invoice.business.logo }}
+          business={{
+            name: invoice.business.name,
+            logoUrl: invoice.business.logo,
+            email: invoice.business.email,
+            phone: invoice.business.phone,
+            address: invoice.business.address,
+            taxId: invoice.business.taxId,
+            paymentInstructions: invoice.business.paymentInstructions,
+          }}
           client={{ name: invoice.client.name, email: invoice.client.email, address: invoice.client.address }}
         />
 

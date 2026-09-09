@@ -8,6 +8,7 @@ import type { Project, ProjectStatus, Priority } from "@/types/schema";
 type Props = {
   projects: Project[];
   workspace: string;
+  workspaceId: string;
   client: string;
 };
 
@@ -43,7 +44,7 @@ function formatCurrency(amount: number, currency: string) {
   }
 }
 
-export default function ProjectsList({ projects, workspace, client }: Props) {
+export default function ProjectsList({ projects, workspace, workspaceId, client }: Props) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<ProjectStatus | "ALL">("ALL");
   const [priority, setPriority] = useState<Priority | "ALL">("ALL");
@@ -154,7 +155,7 @@ export default function ProjectsList({ projects, workspace, client }: Props) {
                     )}
                   </div>
                 </div>
-                <DeleteBtn projectId={p.id} />
+                <DeleteBtn projectId={p.id} workspaceId={workspaceId} clientId={client} />
               </Link>
             );
           })

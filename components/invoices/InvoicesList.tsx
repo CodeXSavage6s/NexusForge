@@ -41,7 +41,7 @@ export default function InvoicesList({
     const query = search.trim().toLowerCase();
 
     return invoices.filter((invoice) => {
-      if (status !== ALL && invoice.status !== status) return false;
+      if (status !== ALL && invoice.displayStatus !== status) return false;
       if (clientId !== ALL && invoice.client.id !== clientId) return false;
       if (!query) return true;
 
@@ -80,6 +80,7 @@ export default function InvoicesList({
           onChange={(e) => setSearch(e.target.value)}
           className="sm:flex-1"
         />
+        <div className="flex justify-between gap-2">
         <Select value={status} onValueChange={setStatus}>
           <SelectTrigger className="sm:w-40">
             <SelectValue placeholder="Status" />
@@ -96,6 +97,7 @@ export default function InvoicesList({
             </SelectGroup>
           </SelectContent>
         </Select>
+          
         <Select value={clientId} onValueChange={setClientId}>
           <SelectTrigger className="sm:w-48">
             <SelectValue placeholder="Client" />
@@ -112,6 +114,7 @@ export default function InvoicesList({
             </SelectGroup>
           </SelectContent>
         </Select>
+        </div>
       </div>
 
       {filtered.length === 0 ? (

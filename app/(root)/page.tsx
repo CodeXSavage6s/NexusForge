@@ -1,309 +1,797 @@
-'use client'
+'use client';
 
-import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { useRef, useState } from 'react'
-import { problems, features, steps, pricingPlans, footerColumns, ITEMS_PER_PAGE } from '@/lib/constants/home-constants'
-import ThemeToggle from '@/components/theme-toggle'
+import Link from 'next/link';
+import Image from 'next/image';
+import {
+  ArrowRight,
+  Check,
+  Clock3,
+  FileText,
+  FolderKanban,
+  Menu,
+  Users,
+  X,
+  Zap,
+  Building2,
+  Crown,
+} from 'lucide-react';
+import { useState } from 'react';
 
+import ThemeToggle from '@/components/theme-toggle';
 
-const Home = () => {
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const [activePage, setActivePage] = useState(0)
+const workflow = [
+  {
+    icon: Building2,
+    title: 'Create your workspace',
+    text: 'Set up your freelance workspace and keep everything under one roof.',
+  },
+  {
+    icon: Users,
+    title: 'Add clients',
+    text: 'Keep every client, contact, and project relationship organized.',
+  },
+  {
+    icon: FolderKanban,
+    title: 'Create projects',
+    text: 'Turn client work into projects with deadlines, budgets, and progress.',
+  },
+  {
+    icon: Check,
+    title: 'Manage tasks',
+    text: 'Know what needs to be done and what is coming next.',
+  },
+  {
+    icon: Clock3,
+    title: 'Track your time',
+    text: 'Track the time you spend on work without leaving your workspace.',
+  },
+  {
+    icon: FileText,
+    title: 'Invoice & get paid',
+    text: 'Create invoices, record payments, and keep your cash flow visible.',
+  },
+];
 
-  const pages = Array.from(
-    { length: Math.ceil(features.length / ITEMS_PER_PAGE) },
-    (_, i) => features.slice(i * ITEMS_PER_PAGE, i * ITEMS_PER_PAGE + ITEMS_PER_PAGE)
-  )
-
-  const handleScroll = () => {
-    const el = scrollRef.current
-    if (!el) return
-    const index = Math.round(el.scrollLeft / el.clientWidth)
-    setActivePage(index)
-  }
-
-  const goToPage = (index: number) => {
-    const el = scrollRef.current
-    if (!el) return
-    el.scrollTo({ left: index * el.clientWidth, behavior: 'smooth' })
-  }
+export default function LandingPage() {
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div>
-      {/* Header */}
-      <header className="header flex items-center justify-between px-4 py-3 border-b z-50">
-        <Link href="/home" className="flex items-center">
-          <Image src="/assets/logo.svg" width={170} height={60} alt="NexusForge" />
-        </Link>
-        
+    <main className="min-h-screen overflow-hidden bg-background text-foreground">
 
-        <nav className="hidden md:flex items-center gap-6 text-sm text-gray-500 dark:text-gray-300 font-bold">
-          <Link href="#features">Features</Link>
-          <Link href="#pricing">Pricing</Link>
-          <Link href="/reviews">Reviews</Link>
-        </nav>
+      {/* NAVBAR */}
+      <header className="fixed inset-x-0 top-0 z-50 border-b bg-background/80 backdrop-blur-xl">
+        <div className=" flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
 
-        <div className="flex items-center gap-2">
-        <ThemeToggle />
-          <Link href="/sign-in">
-            <Button >Sign In</Button>
+          <Link href="/home" className="flex items-center gap-2">
+            <Image
+              src="/assets/logo.svg"
+              alt="NexusForge"
+              width={200}
+              height={150}
+            />
+            {/*<span className="text-lg font-bold tracking-tight">
+              NexusForge
+            </span>*/}
           </Link>
-          <Link href="/sign-up" className="hidden sm:block">
-            <Button className="blue-btn">Get Started</Button>
-          </Link>
-        </div>
-      </header>
 
-      {/* Hero */}
-      <section className="flex flex-col items-center text-center px-4">
-        <div className="load-fade-up light-blue-bg text-blue-600 rounded-full px-2 py-1 text-[9px] font-medium w-fit my-4 border border-blue-200">
-          + All-in-one workspace for freelancers
-        </div>
-
-        <article className="load-fade-up delay-1">
-          <h1 className="h1 md:text-5xl">
-            Manage Clients,
-            <br />
-            <span className="text-blue-500">Projects, and Invoices</span>
-            <br />
-            from One Dashboard
-          </h1>
-          <p className="text-sm md:text-lg text-gray-400 text-center mt-3 max-w-sm mx-auto">
-            A simple workspace for freelancers to track clients, projects, deadlines, and payments.
-          </p>
-        </article>
-
-        <div className="load-fade-up delay-2 flex flex-col gap-2 my-4 w-full max-w-sm">
-          <Button className="blue-btn btn-press">
-            <Link href="/sign-up" className="w-full">
-              Get Started &ndash; It&apos;s Free
-            </Link>
-          </Button>
-          {/*<Button className="black-btn btn-press" variant="outline">
-            <Link href="/demo" className="w-full">
-              View Demo
-            </Link>
-          </Button>*/}
-        </div>
-
-        <div className="load-fade-up delay-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px] text-gray-400 mb-6 md:text-lg">
-          <span>No credit card required</span>
-          <span>Free forever plan</span>
-          <span>Cancel anytime</span>
-        </div>
-      </section>
-
-      {/* Problem */}
-      <section className="bg-card px-4 py-8">
-        <article className="scroll-fade-up text-center ">
-          <h2 className="md:text-4xl">
-            Freelancing is hard enough,
-            <br />
-            <span className="text-blue-500">Managing it shouldn&apos;t be.</span>
-          </h2>
-          <p className="text-sm md:text-lg text-gray-400 mt-2 max-w-md mx-auto">
-            Juggling between multiple tools leads to missed deadlines, lost information, and late payments.
-          </p>
-        </article>
-
-        <div className="scroll-stagger grid grid-cols-2 sm:grid-cols-4 gap-3 my-5">
-          {problems.map((pro) => (
-            <div
-              key={pro}
-              className="hover-lift flex flex-col justify-between gap-3 bg-popover p-3 rounded-lg shadow-sm shadow-muted-foreground transition-shadow hover:shadow-md"
+          <nav className="hidden items-center gap-8 md:flex">
+            <a
+              href="#features"
+              className="text-sm text-muted-foreground transition hover:text-foreground"
             >
-              <Image src="/svgs/icon-cross.svg" width={24} height={24} alt="" />
-              <p className="text-[12px] font-bold">{pro}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+              Features
+            </a>
 
-      {/* Features */}
-      <section id="features" className="px-4 py-8">
-        <article className="scroll-fade-up text-center">
-          <h2>
-            Everything you need to run
-            <br />
-            your <span className="text-blue-500">freelancing business</span>
-          </h2>
-        </article>
-
-        {/* Carousel: small screens */}
-        <div
-          ref={scrollRef}
-          onScroll={handleScroll}
-          className="flex overflow-x-auto snap-x snap-mandatory my-4 md:hidden [&::-webkit-scrollbar]:hidden"
-          style={{ scrollbarWidth: 'none' }}
-        >
-          {pages.map((page, pageIndex) => (
-            <div
-              key={pageIndex}
-              className="grid grid-cols-3 gap-2 w-full flex-shrink-0 snap-start"
+            <a
+              href="#workflow"
+              className="text-sm text-muted-foreground transition hover:text-foreground"
             >
-              {page.map((fea) => (
-                <div
-                  key={fea.title}
-                  className="hover-lift flex flex-col justify-evenly bg-card rounded-lg text-center items-center p-2"
+              How it works
+            </a>
+
+            <a
+              href="#pricing"
+              className="text-sm text-muted-foreground transition hover:text-foreground"
+            >
+              Pricing
+            </a>
+          </nav>
+
+          <div className="hidden items-center gap-3 md:flex">
+            <ThemeToggle />
+
+            <Link
+              href="/sign-in"
+              className="rounded-lg px-4 py-2 text-sm font-medium transition hover:bg-muted"
+            >
+              Sign in
+            </Link>
+
+            <Link
+              href="/sign-up"
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+            >
+              Get started
+            </Link>
+          </div>
+
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="rounded-lg p-2 md:hidden"
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <X size={21} /> : <Menu size={21} />}
+          </button>
+        </div>
+
+        {menuOpen && (
+          <div className="border-t bg-background px-5 py-5 md:hidden">
+            <div className="flex flex-col gap-4">
+
+              <a
+                href="#features"
+                onClick={() => setMenuOpen(false)}
+              >
+                Features
+              </a>
+
+              <a
+                href="#workflow"
+                onClick={() => setMenuOpen(false)}
+              >
+                How it works
+              </a>
+
+              <a
+                href="#pricing"
+                onClick={() => setMenuOpen(false)}
+              >
+                Pricing
+              </a>
+              <ThemeToggle />
+
+              <div className="flex items-center gap-3 border-t pt-4">
+
+                <Link
+                  href="/sign-in"
+                  className="flex-1 rounded-lg border px-4 py-2.5 text-center text-sm"
                 >
-                  <Image src={fea.path} width={30} height={30} alt={fea.title} />
-                  <strong>{fea.title}</strong>
-                  <small>{fea.description}</small>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+                  Sign in
+                </Link>
 
-        {pages.length > 1 && (
-          <div className="flex justify-center gap-2 pb-3 md:hidden">
-            {pages.map((_, index) => (
-              <button
-                key={index}
-                aria-label={`Go to feature set ${index + 1}`}
-                onClick={() => goToPage(index)}
-                className={`h-2 rounded-full transition-all ${
-                  index === activePage ? 'w-5 bg-blue-500' : 'w-2 bg-gray-300'
-                }`}
-              />
-            ))}
+                <Link
+                  href="/sign-up"
+                  className="flex-1 rounded-lg bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-foreground"
+                >
+                  Get started
+                </Link>
+              </div>
+
+            </div>
           </div>
         )}
+      </header>
 
-        {/* Static grid: medium screens and up */}
-        <div className="scroll-stagger hidden md:grid md:grid-cols-3 lg:grid-cols-6 gap-3 my-4">
-          {features.map((fea) => (
-            <div
-              key={fea.title}
-              className="hover-lift flex flex-col justify-evenly bg-card rounded-lg text-center items-center p-3"
-            >
-              <Image src={fea.path} width={30} height={30} alt={fea.title} />
-              <strong className="mt-2">{fea.title}</strong>
-              <small className="text-gray-400">{fea.description}</small>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* HERO */}
+      <section className="relative px-5 pb-10 pt-20 sm:px-8 sm:pt-40">
 
-      {/* How It Works */}
-      <section className="px-4 py-10 text-center">
-        <h2 className="scroll-fade-up">How NexusForge Works</h2>
+        <div className="absolute inset-x-0 top-0 -z-10 h-[600px] bg-[radial-gradient(circle_at_top,theme(colors.primary/10),transparent_60%)]" />
 
-        <div className="scroll-stagger flex md:flex-row md:justify-center md:items-start gap-6 md:gap-4 mt-6 max-w-3xl mx-auto">
-          {steps.map((step, index) => (
-            <div key={step.number} className="flex flex-col items-center gap-4 md:gap-2 md:flex-1 text-center">
-              <div className="flex items-center w-full md:w-auto md:flex-col">
-                <div className="flex items-center justify-center h-10 w-10 rounded-full light-blue-bg text-blue-600 font-bold shrink-0">
-                  {step.number}
-                </div>
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block h-px flex-1 border-t border-dashed border-blue-200 mx-2" />
-                )}
-              </div>
-              <div className="text-left md:text-center">
-                <p className="font-bold text-sm">{step.title}</p>
-                <p className="text-[12px] text-gray-400">{step.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+        <div className="mx-auto max-w-5xl text-center">
 
-      {/* Pricing */}
-      <section id="pricing" className="bg-card px-4 py-10 text-center">
-        <h2 className="scroll-fade-up">Simple, transparent pricing</h2>
-        <p className="scroll-fade-up text-sm text-gray-400 mt-2">Start free and upgrade when you&apos;re ready.</p>
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground load-fade-up">
+            <Zap size={13} className="text-primary" />
+            BUILT FOR FREELANCERS
+          </div>
 
-        <div className="scroll-stagger flex flex-col md:flex-row justify-center gap-4 mt-6 max-w-2xl mx-auto">
-          {pricingPlans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`hover-lift flex-1 text-left bg-popover rounded-xl p-5 border ${
-                plan.highlighted ? 'border-blue-300 shadow-sm' : 'border-muted-foreground/20'
-              }`}
-            >
-            <div className="flex justify-between mb-2 items-center">
-            <div>
-              <p className="font-bold">{plan.name}</p>
-              <p className="mt-1">
-                {plan.price === "Coming Soon" ?
-                <span className="text-2xl font-bold italic font-serif">{plan.price}</span>
-                :
-                <span className="text-2xl font-bold">{plan.price}</span>
-                }
-                {plan.period && <span className="text-gray-400 text-sm">{plan.period}</span>}
-              </p>
-            </div>
+          <h1 className="flex flex-col gap-2 mx-auto max-w-4xl text-5xl font-bold tracking-[-0.04em] sm:text-6xl lg:text-7xl">
+  <span className="">
+    <span className="write-line line-1">Run your freelance business</span>
+    <span className="write-caret caret-1" aria-hidden="true" />
+  </span>
+  <span className=" text-blue-500">
+    <span className="write-line line-2">without the chaos.</span>
+    <span className="write-caret caret-2" aria-hidden="true" />
+  </span>
+</h1>
 
-              <ul className="mt-3 flex flex-col gap-1">
-                {plan.features.map((f) => (
-                  <li key={f} className="text-[13px] flex items-center gap-2 text-gray-600">
-                    <span className="text-blue-500">&#10003;</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-            </div>
 
-              <Link href={plan.href}>
-                <Button className={`w-full mt-4 ${plan.highlighted ? 'blue-btn' : 'black-btn'}`}>
-                  {plan.cta}
-                </Button>
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="px-4 py-8">
-        <div className="scroll-scale bg-card rounded-xl p-5 flex flex-col items-center text-center gap-3 max-w-2xl mx-auto">
-          <p className="font-bold md:text-2xl">Ready to organize your freelance business?</p>
-          <Link href="/sign-up" className="w-full max-w-xs">
-            <Button className="blue-btn btn-press w-full">Get Started &ndash; It&apos;s Free</Button>
-          </Link>
-          <p className="text-[11px] text-gray-400">
-            No credit card required &middot; Free forever plan &middot; Cancel anytime
+          <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg load-fade-up delay-1">
+            Clients, projects, tasks, time, invoices, and payments —
+            connected in one simple workspace built for freelancers.
           </p>
+
+          <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row load-fade-up delay-2">
+
+            <Link
+              href="/sign-up"
+              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg transition hover:-translate-y-0.5 hover:opacity-90"
+            >
+              Start for free
+              <ArrowRight
+                size={17}
+                className="transition-transform group-hover:translate-x-1"
+              />
+            </Link>
+
+            <a
+              href="#workflow"
+              className="inline-flex items-center justify-center rounded-xl border bg-card px-6 py-3.5 text-sm font-semibold transition hover:bg-muted"
+            >
+              See how it works
+            </a>
+
+          </div>
+
+          <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground load-fade-up delay-3">
+            <span>✓ Free to start</span>
+            <span>✓ No credit card required</span>
+            <span>✓ Built for solo work</span>
+          </div>
+
+        </div>
+                {/* DASHBOARD PREVIEW */}
+        <div className="mx-auto mt-16 max-w-6xl scroll-scale">
+          <div className="overflow-hidden rounded-2xl border bg-card shadow-2xl">
+
+            {/* Browser bar */}
+            <div className="flex h-11 items-center gap-2 border-b px-4">
+              <span className="h-2.5 w-2.5 rounded-full border" />
+              <span className="h-2.5 w-2.5 rounded-full border" />
+              <span className="h-2.5 w-2.5 rounded-full border" />
+
+              <div className="ml-4 h-5 flex-1 rounded-md bg-muted/60" />
+            </div>
+
+            <div className="grid min-h-[500px] grid-cols-1 sm:grid-cols-[190px_1fr]">
+
+              {/* Sidebar */}
+              <aside className="hidden border-r bg-muted/20 p-4 sm:block">
+                <div className="mb-7 flex items-center gap-2">
+                  <Image
+                    src="/assets/logo.svg"
+                    alt=""
+                    width={25}
+                    height={25}
+                  />
+                  <span className="text-sm font-bold">
+                    NexusForge
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  {[
+                    'Dashboard',
+                    'Clients',
+                    'Projects',
+                    'Tasks',
+                    'Invoices',
+                  ].map((item, index) => (
+                    <div
+                      key={item}
+                      className={`rounded-lg px-3 py-2 text-xs ${
+                        index === 0
+                          ? 'bg-primary/10 font-semibold text-primary'
+                          : 'text-muted-foreground'
+                      }`}
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </aside>
+
+              {/* Dashboard */}
+              <div className="p-5 sm:p-8">
+
+                <div className="rounded-2xl border bg-background p-6">
+                  <p className="text-sm text-muted-foreground">
+                    Welcome Back
+                  </p>
+
+                  <h3 className="mt-2 text-2xl font-bold">
+                    Code X Savage 👋
+                  </h3>
+
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    You have 2 projects across 2 clients
+                  </p>
+
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <div className="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground">
+                      + New Project
+                    </div>
+
+                    <div className="rounded-lg border bg-card px-4 py-2.5 text-sm font-semibold">
+                      + New Client
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stats */}
+                <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+
+                  {[
+                    ['Clients', '2'],
+                    ['Projects', '2'],
+                    ['Tasks Due Soon', '0'],
+                    ['Overdue Tasks', '0'],
+                    ['Total Invoiced', '$0.00'],
+                    ['Paid', '$0.00'],
+                    ['Outstanding', '$0.00'],
+                    ['Overdue', '$0.00'],
+                  ].map(([title, value]) => (
+                    <div
+                      key={title}
+                      className="rounded-xl border bg-background p-5"
+                    >
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        {title === 'Clients' && <Users size={18} />}
+                        {title === 'Projects' && (
+                          <FolderKanban size={18} />
+                        )}
+                        {title.includes('Tasks') && <Check size={18} />}
+                        {title === 'Total Invoiced' && (
+                          <FileText size={18} />
+                        )}
+                        {title === 'Paid' && <Check size={18} />}
+                        {title === 'Outstanding' && (
+                          <Clock3 size={18} />
+                        )}
+                        {title === 'Overdue' && <X size={18} />}
+                      </div>
+
+                      <p className="mt-5 text-sm font-medium text-muted-foreground">
+                        {title}
+                      </p>
+
+                      <p className="mt-3 text-2xl font-bold">
+                        {value}
+                      </p>
+                    </div>
+                  ))}
+
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="scroll-fade border-t px-4 py-8">
-        <div className="flex flex-col md:flex-row md:justify-between gap-8 max-w-4xl mx-auto">
-          <div className="max-w-xs">
-            <Image src="/assets/logo.svg" width={150} height={40} alt="NexusForge" />
-            <p className="text-[12px] text-gray-400 mt-2">
-              The all-in-one workspace for freelancers to manage clients, projects, and payments.
+      {/* WORKFLOW */}
+      <section
+        id="workflow"
+        className="border-y bg-muted/20 px-5 py-24 sm:px-8"
+      >
+        <div className="mx-auto max-w-6xl">
+
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-widest text-blue-500 text-center scroll-fade-up">
+              One connected workflow
+            </p>
+
+            <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+              From workspace setup to getting paid.
+            </h2>
+
+            <p className="mt-4 leading-7 text-muted-foreground text-center">
+              NexusForge keeps the pieces of your freelance business
+              connected so you spend less time jumping between tools
+              and more time doing the work.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-8">
-            {footerColumns.map((col) => (
-              <div key={col.title}>
-                <p className="font-bold text-sm mb-2">{col.title}</p>
-                <ul className="flex flex-col gap-1">
-                  {col.links.map((link) => (
-                    <li key={link.label}>
-                      <Link href={link.href} className="text-[13px] text-gray-400">
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+          <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border bg-border sm:grid-cols-2 lg:grid-cols-3 scroll-stagger">
+
+            {workflow.map((item, index) => {
+              const Icon = item.icon;
+
+              return (
+                <div
+                  key={item.title}
+                  className="bg-background p-6"
+                >
+                  <div className="flex items-center justify-between">
+
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Icon size={19} />
+                    </div>
+
+                    <span className="text-xs text-muted-foreground">
+                      0{index + 1}
+                    </span>
+
+                  </div>
+
+                  <h3 className="mt-6 font-semibold">
+                    {item.title}
+                  </h3>
+
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {item.text}
+                  </p>
+                </div>
+              );
+            })}
+
           </div>
         </div>
+      </section>
+            <section id="features" className="px-5 py-24 sm:px-8">
+        <div className="mx-auto max-w-6xl">
 
-        <p className="text-center text-[11px] text-gray-400 mt-8">
-          &copy; {new Date().getFullYear()} NexusForge. All rights reserved.
-        </p>
+          <div className="mx-auto max-w-2xl text-center scroll-fade-up">
+            <p className="text-sm font-semibold uppercase tracking-widest text-blue-500 text-center">
+              Everything in one place
+            </p>
+
+            <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+              Built around the way freelancers actually work.
+            </h2>
+          </div>
+
+          <div className="mt-14 grid gap-5 md:grid-cols-3 scroll-fade">
+
+            <FeatureCard
+              icon={<Users size={21} />}
+              title="Know your clients"
+              text="Keep client information, projects, activity, and communication organized in one place."
+              items={[
+                'Client profiles',
+                'Project relationships',
+                'Contact information',
+              ]}
+            />
+
+            <FeatureCard
+              icon={<FolderKanban size={21} />}
+              title="Control your projects"
+              text="Turn scattered to-do lists into a clear workflow with tasks, deadlines, priorities, and progress."
+              items={[
+                'Project tracking',
+                'Tasks & deadlines',
+                'Time tracking',
+              ]}
+            />
+
+            <FeatureCard
+              icon={<FileText size={21} />}
+              title="Get paid with clarity"
+              text="Create invoices, track what has been paid, and always know what is still outstanding."
+              items={[
+                'Professional invoices',
+                'Payment tracking',
+                'Shareable invoice links',
+              ]}
+            />
+
+          </div>
+        </div>
+      </section>
+
+      {/* MONEY */}
+      <section className="border-y bg-muted/20 px-5 py-24 sm:px-8">
+        <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2">
+
+          <div className="scroll-fade-up">
+            <p className="text-sm font-semibold uppercase tracking-widest text-blue-500 text-center">
+              Know your numbers
+            </p>
+
+            <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+              Your work should lead to your money.
+            </h2>
+
+            <p className="mt-5 leading-7 text-muted-foreground text-center">
+              NexusForge connects projects and invoices so you can see
+              what you've earned, what you've billed, and what is still
+              waiting to be paid.
+            </p>
+
+            <div className="mt-8 space-y-4">
+              {[
+                'Create invoices from your workspace',
+                'Record partial or full payments',
+                'See outstanding balances',
+                'Share invoices with a public link',
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-3">
+
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Check size={14} />
+                  </div>
+
+                  <span className="text-sm">
+                    {item}
+                  </span>
+
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border bg-card p-5 shadow-xl sm:p-7 scroll-scale">
+
+            <div className="flex items-center justify-between border-b pb-5">
+
+              <div>
+                <p className="font-semibold">
+                  Invoice INV-0002
+                </p>
+
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Website redesign
+                </p>
+              </div>
+
+              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                Partially paid
+              </span>
+
+            </div>
+
+            <div className="py-8">
+              <p className="text-xs text-muted-foreground">
+                Invoice total
+              </p>
+
+              <p className="mt-2 text-4xl font-bold">
+                $1,320.00
+              </p>
+            </div>
+
+            <div className="space-y-3 border-t pt-5 text-sm">
+
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  Paid
+                </span>
+
+                <span className="font-medium">
+                  $500.00
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  Balance
+                </span>
+
+                <span className="font-semibold">
+                  $820.00
+                </span>
+              </div>
+
+            </div>
+
+            <Link href="https://nexusforge-beta.vercel.app/invoice/fgvXdqFwjbHNrb65cDSwnSZ8PGtPQd3L">
+            <button className="mt-6 w-full rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground">
+              View invoice
+            </button>
+            </Link>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* PREMIUM */}
+      <section className="px-5 py-24 sm:px-8">
+        <div className="mx-auto max-w-5xl">
+
+          <div className="relative overflow-hidden rounded-3xl border bg-card p-8 sm:p-12 scroll-fade-up">
+
+            <div className="absolute right-0 top-0 -z-0 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
+
+            <div className="relative z-10 grid gap-10 md:grid-cols-[1fr_auto] md:items-center">
+
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1.5 text-xs font-semibold text-primary">
+                  <Crown size={14} />
+                  PREMIUM
+                  <span className="text-blue-500">
+                    • COMING SOON
+                  </span>
+                </div>
+
+                <h2 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl">
+                  More power when your business grows.
+                </h2>
+
+                <p className="mt-4 max-w-xl leading-7 text-muted-foreground text-center">
+                  We're working on premium features designed to give
+                  growing freelancers more control, automation, and
+                  insight.
+                </p>
+              </div>
+
+              <Link
+                href="/waitlist"
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+              >
+                Join the waitlist
+                <ArrowRight
+                  size={17}
+                  className="transition-transform group-hover:translate-x-1"
+                />
+              </Link>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+            {/* PRICING */}
+      <section id="pricing" className="px-5 py-24 sm:px-8">
+        <div className="mx-auto max-w-3xl text-center scroll-fade-up">
+
+          <p className="text-sm font-semibold uppercase tracking-widest text-blue-500 text-center">
+            Simple pricing
+          </p>
+
+          <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
+            Start free. Build your workflow.
+          </h2>
+
+          <p className="mx-auto mt-4 max-w-xl leading-7 text-muted-foreground">
+            Start managing your freelance business without paying upfront.
+            Upgrade when NexusForge becomes an essential part of your work.
+          </p>
+
+          <div className="mx-auto mt-10 max-w-md rounded-2xl border bg-card p-7 text-left shadow-lg">
+
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-xl font-bold">
+                  Free
+                </h3>
+
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Everything you need to get started.
+                </p>
+              </div>
+
+              <div className="text-right">
+                <p className="text-3xl font-bold">
+                  $0
+                </p>
+
+                <p className="text-xs text-muted-foreground">
+                  /month
+                </p>
+              </div>
+            </div>
+
+            <div className="my-7 h-px bg-border" />
+
+            <div className="space-y-3">
+              {[
+                'Up to 2 clients',
+                'Up to 5 projects',
+                'Invoice & quotes',
+                'Basic reports',
+              ].map((feature) => (
+                <div
+                  key={feature}
+                  className="flex items-center gap-3"
+                >
+                  <Check
+                    size={16}
+                    className="text-primary"
+                  />
+
+                  <span className="text-sm">
+                    {feature}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <Link
+              href="/sign-up"
+              className="mt-7 block rounded-lg bg-primary px-4 py-3 text-center text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+            >
+              Get started
+            </Link>
+
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="px-5 pb-24 sm:px-8 scroll-fade-up">
+        <div className="mx-auto max-w-6xl rounded-3xl border bg-card px-6 py-16 text-center sm:px-10">
+
+          <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl text-blue-500">
+            Your freelance business deserves a home.
+          </h2>
+
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+            Bring your clients, projects, tasks, time, and invoices
+            together with NexusForge.
+          </p>
+
+          <Link
+            href="/sign-up"
+            className="group mt-8 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"
+          >
+            Start building for free
+
+            <ArrowRight
+              size={17}
+              className="transition-transform group-hover:translate-x-1"
+            />
+          </Link>
+
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t px-5 py-8 sm:px-8">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
+
+          <div className="flex items-center gap-2">
+            <Image
+              src="/assets/logo.svg"
+              alt="NexusForge"
+              width={250}
+              height={150}
+            />
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} NexusForge. Built for freelancers.
+          </p>
+
+        </div>
       </footer>
-    </div>
-  )
+    </main>
+  );
 }
 
-export default Home
+function FeatureCard({
+  icon,
+  title,
+  text,
+  items,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  text: string;
+  items: string[];
+}) {
+  return (
+    <div className="rounded-2xl border bg-card p-7 transition hover:-translate-y-1 hover:shadow-lg">
+
+      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        {icon}
+      </div>
+
+      <h3 className="mt-6 text-lg font-bold">
+        {title}
+      </h3>
+
+      <p className="mt-3 text-sm leading-6 text-muted-foreground">
+        {text}
+      </p>
+
+      <div className="mt-7 space-y-3 border-t pt-6">
+        {items.map((item) => (
+          <div
+            key={item}
+            className="flex items-center gap-3 text-sm"
+          >
+            <Check
+              size={15}
+              className="text-primary"
+            />
+
+            {item}
+          </div>
+        ))}
+      </div>
+
+    </div>
+  );
+}

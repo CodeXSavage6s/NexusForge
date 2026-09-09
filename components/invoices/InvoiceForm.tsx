@@ -17,6 +17,7 @@ import InvoiceLineItemsEditor, { newLineItem } from "@/components/invoices/Invoi
 import InvoiceSummary from "@/components/invoices/InvoiceSummary";
 import { calculateTotal } from "@/lib/invoices/calculations";
 import { CreateInvoice, UpdateInvoice } from "@/lib/actions/invoice";
+import { INVOICE_CURRENCIES } from "@/lib/constants/invoice-constants";
 import type { InvoiceFormValues, InvoiceLineItemFormValue } from "@/types/invoice";
 
 export interface ClientOption {
@@ -36,6 +37,7 @@ interface InvoiceFormProps {
   clients: ClientOption[];
   projects: ProjectOption[];
   suggestedInvoiceNumber?: string;
+  defaultCurrency?: string;
   mode: "create" | "edit";
   invoiceId?: string;
   initialValues?: InvoiceFormValues;
@@ -53,13 +55,14 @@ function defaultDueDate() {
   return d.toISOString().slice(0, 10);
 }
 
-function buildInitialValues(suggestedInvoiceNumber?: string): InvoiceFormValues {
+function buildInitialValues(suggestedInvoiceNumber?: string, defaultCurrency = "USD"): InvoiceFormValues {
   return {
     clientId: "",
     projectId: null,
     invoiceNumber: suggestedInvoiceNumber ?? "",
     issueDate: todayISO(),
     dueDate: defaultDueDate(),
+    currency: defaultCurrency,
     taxRate: "",
     notes: "",
     lineItems: [newLineItem()],
@@ -72,13 +75,14 @@ export default function InvoiceForm({
   clients,
   projects,
   suggestedInvoiceNumber,
+  defaultCurrency = "USD",
   mode,
   invoiceId,
   initialValues,
 }: InvoiceFormProps) {
   const router = useRouter();
   const [form, setForm] = useState<InvoiceFormValues>(
-    initialValues ?? buildInitialValues(suggestedInvoiceNumber)
+    initialValues ?? buildInitialValues(suggestedInvoiceNumber, defaultCurrency)
   );
   const [isSubmitting, setIsSubmitting] = useState<"draft" | "create" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -137,6 +141,7 @@ export default function InvoiceForm({
         invoiceNumber: form.invoiceNumber.trim(),
         issueDate: new Date(form.issueDate),
         dueDate: new Date(form.dueDate),
+        currency: form.currency,
         taxRate: taxRateValue,
         notes: form.notes,
         lineItems: numericLineItems,
@@ -239,6 +244,30 @@ export default function InvoiceForm({
           </div>
 
           <div className="grid gap-2">
+            <Label htmlFor="currency">Currency</Label>
+            <Select
+              value={form.currency}
+              onValueChange={(value) => setForm((prev) => ({ ...prev, currency: value }))}
+            >
+              <SelectTrigger id="currency" className="w-full" aria-invalid={!!fieldErrors.currency}>
+                <SelectValue placeholder="Currency" />
+              </SelectTrigger>
+              <SelectContent>
+                {INVOICE_CURRENCIES.map((code) => (
+                  <SelectItem key={code} value={code}>
+                    {code}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {fieldErrors.currency ? (
+              <p className="text-sm text-destructive">{fieldErrors.currency}</p>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-2">
             <Label htmlFor="issueDate">Issue date</Label>
             <Input
               id="issueDate"
@@ -269,6 +298,7 @@ export default function InvoiceForm({
           <InvoiceLineItemsEditor
             items={form.lineItems}
             onChange={setLineItems}
+            currency={form.currency}
             error={fieldErrors.lineItems}
           />
         </div>
@@ -292,7 +322,7 @@ export default function InvoiceForm({
             ) : null}
           </div>
 
-          <InvoiceSummary subtotal={subtotal} tax={tax} total={total} taxRate={taxRateValue} />
+          <InvoiceSummary subtotal={subtotal} tax={tax} total={total} taxRate={taxRateValue} currency={form.currency} />
         </div>
 
         <div className="grid gap-2 border-t border-border pt-4">

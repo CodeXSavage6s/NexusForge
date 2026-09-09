@@ -30,7 +30,7 @@ export default function InvoiceCard({
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <span className="font-semibold">{invoice.invoiceNumber}</span>
-          <InvoiceStatusBadge status={invoice.status} />
+          <InvoiceStatusBadge status={invoice.displayStatus} />
         </div>
         <span className="text-sm text-muted-foreground">{invoice.client.name}</span>
         {invoice.project ? (
@@ -44,6 +44,11 @@ export default function InvoiceCard({
         <span className="text-lg font-semibold tabular-nums">
           {formatMoney(invoice.amount, invoice.currency)}
         </span>
+        {invoice.remainingBalance > 0 && invoice.displayStatus !== "CANCELLED" ? (
+          <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+            {formatMoney(invoice.remainingBalance, invoice.currency)} due
+          </span>
+        ) : null}
         <span className="text-xs text-muted-foreground">
           Issued {formatDate(invoice.issueDate)} · Due {formatDate(invoice.dueDate)}
         </span>

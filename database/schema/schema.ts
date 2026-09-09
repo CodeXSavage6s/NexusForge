@@ -76,9 +76,16 @@ export const projectMemberRoleEnum = pgEnum("project_member_role", [
   "VIEWER",
 ]);
 
+// NOTE: "OVERDUE" is kept for backwards compatibility with existing rows /
+// external integrations, but new code should NOT write it directly. Overdue
+// is a derived, read-time state (see lib/invoices/calculations.ts
+// `deriveInvoiceDisplayStatus`) based on dueDate + payment state, so it stays
+// correct without a cron job. "PARTIALLY_PAID" is the new state for invoices
+// that have received a payment smaller than their total.
 export const invoiceStatusEnum = pgEnum("invoice_status", [
   "DRAFT",
   "SENT",
+  "PARTIALLY_PAID",
   "PAID",
   "OVERDUE",
   "CANCELLED",
@@ -100,6 +107,17 @@ export const workspaces = pgTable(
     name: text("name").notNull().unique(),
     slug: text("slug").notNull().unique(),
     logo: text("logo"),
+    // ── Business info, used on invoices (previews + public invoice page) ──
+    businessEmail: text("business_email"),
+    businessPhone: text("business_phone"),
+    businessAddress: text("business_address"),
+    taxId: text("tax_id"),
+    defaultCurrency: text("default_currency").notNull().default("USD"),
+    // Plain-text payment instructions (e.g. bank transfer details, PayPal
+    // handle). Intentionally not a structured "bank account" field — see
+    // note in the workspace actions about not storing sensitive bank
+    // credentials without a properly secured design.
+    paymentInstructions: text("payment_instructions"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
@@ -415,6 +433,13 @@ export const invoices = pgTable(
     dueDate: timestamp("due_date").notNull(),
     // Percentage, e.g. 7.5 for 7.5%. Null/omitted means no tax applied.
     taxRate: numeric("tax_rate", { precision: 5, scale: 2, mode: "number" }),
+    // Cumulative amount recorded as paid. Always <= amount (enforced in
+    // lib/actions/invoice.ts, never trust a value posted from the browser).
+    amountPaid: numeric("amount_paid", { precision: 12, scale: 2, mode: "number" })
+      .notNull()
+      .default(0),
+    paidAt: timestamp("paid_at"),
+    paymentMethod: text("payment_method"),
     notes: text("notes"),
     // Cryptographically random token that gates the public /invoice/[publicToken]
     // route. Null until the freelancer generates a share link. Never derived
