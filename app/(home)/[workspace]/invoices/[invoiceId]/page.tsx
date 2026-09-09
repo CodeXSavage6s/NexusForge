@@ -45,6 +45,9 @@ export default async function InvoiceDetailPage({
             workspaceSlug={workspaceSlug}
             invoiceId={invoice.id}
             status={invoice.status}
+            displayStatus={invoice.displayStatus}
+            currency={invoice.currency}
+            remainingBalance={invoice.remainingBalance}
             publicToken={invoice.publicToken}
           />
         </div>
@@ -52,7 +55,7 @@ export default async function InvoiceDetailPage({
 
       <InvoicePreview
         invoiceNumber={invoice.invoiceNumber}
-        status={invoice.status}
+        status={invoice.displayStatus}
         issueDate={invoice.issueDate}
         dueDate={invoice.dueDate}
         currency={invoice.currency}
@@ -61,8 +64,18 @@ export default async function InvoiceDetailPage({
         subtotal={subtotal}
         tax={tax}
         total={total}
+        amountPaid={invoice.amountPaid}
+        remainingBalance={invoice.remainingBalance}
         lineItems={invoice.lineItems}
-        business={{ name: workspace.name, logoUrl: workspace.logo }}
+        business={{
+          name: workspace.name,
+          logoUrl: workspace.logo,
+          email: workspace.businessEmail,
+          phone: workspace.businessPhone,
+          address: workspace.businessAddress,
+          taxId: workspace.taxId,
+          paymentInstructions: workspace.paymentInstructions,
+        }}
         client={{
           name: invoice.client.name,
           email: invoice.client.email,

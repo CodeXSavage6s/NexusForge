@@ -25,8 +25,18 @@ export interface InvoicePreviewProps {
   subtotal: number;
   tax: number;
   total: number;
+  amountPaid?: number;
+  remainingBalance?: number;
   lineItems: { id: string; description: string; quantity: number; rate: number }[];
-  business: { name: string; logoUrl?: string | null };
+  business: {
+    name: string;
+    logoUrl?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    address?: string | null;
+    taxId?: string | null;
+    paymentInstructions?: string | null;
+  };
   client: { name: string; email?: string | null; address?: string | null };
 }
 
@@ -41,27 +51,40 @@ export default function InvoicePreview({
   subtotal,
   tax,
   total,
+  amountPaid = 0,
+  remainingBalance,
   lineItems,
   business,
   client,
 }: InvoicePreviewProps) {
+  const balance = remainingBalance ?? Math.max(0, total - amountPaid);
+  const showPaymentStatus = status !== "DRAFT";
+
   return (
     <div
       id="invoice-preview"
       className="mx-auto w-full max-w-3xl rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-10 print:m-0 print:max-w-none print:rounded-none print:border-0 print:p-0 print:shadow-none"
     >
       <div className="flex flex-col justify-between gap-4 border-b border-border pb-6 sm:flex-row sm:items-start">
-        <div>
+        <div className="space-y-0.5">
           {business.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={business.logoUrl} alt={business.name} className="mb-2 h-10 w-auto" />
           ) : null}
           <p className="font-semibold">{business.name}</p>
+          {business.email ? <p className="text-xs text-muted-foreground">{business.email}</p> : null}
+          {business.phone ? <p className="text-xs text-muted-foreground">{business.phone}</p> : null}
+          {business.address ? (
+            <p className="whitespace-pre-wrap text-xs text-muted-foreground">{business.address}</p>
+          ) : null}
+          {business.taxId ? (
+            <p className="text-xs text-muted-foreground">Tax ID: {business.taxId}</p>
+          ) : null}
         </div>
         <div className="text-left sm:text-right">
           <h1 className="text-2xl font-bold tracking-tight">INVOICE</h1>
           <p className="text-sm text-muted-foreground">#{invoiceNumber}</p>
-          <div className="mt-2">
+          <div className="mt-2 flex sm:justify-end">
             <InvoiceStatusBadge status={status} />
           </div>
         </div>
@@ -119,9 +142,33 @@ export default function InvoicePreview({
         ))}
       </div>
 
-      <div className="py-6">
+      <div className="flex flex-col gap-6 py-6 sm:flex-row sm:justify-between">
+        {showPaymentStatus ? (
+          <div className="flex flex-col gap-1 text-sm sm:max-w-56">
+            <div className="flex justify-between gap-4 text-muted-foreground">
+              <span>Amount paid</span>
+              <span className="tabular-nums text-foreground">{formatMoney(amountPaid, currency)}</span>
+            </div>
+            <div className="flex justify-between gap-4 font-medium">
+              <span>Balance due</span>
+              <span className="tabular-nums">{formatMoney(balance, currency)}</span>
+            </div>
+          </div>
+        ) : (
+          <div />
+        )}
+
         <InvoiceSummary subtotal={subtotal} tax={tax} total={total} taxRate={taxRate} currency={currency} />
       </div>
+
+      {business.paymentInstructions ? (
+        <div className="border-t border-border pt-6">
+          <p className="mb-1 text-xs font-medium text-muted-foreground">Payment Instructions</p>
+          <p className="whitespace-pre-wrap text-sm text-muted-foreground">
+            {business.paymentInstructions}
+          </p>
+        </div>
+      ) : null}
 
       {notes ? (
         <div className="border-t border-border pt-6">

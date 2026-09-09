@@ -4,9 +4,10 @@ import { auth } from "@/lib/better-auth/auth";
 import { headers } from "next/headers";
 import { redirect, notFound } from "next/navigation";
 import { getWorkspace } from "@/lib/actions/workspace";
-import { GetWorkspaceInvoices } from "@/lib/actions/invoice";
+import { GetWorkspaceInvoices, GetInvoiceSummary } from "@/lib/actions/invoice";
 import { Button } from "@/components/ui/button";
 import InvoicesList from "@/components/invoices/InvoicesList";
+import InvoiceSummaryCards from "@/components/invoices/InvoiceSummaryCards";
 
 export default async function InvoicesPage({
   params,
@@ -21,7 +22,10 @@ export default async function InvoicesPage({
   const workspace = await getWorkspace(workspaceSlug, session.user.id);
   if (!workspace) notFound();
 
-  const { invoices } = await GetWorkspaceInvoices(workspace.id);
+  const [{ invoices }, summary] = await Promise.all([
+    GetWorkspaceInvoices(workspace.id),
+    GetInvoiceSummary(workspace.id),
+  ]);
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4">
@@ -39,6 +43,8 @@ export default async function InvoicesPage({
           </Link>
         </Button>
       </div>
+
+      {invoices.length > 0 ? <InvoiceSummaryCards summary={summary} /> : null}
 
       <InvoicesList invoices={invoices} workspaceSlug={workspaceSlug} />
     </div>

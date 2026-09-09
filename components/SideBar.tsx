@@ -243,6 +243,7 @@ export function AppSidebar({
               <SidebarMenu>
                 <SidebarMenuItem className="font-bold text-lg"><SidebarMenuButton asChild><Link href="/settings/profile"><Users className="h-4 w-4" /> Profile</Link></SidebarMenuButton></SidebarMenuItem>
                 <SidebarMenuItem className="font-bold text-lg"><SidebarMenuButton asChild><Link href="/settings/notifications"><Bell className="h-4 w-4" /> Notifications</Link></SidebarMenuButton></SidebarMenuItem>
+                <SidebarMenuItem className="font-bold text-lg"><SidebarMenuButton asChild><Link href="/settings/workspace"><FolderKanban className="h-4 w-4" /> Workspace</Link></SidebarMenuButton></SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
         </SidebarGroup>

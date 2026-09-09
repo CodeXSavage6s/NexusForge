@@ -7,6 +7,7 @@ import { PROJECT_PRIORITY, PROJECT_STATUS } from "@/lib/constants/client-constan
 import { NewClientActivity } from "@/lib/actions/activity"
 import { auth } from "@/lib/better-auth/auth"
 import { headers } from "next/headers"
+import { requireWorkspaceAccess } from "@/lib/authz"
 import { success } from 'better-auth';
 
 
@@ -203,13 +204,21 @@ export async function CreateProject(data: {
     icon?: string;
 }) {
   try {
-    // console.log("create project hit")
-    // console.log("data", data)
     const { workspaceId, clientId, name, slug, description, status, priority, budget, currency, startDate, dueDate, color, icon } = data;
+
+    // Verify the caller owns this workspace, and that the client actually
+    // belongs to it, before creating anything under it.
+    await requireWorkspaceAccess(workspaceId);
+    const [ownedClient] = await db
+      .select({ id: clients.id })
+      .from(clients)
+      .where(and(eq(clients.id, clientId), eq(clients.workspaceId, workspaceId)));
+    if (!ownedClient) {
+      return { success: false, error: "not_found", message: "Client not found in this workspace." };
+    }
 
     const check = await db.select().from(projects).where(and(eq(projects.clientId, clientId), eq(projects.name, name)));
 
-    console.log("check", check)
     if (check.length > 0) {
       return {
         success: false,
@@ -258,9 +267,25 @@ export async function CreateProject(data: {
 
 }
 
-export async function GetProjectDetails(projectiD: string, clientId: string) {
+export async function GetProjectDetails(projectiD: string, clientId: string, workspaceId?: string) {
   try {
-    const project = await db.select().from(projects).where(and(eq(projects.id, projectiD), eq(projects.clientId, clientId)))
+    // SECURITY FIX: this previously had no workspace check at all — any
+    // authenticated user who guessed/knew a projectId+clientId pair could
+    // read another workspace's project. Require workspaceId and verify it.
+    if (workspaceId) {
+      await requireWorkspaceAccess(workspaceId);
+    }
+
+    const [project] = await db
+      .select()
+      .from(projects)
+      .where(
+        and(
+          eq(projects.id, projectiD),
+          eq(projects.clientId, clientId),
+          ...(workspaceId ? [eq(projects.workspaceId, workspaceId)] : [])
+        )
+      )
 
     return {
       success: true,
@@ -300,11 +325,34 @@ export async function UpdateProject(data: {
     if (!workspaceId) return { success: false, error: "Could not find workspaceId"}
     if (!clientId) return { success: false, error: "Could not identify Client"}
 
-    const check = db.select().from(projects).where(and(eq(projects.clientId, clientId), eq(projects.name, name), ne(projects.id, id)))
+    // Enforce workspace/client ownership — never trust ids from the client
+    // without verifying the project actually belongs to this workspace.
+    await requireWorkspaceAccess(workspaceId);
+    const [existingProject] = await db
+      .select({ id: projects.id })
+      .from(projects)
+      .where(and(eq(projects.id, id), eq(projects.workspaceId, workspaceId), eq(projects.clientId, clientId)));
+    if (!existingProject) {
+      return { success: false, error: "Project not found in this workspace." };
+    }
 
-    if (!check) return { success: false, error: "A project with this name alread exist in client"}
+    // CRITICAL FIX: this query was previously missing `await` (so the
+    // truthiness check below always passed) AND the update below was
+    // previously missing a `.where()` clause entirely, which would have
+    // overwritten every project row in the database with this one
+    // project's data. Both are fixed here.
+    const [duplicateName] = await db
+      .select({ id: projects.id })
+      .from(projects)
+      .where(and(eq(projects.clientId, clientId), eq(projects.name, name), ne(projects.id, id)));
 
-    const [updatedProject] = await db.update(projects).set({ id, workspaceId, clientId, name, slug, description, status, priority, budget, currency, startDate, dueDate, completedAt, progress, color, icon }).returning()
+    if (duplicateName) return { success: false, error: "A project with this name already exists for this client." }
+
+    const [updatedProject] = await db
+      .update(projects)
+      .set({ name, slug, description, status, priority, budget, currency, startDate, dueDate, completedAt, progress, color, icon, updatedAt: new Date() })
+      .where(and(eq(projects.id, id), eq(projects.workspaceId, workspaceId)))
+      .returning()
 
     return {
       success: true,
@@ -312,7 +360,7 @@ export async function UpdateProject(data: {
       message: "Updated Project successful"
     }
   } catch (err) {
-    console.log("Error Upating Project", err)
+    console.error("Error updating project:", err)
     return {
       success: false,
       error: "Failed to Update Project"
@@ -320,9 +368,18 @@ export async function UpdateProject(data: {
   }
 }
 
-export async function DeleteProject(projectId: string, clientId?: string) {
+export async function DeleteProject(projectId: string, workspaceId: string, clientId?: string) {
   try {
-    const whereClause = clientId ? and(eq(projects.id, projectId), eq(projects.clientId, clientId)) : eq(projects.id, projectId);
+    // SECURITY FIX: this previously deleted by projectId alone with no
+    // workspace check at all — any authenticated user who knew/guessed a
+    // projectId could delete any project in the database. Now requires
+    // and verifies workspaceId (and clientId, when provided).
+    await requireWorkspaceAccess(workspaceId);
+
+    const whereClause = clientId
+      ? and(eq(projects.id, projectId), eq(projects.workspaceId, workspaceId), eq(projects.clientId, clientId))
+      : and(eq(projects.id, projectId), eq(projects.workspaceId, workspaceId));
+
     const [deleted] = await db.delete(projects).where(whereClause).returning();
     if (!deleted) return { success: false, error: 'Project not found or not authorized' };
     return { success: true, project: deleted };

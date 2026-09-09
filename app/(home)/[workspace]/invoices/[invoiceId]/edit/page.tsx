@@ -62,6 +62,7 @@ export default async function EditInvoicePage({
         invoiceNumber: invoice.invoiceNumber,
         issueDate: toDateInput(invoice.issueDate),
         dueDate: toDateInput(invoice.dueDate),
+        currency: invoice.currency,
         taxRate: invoice.taxRate != null ? String(invoice.taxRate) : "",
         notes: invoice.notes ?? "",
         lineItems: lineItems.length > 0 ? lineItems : [newLineItem()],

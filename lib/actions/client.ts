@@ -172,10 +172,8 @@ export async function GetWorkspaceClient(workspaceId: string) {
 
 export async function GetClientDetails(clientId: string, workspaceId: string | undefined) {
   try {
-    console.log("Fetching client details for clientId:", clientId, "in workspaceId:", workspaceId);
     const [client] = await db.select().from(clients).where(and(eq(clients.id, clientId), eq(clients.workspaceId, workspaceId)))
-    
-    console.log("client from server", client)
+
     return client
   } catch (err) {
     console.error("Error fetching client details", err)

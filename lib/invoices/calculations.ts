@@ -5,6 +5,8 @@
 // the server as the authoritative recalculation before anything is persisted.
 // Never trust a total computed only on the client.
 
+import type { InvoiceStatus } from "@/lib/constants/invoice-constants";
+
 export interface InvoiceLineItemInput {
   description: string;
   quantity: number;
@@ -54,4 +56,70 @@ export function validateTaxRate(taxRate: number | null | undefined): string | nu
     return "Tax rate must be between 0 and 100.";
   }
   return null;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Payment tracking
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Derives the status an invoice should be DISPLAYED as, given its stored
+ * status, dueDate, and payment state. Overdue is intentionally never
+ * persisted for SENT/PARTIALLY_PAID invoices — it's computed here at read
+ * time so it's always correct without a cron job. PAID and CANCELLED never
+ * display as overdue regardless of dueDate.
+ */
+export function deriveInvoiceDisplayStatus(params: {
+  status: InvoiceStatus;
+  dueDate: Date;
+  amountPaid: number;
+  amount: number;
+  now?: Date;
+}): InvoiceStatus {
+  const { status, dueDate, now = new Date() } = params;
+
+  if (status === "PAID" || status === "CANCELLED" || status === "DRAFT") {
+    return status;
+  }
+
+  // status is SENT, PARTIALLY_PAID, or the legacy stored OVERDUE.
+  const isPastDue = dueDate.getTime() < now.getTime();
+  if (isPastDue) return "OVERDUE";
+
+  return status === "OVERDUE" ? "SENT" : status;
+}
+
+/** Remaining balance owed on an invoice, floored at 0 and rounded to cents. */
+export function remainingBalance(amount: number, amountPaid: number): number {
+  return round2(Math.max(0, amount - amountPaid));
+}
+
+/**
+ * Validates a payment amount being recorded against an invoice.
+ * Returns an error message, or null if valid.
+ */
+export function validatePaymentAmount(params: {
+  amount: number;
+  invoiceTotal: number;
+  alreadyPaid: number;
+}): string | null {
+  const { amount, invoiceTotal, alreadyPaid } = params;
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    return "Payment amount must be greater than 0.";
+  }
+
+  // Never allow amountPaid to exceed the invoice total (with a tiny epsilon
+  // for floating point rounding).
+  if (round2(alreadyPaid + amount) - invoiceTotal > 0.005) {
+    const remaining = remainingBalance(invoiceTotal, alreadyPaid);
+    return `Payment exceeds the remaining balance of ${remaining.toFixed(2)}.`;
+  }
+
+  return null;
+}
+
+/** Given a total and an amount already paid, what status should the invoice move to. */
+export function statusForPaymentState(amountPaid: number, total: number): "PARTIALLY_PAID" | "PAID" {
+  return round2(amountPaid) >= round2(total) ? "PAID" : "PARTIALLY_PAID";
 }

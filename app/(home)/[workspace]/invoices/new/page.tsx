@@ -40,6 +40,7 @@ export default async function NewInvoicePage({
       clients={clients}
       projects={projects}
       suggestedInvoiceNumber={suggestedInvoiceNumber}
+      defaultCurrency={workspace.defaultCurrency ?? "USD"}
       mode="create"
     />
   );
