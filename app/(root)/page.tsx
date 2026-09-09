@@ -624,7 +624,7 @@ export default function LandingPage() {
       </section>
             {/* PRICING */}
       <section id="pricing" className="px-5 py-24 sm:px-8">
-        <div className="mx-auto max-w-3xl text-center scroll-fade-up">
+        <div className="mx-auto max-w-3xl text-center ">
 
           <p className="text-sm font-semibold uppercase tracking-widest text-blue-500 text-center">
             Simple pricing
@@ -700,7 +700,7 @@ export default function LandingPage() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="px-5 pb-24 sm:px-8 scroll-fade-up">
+      <section className="px-5 pb-24 sm:px-8 ">
         <div className="mx-auto max-w-6xl rounded-3xl border bg-card px-6 py-16 text-center sm:px-10">
 
           <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl text-blue-500">
