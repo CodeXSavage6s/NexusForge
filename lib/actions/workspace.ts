@@ -55,9 +55,10 @@ export async function createWorkspace(
 ): Promise<{ id?: string; name?: string; slug?: string; message?: string }> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) throw new Error("Not authenticated");
+  const user = await session?.user
   
   try {
-    const check = await db.select().from(workspaces).where(eq(workspaces.slug, slug));
+    const check = await db.select().from(workspaces).where(and(eq(workspaces.slug, slug), eq(workspaces.ownerId, user?.id)));
 
     if (check.length > 0) return { message: "Workspace name already taken" };
     
