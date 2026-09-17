@@ -104,8 +104,8 @@ export const workspaces = pgTable(
   {
     id: cuid(),
     ownerId: text("owner_id").notNull(), // TODO: .references(() => user.id, { onDelete: "cascade" })
-    name: text("name").notNull().unique(),
-    slug: text("slug").notNull().unique(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
     logo: text("logo"),
     // ── Business info, used on invoices (previews + public invoice page) ──
     businessEmail: text("business_email"),

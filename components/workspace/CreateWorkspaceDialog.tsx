@@ -57,8 +57,9 @@ export function CreateWorkspaceDialog({
       }
       setOpen(false);
       setName("");
-      router.push(`/${workspace.slug}/dashboard`);
       router.refresh();
+      router.push(`/${workspace.slug}/dashboard`);
+      console.log("redirected")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create workspace");
     } finally {

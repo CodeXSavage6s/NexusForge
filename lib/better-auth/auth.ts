@@ -17,10 +17,10 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     disableSignUp: false,
-    requireEmailVerification: false,
+    requireEmailVerification: true,
     minPasswordLength: 8,
     maxPasswordLength: 128,
-    autoSignIn: false,
+    autoSignIn: true,
     baseURL: process.env.BETTER_AUTH_URL,
     resetPasswordTokenExpiresIn: 3600, // 1 hour — keep in sync with the "expires in" text in the email
     sendResetPassword: async ({ user, url }, request) => {

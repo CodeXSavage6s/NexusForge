@@ -154,10 +154,13 @@ export function CreateClientDialog({
               <Label htmlFor="phone">Phone (Optional)</Label>
               <Input
                 id="phone"
+                type="tel"
+                inputMode="tel"
                 value={form.phone}
                 onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
                 placeholder="+1 (555) 000-0000"
               />
+              {errors?.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
             </div>
 
             <div className="grid gap-2">

@@ -17,13 +17,17 @@ export interface CreateClientState {
     name?: string;
     email?: string;
     website?: string;
+    phone?: string;
   };
   clientId?: string;
   client?: typeof clients.$inferSelect;
 }
 
-//const EMAIL_RE =
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const WEBSITE_RE = /^https?:\/\/./i;
+// Accepts an optional leading +, then digits/spaces/dashes/dots/parens,
+// requiring at least 7 digits overall (loose international-friendly check).
+const PHONE_RE = /^\+?[0-9\s().-]{7,20}$/;
 
 export async function CreateClient(
   data: {
@@ -64,20 +68,25 @@ export async function CreateClient(
       name?: string;
       email?: string;
       website?: string;
+      phone?: string;
     } = {};
 
     if (!name?.trim()) {
       fieldErrors.name = "Client name is required.";
     }
 
-    //if (email && !EMAIL_RE.test(email)) {
-    //  fieldErrors.email = "Enter a valid email address.";
-   // }
+    if (email && !EMAIL_RE.test(email)) {
+      fieldErrors.email = "Enter a valid email address.";
+    }
 
-   /* if (website && !WEBSITE_RE.test(website)) {
+    if (website && !WEBSITE_RE.test(website)) {
       fieldErrors.website = "Enter a valid URL (starting with http:// or https://).";
     }
-*/
+
+    if (phone && !PHONE_RE.test(phone)) {
+      fieldErrors.phone = "Enter a valid phone number.";
+    }
+
     if (Object.keys(fieldErrors).length > 0) {
       return {
         success: false,
