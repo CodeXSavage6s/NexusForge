@@ -43,7 +43,16 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    sendOnSignUp: true,
+    // IMPORTANT: false on purpose. Email/password sign-up now goes through
+    // the OTP-first flow in lib/actions/auth.ts (startSignup ->
+    // verifySignupOtp), which only ever calls `auth.api.signUpEmail`
+    // *after* the user has already proven ownership of the email address
+    // via a 6-digit OTP. If this were `true`, Better Auth would also fire
+    // the old verification-link email immediately after that call,
+    // duplicating what the OTP already accomplished. `sendVerificationEmail`
+    // below is still used for the unrelated `resendVerificationEmail()`
+    // action (e.g. any pre-existing unverified accounts).
+    sendOnSignUp: false,
     expiresIn: 3600, // 1 hour — keep in sync with the "expires in" text in the email
     sendVerificationEmail: async ({ user, url }, request) => {
       try {

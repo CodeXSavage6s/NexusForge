@@ -122,7 +122,7 @@ export const workspaces = pgTable(
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (t) => ({
-    slugUnique: uniqueIndex("workspaces_slug_unique").on(t.slug),
+    ownerSlugUnique: uniqueIndex("workspaces_owner_slug_unique").on(t.ownerId, t.slug),
     ownerIdx: index("workspaces_owner_idx").on(t.ownerId),
   })
 );

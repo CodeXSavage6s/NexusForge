@@ -238,7 +238,55 @@ export function passwordResetEmailHtml({
 }
 
 /* ------------------------------------------------------------------ */
-/* 4. Waitlist confirmation email                                      */
+/* 4. Signup OTP email                                                  */
+/* ------------------------------------------------------------------ */
+
+export function signupOtpEmailHtml({
+  name,
+  otp,
+  expiresInMinutes = 10,
+}: {
+  name?: string;
+  otp: string;
+  expiresInMinutes?: number;
+}): string {
+  const greeting = name ? `Hi ${escapeHtml(name)},` : "Hi there,";
+  const otpDigits = escapeHtml(otp);
+  const body = `
+    <h1 style="margin:0 0 16px 0; font-size:22px; line-height:28px; font-weight:700; color:${BRAND.textDark};">
+      Confirm your email address
+    </h1>
+    <p style="margin:0 0 8px 0; font-size:15px; line-height:24px; color:${BRAND.textDark};">
+      ${greeting}
+    </p>
+    <p style="margin:0 0 24px 0; font-size:15px; line-height:24px; color:${BRAND.textDark};">
+      Use the code below to finish creating your ${BRAND.name} account. Enter it on the verification page to confirm this is your email address.
+    </p>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 24px auto;">
+      <tr>
+        <td align="center" style="border-radius:10px; background:${BRAND.pageBg}; border:1px solid ${BRAND.border}; padding: 20px 32px;">
+          <span style="font-family: 'Courier New', Courier, monospace; font-size:32px; font-weight:700; letter-spacing:8px; color:${BRAND.textDark};">
+            ${otpDigits}
+          </span>
+        </td>
+      </tr>
+    </table>
+    <p style="margin: 0 0 8px 0; font-size:13px; line-height:20px; color:${BRAND.textMuted}; text-align:center;">
+      This code will expire in ${expiresInMinutes} minutes.
+    </p>
+    <p style="margin: 24px 0 0 0; font-size:13px; line-height:20px; color:${BRAND.textMuted};">
+      For your security, never share this code with anyone — not even someone claiming to be from ${BRAND.name}. If you didn't try to create a ${BRAND.name} account, you can safely ignore this email.
+    </p>
+  `;
+  return shell(
+    "Confirm your email address",
+    body,
+    `Your ${BRAND.name} verification code is ${otp}.`
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* 5. Waitlist confirmation email                                      */
 /* ------------------------------------------------------------------ */
 
 export function waitlistEmailHtml({ name }: { name?: string }): string {
