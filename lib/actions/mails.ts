@@ -6,6 +6,7 @@ import {
   verificationEmailHtml,
   welcomeEmailHtml,
   passwordResetEmailHtml,
+  signupOtpEmailHtml,
   waitlistEmailHtml,
 } from "./email-templates";
 
@@ -116,6 +117,29 @@ export async function sendPasswordResetEmail({
     to,
     subject: "Reset your password",
     text: `Reset your password by visiting: ${resetUrl}`,
+    html,
+    attachments: [logoAttachment],
+  });
+}
+
+export async function sendSignupOtpEmail({
+  to,
+  name,
+  otp,
+  expiresInMinutes,
+}: {
+  to: string;
+  name?: string;
+  otp: string;
+  expiresInMinutes?: number;
+}) {
+  const html = signupOtpEmailHtml({ name, otp, expiresInMinutes });
+  await sendEmail({
+    to,
+    subject: `Your NexusForge verification code`,
+    // NOTE: the OTP is intentionally included here (it's the whole point
+    // of the email) but must never be written to application logs.
+    text: `Your NexusForge verification code is ${otp}. It expires in ${expiresInMinutes ?? 10} minutes. Never share this code with anyone.`,
     html,
     attachments: [logoAttachment],
   });

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import InputField from "@/components/form/InputField";
 import FooterLink from '@/components/form/FooterLink'
 import { SignUpFormData } from "@/types/form";
-import { signUp } from '@/lib/actions/auth'
+import { startSignup } from '@/lib/actions/auth'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import GoogleAuth from '@/components/form/GoogleAuth'
@@ -21,21 +21,31 @@ const SignUp = () => {
     formState: { errors, isSubmitting },
   } = useForm<SignUpFormData>();
 
-  const onSubmit = async (data: SignUpFormData) => { 
-  setError(null);
-  
-  const response = await signUp(data);
-  
-  console.log("signUp response:", response); 
+  const onSubmit = async (data: SignUpFormData) => {
+    setError(null);
 
-  if (!response.success) {
-    setError(response.error || "Something went wrong");
-    return; // ← stop here, don't redirect
-  }
-  
-  setError(null);
-  router.push("/home"); 
-};
+    // Never creates a Better Auth account directly — this only creates a
+    // temporary pending signup and emails a one-time code. The real
+    // account is created in verifySignupOtp() on the /verify-signup page,
+    // once that code is confirmed.
+    const response = await startSignup(data);
+
+    if (!response.success || !response.token) {
+      setError(response.error || "Something went wrong");
+      return; // ← stop here, don't navigate
+    }
+
+    // The token is an opaque reference to this pending signup only — it
+    // carries no password/OTP and can't be used to look up anything else.
+    try {
+      sessionStorage.setItem("nf_pending_signup_email", response.email ?? data.email);
+    } catch {
+      // sessionStorage can fail in some environments (private browsing,
+      // etc.) — the verify page falls back to fetching the email by token.
+    }
+
+    router.push(`/verify-signup?token=${encodeURIComponent(response.token)}`);
+  };
 
   return (
     <div className="flex flex-col px-4">
